@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.text-gradiant {
+  background-image: linear-gradient(to right, #926BB9, #5A79FB,#2FBCF7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+body {
+  font-family: "Open Sans", serif;
+  font-style: normal;
+}
+
+
+
+@layer utilities{
+  .bg-grad{
+    @apply bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7];
+  }
+}

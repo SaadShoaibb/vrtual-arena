@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.text-gradiant {
+  background-image: linear-gradient(to right, #926BB9, #5A79FB,#2FBCF7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+body {
+  background-color: rgb(11, 23, 57);
+  font-family: Arial, Helvetica, sans-serif;
+}
+@layer utilities{
+  .bg-grad{
+    @apply bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7]
+  }
+}
+
+/* Ensure the main content doesn't overflow when sidebar is open on mobile */
+@media (max-width: 767px) {
+  .dashboard-layout {
+      overflow-x: hidden;
+  }
+
+  .sidebar {
+      transition: left 0.3s ease;
+  }
+
+  .sidebar.closed {
+      left: -64px; /* Hide sidebar when closed */
+  }
+
+  .sidebar.open {
+      left: 0; /* Show sidebar when open */
+  }
+}
