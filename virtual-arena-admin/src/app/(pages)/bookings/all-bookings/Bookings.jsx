@@ -1,4 +1,6 @@
 'use client';
+export const dynamic = 'force-dynamic';
+
 import DynamicTable from '@/components/common/Table';
 import { API_URL, getAuthHeaders } from '@/utils/ApiUrl';
 import axios from 'axios';
@@ -14,7 +16,7 @@ const Bookings = () => {
     const [bookings, setBookings] = useState([]);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState(null);
-    const [sidebarMode, setSidebarMode] = useState('view'); // 'view' or 'edit'
+    const [sidebarMode, setSidebarMode] = useState('view');
     const [selectedRow, setSelectedRow] = useState(null);
     const [dropdownOpen, setDropdownOpen] = useState(null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -55,7 +57,6 @@ const Bookings = () => {
     const handleFetchBookings = async () => {
         try {
             const response = await axios.get(`${API_URL}/admin/get-Bookings/`, getAuthHeaders());
-            console.log(response);
             setBookings(response?.data?.bookings);
         } catch (error) {
             console.log(error);
@@ -65,29 +66,25 @@ const Bookings = () => {
     useEffect(() => {
         handleFetchBookings();
     }, []);
+
     useEffect(() => {
         const channel = pusher.subscribe('my-channel');
-        channel.bind('my-event', (data) => {
-        //   console.log('New order notification:', data);
-        handleFetchBookings();
-        //   alert(`New order created: ${data.message}`);/
+        channel.bind('my-event', () => {
+            handleFetchBookings();
         });
-    
-        // Cleanup
         return () => {
-          pusher.unsubscribe('my-channel');
+            pusher.unsubscribe('my-channel');
         };
-      }, []);
+    }, []);
+
     const handleDelete = (row) => {
         setSelectedRow(row);
         setDeleteModalOpen(true);
     };
 
     const handleSave = async (updatedBooking) => {
-        console.log(updatedBooking);
         const formatToMySQLDateTime = (dateTimeLocal) => {
             if (!dateTimeLocal) return '';
-
             const date = new Date(dateTimeLocal);
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -95,7 +92,6 @@ const Bookings = () => {
             const hours = String(date.getHours()).padStart(2, '0');
             const minutes = String(date.getMinutes()).padStart(2, '0');
             const seconds = String(date.getSeconds()).padStart(2, '0');
-
             return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         };
 
@@ -167,7 +163,6 @@ const Bookings = () => {
         router.push('/bookings/all-bookings');
     };
 
-    // Check URL query on component mount
     useEffect(() => {
         const bookingId = searchParams.get('booking_id');
         if (bookingId) {
@@ -182,11 +177,8 @@ const Bookings = () => {
     const bookingData = [
         { label: 'Name', value: selectedBooking?.machine_type },
         { label: 'User Name', value: selectedBooking?.user_name },
-        // { label: 'Start Time', value: formatDateTime(selectedBooking?.start_time) },
-        // { label: 'End Time', value: formatDateTime(selectedBooking?.end_time)},
         { label: 'Payment Status', value: selectedBooking?.payment_status },
     ];
-    console.log(selectedBooking)
 
     return (
         <div className="p-6">
@@ -204,7 +196,6 @@ const Bookings = () => {
                 setDeleteModalOpen={setDeleteModalOpen}
             />
 
-            {/* Sidebar with Framer Motion */}
             <AnimatePresence>
                 {sidebarOpen && (
                     <motion.div
@@ -225,7 +216,12 @@ const Bookings = () => {
                         {sidebarMode === 'edit' ? (
                             <EditBookingForm data={selectedBooking} onSave={handleSave} />
                         ) : (
-                            <DetailView data={bookingData} title="Booking Details" type="VR_SESSION" id={selectedBooking?.booking_id}/>
+                            <DetailView
+                                data={bookingData}
+                                title="Booking Details"
+                                type="VR_SESSION"
+                                id={selectedBooking?.booking_id}
+                            />
                         )}
                     </motion.div>
                 )}
