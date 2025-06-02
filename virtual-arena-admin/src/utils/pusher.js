@@ -8,5 +8,5 @@ const getPusherInstance = () => {
   });
 };
 
-export default getPusherInstance;
-export { getPusherInstance };
+export default getPusherInstance; // for: import pusher from '@/utils/pusher'
+export { getPusherInstance };     // for: import { getPusherInstance } from '@/utils/pusher'
