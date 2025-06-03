@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 import DetailOrderView from './DetailOrderView';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AnimatePresence,motion } from 'framer-motion';
-import pusher from '@/utils/pusher';
+import { getPusherInstance, cleanupPusher } from '@/utils/pusher';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchOrders } from '@/Store/ReduxSlice/orderSlice';
 
@@ -82,18 +82,19 @@ const Orders = ({orders}) => {
     
 
     useEffect(() => {
+        const pusher = getPusherInstance();
         const channel = pusher.subscribe('my-channel');
+        
         channel.bind('my-event', (data) => {
-        //   console.log('New order notification:', data);
-        handleFetchOrders();
-        //   alert(`New order created: ${data.message}`);/
+            handleFetchOrders();
         });
     
         // Cleanup
         return () => {
-          pusher.unsubscribe('my-channel');
+            channel.unbind_all();
+            channel.unsubscribe();
         };
-      }, []);
+    }, []);
     // Initialize filteredOrders with all orders when the component mounts
     useEffect(() => {
         setFilteredOrders(orders);

@@ -1,6 +1,6 @@
 'use client';
 import { fetchNotifications, markAllNotificationsAsRead, markNotificationAsRead } from '@/Store/ReduxSlice/notificationSlice';
-import pusher from '@/utils/pusher';
+import { getPusherInstance, cleanupPusher } from '@/utils/pusher';
 import Link from 'next/link';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,17 +14,20 @@ const AllNotifications = () => {
     }, [dispatch]);
 
     useEffect(() => {
-        if (typeof window !== 'undefined' && pusher) {
+        if (typeof window !== 'undefined') {
+            const pusher = getPusherInstance();
             const channel = pusher.subscribe('my-channel');
+            
             channel.bind('my-event', (data) => {
                 dispatch(fetchNotifications());
             });
 
             return () => {
-                pusher.unsubscribe('my-channel');
+                channel.unbind_all();
+                channel.unsubscribe();
             };
         }
-    }, []);
+    }, [dispatch]);
 
     const handleMarkAsRead = async (notificationId) => {
         dispatch(markNotificationAsRead(notificationId));

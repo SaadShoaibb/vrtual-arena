@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 import { FaBell } from 'react-icons/fa';
 import { fetchNotifications, markAllNotificationsAsRead, markNotificationAsRead } from '@/Store/ReduxSlice/notificationSlice';
-import pusher from '@/utils/pusher';
+import { getPusherInstance, cleanupPusher } from '@/utils/pusher';
 
 
 const NotificationDropdown = () => {
@@ -14,18 +14,19 @@ const NotificationDropdown = () => {
     const { notifications, loading, error } = useSelector((state) => state.notifications);
     const dropdownRef = useRef(null); // Ref for the dropdown menu
     useEffect(() => {
+        const pusher = getPusherInstance();
         const channel = pusher.subscribe('my-channel');
+        
         channel.bind('my-event', (data) => {
-        //   console.log('New order notification:', data);
-          dispatch(fetchNotifications());
-        //   alert(`New order created: ${data.message}`);/
+            dispatch(fetchNotifications());
         });
     
         // Cleanup
         return () => {
-          pusher.unsubscribe('my-channel');
+            channel.unbind_all();
+            channel.unsubscribe();
         };
-      }, []);
+    }, [dispatch]);
     // Fetch notifications when the dropdown is opened
     useEffect(() => {
             dispatch(fetchNotifications());

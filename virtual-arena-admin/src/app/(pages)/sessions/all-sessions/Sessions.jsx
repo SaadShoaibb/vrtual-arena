@@ -3,7 +3,7 @@ import EditForm from '@/components/common/EditForm';
 import DynamicTable from '@/components/common/Table';
 import DetailView from '@/components/Detail';
 import { API_URL, getAuthHeaders } from '@/utils/ApiUrl';
-import pusher from '@/utils/pusher';
+import { getPusherInstance, cleanupPusher } from '@/utils/pusher';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -56,18 +56,20 @@ const Sessions = () => {
     }, [])
 
     useEffect(() => {
+        const pusher = getPusherInstance();
         const channel = pusher.subscribe('my-channel');
+        
         channel.bind('my-event', (data) => {
-        //   console.log('New order notification:', data);
-        handleFetchSessions()
-        //   alert(`New order created: ${data.message}`);/
+            handleFetchSessions();
         });
     
         // Cleanup
         return () => {
-          pusher.unsubscribe('my-channel');
+            channel.unbind_all();
+            channel.unsubscribe();
         };
-      }, []);
+    }, []);
+
     const handleDelete = (row) => {
         setSelectedRow(row);
         setDeleteModalOpen(true);

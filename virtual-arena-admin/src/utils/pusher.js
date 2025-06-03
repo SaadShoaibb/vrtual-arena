@@ -1,12 +1,23 @@
 // utils/pusher.js
 import Pusher from 'pusher-js';
 
+let pusherInstance = null;
+
 const getPusherInstance = () => {
-  return new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
-    cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
-    forceTLS: true,
-  });
+  if (!pusherInstance) {
+    pusherInstance = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
+      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
+      forceTLS: true,
+    });
+  }
+  return pusherInstance;
 };
 
-export default getPusherInstance; // for: import pusher from '@/utils/pusher'
-export { getPusherInstance };     // for: import { getPusherInstance } from '@/utils/pusher'
+const cleanupPusher = () => {
+  if (pusherInstance) {
+    pusherInstance.disconnect();
+    pusherInstance = null;
+  }
+};
+
+export { getPusherInstance, cleanupPusher };
