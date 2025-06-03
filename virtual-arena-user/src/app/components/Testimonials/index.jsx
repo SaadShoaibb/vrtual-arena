@@ -21,71 +21,87 @@ const Testimonials = () => {
                         </div>
                     </div>
 
-                    <div className='grid grid-cols-5 gap-8 xl:gap-24 mt-16 pl-16'>
-                        <div className='col-span-5 lg:col-span-2 xl:col-span-1 -ml-16 md:ml-0 flex flex-col justify-between'>
-                            <div className='flex items-center gap-2'>
-                                <img src="assets/user.png" alt="User" />
+                    <div className='grid grid-cols-1 lg:grid-cols-5 gap-8 mt-16'>
+                        <div className='lg:col-span-2 xl:col-span-1 flex flex-col justify-between gap-8'>
+                            <div className='flex items-center gap-4'>
+                                <img src="assets/user.png" alt="User" className="w-16 h-16 object-cover rounded-full" />
                                 <div className='flex flex-col gap-1'>
                                     <div className='flex gap-2 text-[#FFA600]'>
-                                        <FaStar size={26} />
-                                        <FaStar size={26} />
-                                        <FaStar size={26} />
-                                        <FaStar size={26} />
-                                        <FaStar size={26} />
+                                        <FaStar size={20} />
+                                        <FaStar size={20} />
+                                        <FaStar size={20} />
+                                        <FaStar size={20} />
+                                        <FaStar size={20} />
                                     </div>
                                     <h1 className='text-white font-semibold'>15k+ Reviews</h1>
                                 </div>
                             </div>
 
                             <div className='flex items-center gap-5'>
-                                <img src="/icons/left.png" alt="Previous" />
-                                <img src="/icons/right.png" alt="Next" />
+                                <button className="hover:opacity-80 transition-opacity">
+                                    <img src="/icons/left.png" alt="Previous" className="w-12 h-12" />
+                                </button>
+                                <button className="hover:opacity-80 transition-opacity">
+                                    <img src="/icons/right.png" alt="Next" className="w-12 h-12" />
+                                </button>
                             </div>
                         </div>
 
-                        <div className='col-span-5 lg:col-span-3 xl:col-span-2 bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] rounded-xl flex gap-4 md:gap-7 h-[280px]'>
-                            <img src="assets/user.png" alt="Esther Howard" className='border -ml-12 md:-ml-16 border-white h-20 md:h-[120px] w-20 md:w-[120px] my-auto rounded-full' />
-                            <div className='my-auto pr-6'>
-                                <div className='flex justify-between items-center'>
-                                    <div className='flex flex-col gap-1'>
-                                        <div className='flex gap-2 text-[#FFA600] -ml-6 md:ml-0'>
-                                            <FaStar size={26} />
-                                            <FaStar size={26} />
-                                            <FaStar size={26} />
-                                            <FaStar size={26} />
-                                            <FaStar size={26} />
+                        <div className='lg:col-span-3 xl:col-span-2 bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] rounded-xl p-6 md:p-8'>
+                            <div className='flex flex-col md:flex-row gap-6 md:gap-8'>
+                                <img 
+                                    src="assets/user.png" 
+                                    alt="Esther Howard" 
+                                    className='w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-white object-cover'
+                                />
+                                <div className='flex-1'>
+                                    <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4'>
+                                        <div>
+                                            <div className='flex gap-1 text-[#FFA600] mb-2'>
+                                                <FaStar size={20} />
+                                                <FaStar size={20} />
+                                                <FaStar size={20} />
+                                                <FaStar size={20} />
+                                                <FaStar size={20} />
+                                            </div>
+                                            <h1 className='text-2xl md:text-3xl text-white font-bold'>Esther Howard</h1>
+                                            <h3 className='text-white text-lg'>Client Feedback</h3>
                                         </div>
-                                        <h1 className='text-[24px] md:text-[30px] -ml-6 md:ml-0 text-white font-bold'>Esther Howard</h1>
-                                        <h3 className='text-white text-lg'>Client Feedback</h3>
+                                        <img src="/icons/comma.png" alt="Quote" className='w-12 h-12' />
                                     </div>
-                                    <img src="/icons/comma.png" alt="Quote" className='-ml-6 md:ml-0' />
+                                    <p className='text-base md:text-lg font-light text-white'>
+                                        "The VR experience at VRA was absolutely mind-blowing! The equipment was top-notch, the staff were super helpful, and I felt like I was really inside the game. Will definitely be back with friends!"
+                                    </p>
                                 </div>
-                                <p className='text-sm md:text-lg font-light text-white'>
-                                    “The VR experience at VRA was absolutely mind-blowing! The equipment was top-notch, the staff were super helpful, and I felt like I was really inside the game. Will definitely be back with friends!”
-                                </p>
                             </div>
                         </div>
 
-                        <div className='hidden col-span-2 bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] rounded-xl xl:flex gap-7 h-[280px]'>
-                            <img src="assets/user.png" alt="Esther Howard" className='border rounded-full -ml-16 border-white h-[120px] w-[120px] my-auto' />
-                            <div className='my-auto pr-6'>
-                                <div className='flex justify-between items-center'>
-                                    <div className='flex flex-col gap-1'>
-                                        <div className='flex gap-2 text-[#FFA600]'>
-                                            <FaStar size={26} />
-                                            <FaStar size={26} />
-                                            <FaStar size={26} />
-                                            <FaStar size={26} />
-                                            <FaStar size={26} />
+                        <div className='hidden xl:block col-span-2 bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] rounded-xl p-8'>
+                            <div className='flex gap-8'>
+                                <img 
+                                    src="assets/user.png" 
+                                    alt="Michael Lee" 
+                                    className='w-24 h-24 rounded-full border-2 border-white object-cover'
+                                />
+                                <div className='flex-1'>
+                                    <div className='flex justify-between items-center mb-4'>
+                                        <div>
+                                            <div className='flex gap-1 text-[#FFA600] mb-2'>
+                                                <FaStar size={20} />
+                                                <FaStar size={20} />
+                                                <FaStar size={20} />
+                                                <FaStar size={20} />
+                                                <FaStar size={20} />
+                                            </div>
+                                            <h1 className='text-3xl text-white font-bold'>Michael Lee</h1>
+                                            <h3 className='text-white text-lg'>Client Feedback</h3>
                                         </div>
-                                        <h1 className='text-[30px] text-white font-bold'>Michael Lee</h1>
-                                        <h3 className='text-white text-lg'>Client Feedback</h3>
+                                        <img src="/icons/comma.png" alt="Quote" className='w-12 h-12' />
                                     </div>
-                                    <img src="/icons/comma.png" alt="Quote" />
+                                    <p className='text-lg font-light text-white'>
+                                        "I hosted my son's birthday party at VRA and it was a total hit. The kids had a blast, and everything was perfectly organized. Thank you for making it so special!"
+                                    </p>
                                 </div>
-                                <p className='text-lg font-light text-white'>
-                                    “I hosted my son's birthday party at VRA and it was a total hit. The kids had a blast, and everything was perfectly organized. Thank you for making it so special!”
-                                </p>
                             </div>
                         </div>
                     </div>
