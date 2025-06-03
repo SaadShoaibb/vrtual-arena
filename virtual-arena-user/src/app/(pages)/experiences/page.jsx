@@ -4,13 +4,11 @@ import { useEffect, useState, useRef } from 'react'
 import Image from 'next/image'
 import Navbar from '@/app/components/Navbar'
 import Footer from '@/app/components/Footer'
-import { getMediaBaseUrl } from '@/utils/ApiUrl'
 
 const LazyMedia = ({ type, src, index, poster }) => {
   const ref = useRef(null)
   const [isVisible, setIsVisible] = useState(false)
   const [error, setError] = useState(false)
-  const baseUrl = getMediaBaseUrl()
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -28,6 +26,7 @@ const LazyMedia = ({ type, src, index, poster }) => {
   }, [])
 
   const handleImageError = () => {
+    console.error(`Failed to load image: ${src}`);
     setError(true);
   }
 
@@ -44,7 +43,7 @@ const LazyMedia = ({ type, src, index, poster }) => {
             </div>
           ) : (
             <Image
-              src={`${baseUrl}${src}`}
+              src={src}
               alt={`Gallery Image ${index + 1}`}
               loading="lazy"
               width={1280}
@@ -59,10 +58,11 @@ const LazyMedia = ({ type, src, index, poster }) => {
               controls
               playsInline
               preload="metadata"
-              poster={poster ? `${baseUrl}${poster}` : '/gallery/video-thumb.jpg'}
+              poster={poster || '/gallery/video-thumb.jpg'}
               className="w-full h-full object-cover rounded-2xl outline-none transition-all duration-300 hover:brightness-110"
+              onError={handleImageError}
             >
-              <source src={`${baseUrl}${src}`} type="video/mp4" />
+              <source src={src} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           </div>
@@ -121,6 +121,10 @@ export default function GalleryPage() {
     fetchMedia()
   }, [])
 
+  if (error) {
+    console.error('Gallery error:', error);
+  }
+
   return (
     <div className="relative bg-gradient-to-b from-black via-gray-900 to-black text-white min-h-screen">
       <Navbar />
@@ -139,6 +143,10 @@ export default function GalleryPage() {
         ) : error ? (
           <div className="text-center text-red-500 py-8">
             {error}
+          </div>
+        ) : mediaItems.length === 0 ? (
+          <div className="text-center text-gray-400 py-8">
+            No media items found in the gallery
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
