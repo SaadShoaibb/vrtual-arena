@@ -1,8 +1,8 @@
 // import { useSelector } from "react-redux";
 
 // export const API_URL = 'https://virtual-arena-backend.vercel.app/api/v1';
-export const API_URL = 'https://69.62.69.119:8080/api/v1';
-export const SOCKET_URL = 'https://69.62.69.119:5000/';
+export const API_URL = '/api/v1';
+export const SOCKET_URL = '/socket';
 // export const useAuthToken = () => {
 //     return useSelector((state) => state.login.token);
 // };
@@ -34,4 +34,9 @@ export const getFormDataAuthHeaders = () => {
       "Content-Type": "multipart/form-data",
     }
   };
+};
+
+// Helper function to get the base URL for media/assets
+export const getMediaBaseUrl = () => {
+  return '';
 };
