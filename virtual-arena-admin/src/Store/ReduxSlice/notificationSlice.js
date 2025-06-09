@@ -5,35 +5,50 @@ import axios from 'axios';
 // Async Thunk for fetching notifications
 export const fetchNotifications = createAsyncThunk(
     'notifications/fetchNotifications',
-    async () => {
-        const response = await axios.get(`${API_URL}/user/notifications`, getAuthHeaders());
-        return response.data.notifications;
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(`${API_URL}/admin/notifications`, getAuthHeaders());
+            return response.data.notifications || [];
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+            return rejectWithValue(error.response?.data || 'Failed to fetch notifications');
+        }
     }
 );
 
 // Async Thunk for marking a single notification as read
 export const markNotificationAsRead = createAsyncThunk(
     'notifications/markNotificationAsRead',
-    async (notificationId) => {
-        const response = await axios.put(
-            `${API_URL}/user/notification/${notificationId}/read`,
-            {},
-            getAuthHeaders()
-        );
-        return response.data;
+    async (notificationId, { rejectWithValue }) => {
+        try {
+            const response = await axios.put(
+                `${API_URL}/admin/notification/${notificationId}/read`,
+                {},
+                getAuthHeaders()
+            );
+            return response.data;
+        } catch (error) {
+            console.error('Error marking notification as read:', error);
+            return rejectWithValue(error.response?.data || 'Failed to mark notification as read');
+        }
     }
 );
 
 // Async Thunk for marking all notifications as read
 export const markAllNotificationsAsRead = createAsyncThunk(
     'notifications/markAllNotificationsAsRead',
-    async () => {
-        const response = await axios.put(
-            `${API_URL}/user/notifications/read-all`,
-            {},
-            getAuthHeaders()
-        );
-        return response.data;
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await axios.put(
+                `${API_URL}/admin/notifications/read-all`,
+                {},
+                getAuthHeaders()
+            );
+            return response.data;
+        } catch (error) {
+            console.error('Error marking all notifications as read:', error);
+            return rejectWithValue(error.response?.data || 'Failed to mark all notifications as read');
+        }
     }
 );
 
@@ -44,7 +59,11 @@ const notificationSlice = createSlice({
         loading: false,
         error: null,
     },
-    reducers: {},
+    reducers: {
+        clearNotificationErrors: (state) => {
+            state.error = null;
+        }
+    },
     extraReducers: (builder) => {
         builder
             // Fetch Notifications
@@ -58,7 +77,7 @@ const notificationSlice = createSlice({
             })
             .addCase(fetchNotifications.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.error.message;
+                state.error = action.payload || 'Unknown error occurred';
             })
 
             // Mark Single Notification as Read
@@ -68,12 +87,19 @@ const notificationSlice = createSlice({
                     n.notification_id === notificationId ? { ...n, is_read: true } : n
                 );
             })
+            .addCase(markNotificationAsRead.rejected, (state, action) => {
+                state.error = action.payload || 'Failed to mark notification as read';
+            })
 
             // Mark All Notifications as Read
             .addCase(markAllNotificationsAsRead.fulfilled, (state) => {
                 state.notifications = state.notifications.map((n) => ({ ...n, is_read: true }));
+            })
+            .addCase(markAllNotificationsAsRead.rejected, (state, action) => {
+                state.error = action.payload || 'Failed to mark all notifications as read';
             });
     },
 });
 
+export const { clearNotificationErrors } = notificationSlice.actions;
 export default notificationSlice.reducer;
