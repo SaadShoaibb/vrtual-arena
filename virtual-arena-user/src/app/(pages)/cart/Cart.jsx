@@ -16,6 +16,9 @@ const Cart = ({ cart }) => {
     setCartItems(cart);
   }, [cart]);
 
+  // Check if cart has any physical products
+  const hasPhysicalProducts = cartItems.some(item => !item.item_type || item.item_type === 'product');
+  
   const subtotal = cartItems.reduce((total, item) => total + item.discount_price * item.quantity, 0);
 
   const incrementQuantity = async (cart_id) => {
@@ -80,18 +83,28 @@ const Cart = ({ cart }) => {
                         <button onClick={() => removeItem(item.cart_id)} >
                           <IoClose size={24} />
                         </button>
-                        <img src='/assets/d1.png' className="h-20 w-20 object-cover" alt={item.name} />
-                        <h2 className="text-lg font-semibold">{item.name}</h2>
+                        <img src={item.item_type === 'tournament' ? '/assets/tournament.png' : '/assets/d1.png'} className="h-20 w-20 object-cover" alt={item.name} />
+                        <div>
+                          <h2 className="text-lg font-semibold">{item.name}</h2>
+                          {item.item_type === 'tournament' && 
+                            <span className="ml-2 text-xs bg-purple-700 text-white px-2 py-1 rounded">Tournament</span>
+                          }
+                        </div>
                       </td>
                       <td className='p-2 text-center'>${item.discount_price}</td>
                       <td className='p-2 flex justify-center'>
                         <div className='flex items-center mt-2 border w-fit'>
-
-                          <button onClick={() => decrementQuantity(item.cart_id)} className="p-2 border-r rounded"><FaMinus /></button>
-                          <span className="px-4">{item.quantity}</span>
-                          <button onClick={() => incrementQuantity(item.cart_id)} className="p-2 border-l rounded"><FaPlus /></button>
+                          {/* For tournament tickets, we typically don't allow quantity changes */}
+                          {item.item_type === 'tournament' ? (
+                            <span className="px-4">{item.quantity}</span>
+                          ) : (
+                            <>
+                              <button onClick={() => decrementQuantity(item.cart_id)} className="p-2 border-r rounded"><FaMinus /></button>
+                              <span className="px-4">{item.quantity}</span>
+                              <button onClick={() => incrementQuantity(item.cart_id)} className="p-2 border-l rounded"><FaPlus /></button>
+                            </>
+                          )}
                         </div>
-
                       </td>
                       <td className='p-2 text-center'>
                         ${item.discount_price * item.quantity}
@@ -109,20 +122,30 @@ const Cart = ({ cart }) => {
                   <button onClick={() => removeItem(item.cart_id)} >
                     <IoClose size={24} />
                   </button>
-                  <img src='/assets/d1.png' className="h-20 w-20 object-cover" alt={item.name} />
-                  <h2 className="text-lg font-semibold text-nowrap">{item.name}</h2>
+                  <img src={item.item_type === 'tournament' ? '/assets/tournament.png' : '/assets/d1.png'} className="h-20 w-20 object-cover" alt={item.name} />
+                  <div>
+                    <h2 className="text-lg font-semibold text-nowrap">{item.name}</h2>
+                    {item.item_type === 'tournament' && 
+                      <span className="ml-2 text-xs bg-purple-700 text-white px-2 py-1 rounded">Tournament</span>
+                    }
+                  </div>
                 </div>
                 <div className='flex flex-row sm:flex-row items-center'>
 
                   <div className='p-2 text-center'>${item.discount_price}</div>
                   <div className='p-2 flex justify-center'>
                     <div className='flex items-center mt-2 border w-fit h-fit'>
-
-                      <button onClick={() => decrementQuantity(item.cart_id)} className="p-2 border-r rounded"><FaMinus /></button>
-                      <span className="px-4">{item.quantity}</span>
-                      <button onClick={() => incrementQuantity(item.cart_id)} className="p-2 border-l rounded"><FaPlus /></button>
+                      {/* For tournament tickets, we typically don't allow quantity changes */}
+                      {item.item_type === 'tournament' ? (
+                        <span className="px-4">{item.quantity}</span>
+                      ) : (
+                        <>
+                          <button onClick={() => decrementQuantity(item.cart_id)} className="p-2 border-r rounded"><FaMinus /></button>
+                          <span className="px-4">{item.quantity}</span>
+                          <button onClick={() => incrementQuantity(item.cart_id)} className="p-2 border-l rounded"><FaPlus /></button>
+                        </>
+                      )}
                     </div>
-
                   </div>
                   <div className='p-2 text-center'>
                     ${item.discount_price * item.quantity}
@@ -139,7 +162,12 @@ const Cart = ({ cart }) => {
               <div className='p-4 bg-gray-900'>
                 <h1 class="text-2xl font-bold mb-4 uppercase my-4 text-center">Carts Total</h1>
                 <div class="flex justify-between px-2 border-b-2 pb-2"><h1 class="font-bold ">Subtotal</h1><h1>${subtotal.toFixed(2)}</h1></div>
-                <div class="flex justify-between px-2 mt-4 border-b-2 pb-2"><h1 class="font-bold ">Shipping</h1><h1>Shipping &amp; taxes calculated at checkout</h1></div>
+                {hasPhysicalProducts && (
+                  <div class="flex justify-between px-2 mt-4 border-b-2 pb-2">
+                    <h1 class="font-bold ">Shipping</h1>
+                    <h1>Shipping &amp; taxes calculated at checkout</h1>
+                  </div>
+                )}
 
 
                 <button onClick={() => router.push('/checkout')} class="bg-grad w-full py-2 text-white  mt-4 font-bold transition-colors duration-500">PROOCEED TO CHECKOUT</button>

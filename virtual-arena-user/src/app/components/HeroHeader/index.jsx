@@ -1,9 +1,12 @@
 'use client'
 import React from 'react'
+import { translations } from '@/app/translations'
 
-const HeroHeader = ({btn, title, bg}) => {
+const HeroHeader = ({btn, title, bg, locale = 'en'}) => {
+    const t = translations[locale] || translations.en;
+    
     return (
-        <div className="h-[700px] overflow-x-hidden relative -mt-[90px] md:-mt-[110px]">
+        <div className="h-[700px] overflow-hidden relative -mt-[90px] md:-mt-[110px] z-10">
 
             <div className="absolute inset-0 z-0 bg-black bg-gradient-to-tr from-[#00000000] to-[#00000080] bg-opacity-50"></div>
             <img src="/assets/header.png" alt="" className='absolute z-0 top-0 w-full h-full' />
@@ -19,7 +22,7 @@ const HeroHeader = ({btn, title, bg}) => {
                             <h1 className='text-white text-[50px] mb-6 w-full md:text-[80px] lg:text-[100px] leading-none font-bold text-center text-wrap'>{title}</h1>
 
                             <p className='text-white text-center w-full mt-2.5 text-xl'>
-                                Discover unbeatable offers, premium features, and tailored services designed to elevate your experience. Whether you're exploring, connecting, or upgrading—you're in the right place.
+                                {t.heroHeaderDescription}
                             </p>
                             <div className='flex flex-col md:flex-row items-center mt-6 gap-3 w-full justify-center'>
                             </div>

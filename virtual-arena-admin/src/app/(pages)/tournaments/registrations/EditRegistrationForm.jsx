@@ -29,6 +29,22 @@ const EditRegistrationForm = ({ data, onSave }) => {
         { value: 'pending', label: 'Pending' },
         { value: 'cancelled', label: 'Cancelled' },
     ];
+    
+    // Options for the payment status dropdown
+    const paymentStatusOptions = [
+        { value: '', label: 'Select payment status' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'paid', label: 'Paid' },
+        { value: 'failed', label: 'Failed' },
+        { value: 'refunded', label: 'Refunded' },
+    ];
+    
+    // Options for the payment option dropdown
+    const paymentOptionOptions = [
+        { value: '', label: 'Select payment option' },
+        { value: 'online', label: 'Online' },
+        { value: 'at_event', label: 'Pay at Event' },
+    ];
 
     return (
         <form onSubmit={handleSubmit}>
@@ -66,6 +82,26 @@ const EditRegistrationForm = ({ data, onSave }) => {
                             onChange={handleChange}
                             options={statusOptions}
                             required
+                        />
+                    </FieldContainer>
+                    
+                    {/* Payment Status Field */}
+                    <FieldContainer label="Payment Status" htmlFor="payment_status">
+                        <Select
+                            name="payment_status"
+                            value={formData.payment_status || ''}
+                            onChange={handleChange}
+                            options={paymentStatusOptions}
+                        />
+                    </FieldContainer>
+                    
+                    {/* Payment Option Field */}
+                    <FieldContainer label="Payment Option" htmlFor="payment_option">
+                        <Select
+                            name="payment_option"
+                            value={formData.payment_option || 'online'}
+                            onChange={handleChange}
+                            options={paymentOptionOptions}
                         />
                     </FieldContainer>
                 </div>

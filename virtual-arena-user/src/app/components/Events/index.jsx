@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 import PaymentModal from '../PaymentForm';
 import { useRouter } from 'next/navigation';
 import { fetchUserData } from '@/Store/Actions/userActions';
+import { addToCart, fetchCart } from '@/Store/ReduxSlice/addToCartSlice';
 
 const Calender = () => {
     const [tournament, setTournament] = useState({})
@@ -38,14 +39,51 @@ const Calender = () => {
         setOption(option)
     }
 
+    const [showPaymentOptions, setShowPaymentOptions] = useState(false);
+    const [currentTournament, setCurrentTournament] = useState(null);
+    const [paymentChoice, setPaymentChoice] = useState('online'); // 'online' or 'at_event'
+
     const handleSelectTournament = (tournament) => {
         if (registrations?.includes(tournament?.tournament_id)) {
             toast.error("You have already registered this tournament")
         } else {
-            setPaymentModel(true);
-            setTournament(tournament);
-            setSelectedTournament(tournament)
+            // Show payment options instead of directly adding to cart
+            setCurrentTournament(tournament);
+            setShowPaymentOptions(true);
         }
+    };
+    
+    const handlePaymentOptionSelect = () => {
+        // Add tournament to cart with payment choice
+        dispatch(addToCart({
+            tournament_id: currentTournament.tournament_id,
+            quantity: 1,
+            item_type: 'tournament',
+            payment_option: paymentChoice // Add payment option to cart item
+        }))
+            .unwrap()
+            .then((response) => {
+                setShowPaymentOptions(false);
+                
+                if (paymentChoice === 'at_event') {
+                    // For 'Pay at Event', show success message but don't redirect to cart
+                    toast.success(response?.message || "You have been registered for the tournament. Payment will be collected at the event.");
+                    dispatch(fetchUserData()); // Refresh user data to update registrations
+                } else {
+                    // For online payment, add to cart and redirect
+                    toast.success("Tournament ticket added to cart");
+                    dispatch(fetchCart()); // Refresh cart data
+                    router.push('/cart'); // Redirect to cart page
+                }
+            })
+            .catch((error) => {
+                console.error('Error adding to cart:', error);
+                toast.error(error?.message || error?.response?.data?.message || "Failed to add tournament to cart");
+            });
+    };
+    
+    const handlePaymentChoiceChange = (choice) => {
+        setPaymentChoice(choice);
     };
 
     const handleCloseTournamentModel = () => {
@@ -170,6 +208,52 @@ const Calender = () => {
                         </AuthModel>
                     </>
                 }
+                
+                {showPaymentOptions && currentTournament && (
+                    <AuthModel onClose={() => setShowPaymentOptions(false)}>
+                        <div className="bg-[#1E1E1E] p-6 rounded-lg max-w-md w-full">
+                            <h2 className="text-white text-2xl font-bold mb-4">Payment Options</h2>
+                            <p className="text-white mb-6">How would you like to pay for this tournament?</p>
+                            
+                            <div className="flex flex-col gap-4 mb-6">
+                                <div 
+                                    className={`flex items-center gap-3 p-4 rounded-lg cursor-pointer ${paymentChoice === 'online' ? 'bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7]' : 'bg-[#2A2A2A]'}`}
+                                    onClick={() => handlePaymentChoiceChange('online')}
+                                >
+                                    <div className={`w-5 h-5 rounded-full border-2 ${paymentChoice === 'online' ? 'border-white bg-white' : 'border-white'} flex items-center justify-center`}>
+                                        {paymentChoice === 'online' && <div className="w-3 h-3 rounded-full bg-[#5A79FB]"></div>}
+                                    </div>
+                                    <span className="text-white font-medium">Pay Online Now (${currentTournament.ticket_price})</span>
+                                </div>
+                                
+                                <div 
+                                    className={`flex items-center gap-3 p-4 rounded-lg cursor-pointer ${paymentChoice === 'at_event' ? 'bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7]' : 'bg-[#2A2A2A]'}`}
+                                    onClick={() => handlePaymentChoiceChange('at_event')}
+                                >
+                                    <div className={`w-5 h-5 rounded-full border-2 ${paymentChoice === 'at_event' ? 'border-white bg-white' : 'border-white'} flex items-center justify-center`}>
+                                        {paymentChoice === 'at_event' && <div className="w-3 h-3 rounded-full bg-[#5A79FB]"></div>}
+                                    </div>
+                                    <span className="text-white font-medium">Pay at the Event (${currentTournament.ticket_price})</span>
+                                </div>
+                            </div>
+                            
+                            <div className="flex justify-between">
+                                <button 
+                                    onClick={() => setShowPaymentOptions(false)}
+                                    className="px-6 py-2 bg-[#2A2A2A] text-white rounded-full"
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    onClick={handlePaymentOptionSelect}
+                                    className="px-6 py-2 bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] text-white rounded-full"
+                                >
+                                    Continue
+                                </button>
+                            </div>
+                        </div>
+                    </AuthModel>
+                )}
             </div>
         </>
     )

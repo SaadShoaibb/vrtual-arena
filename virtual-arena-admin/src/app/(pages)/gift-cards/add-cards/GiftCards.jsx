@@ -11,7 +11,7 @@ const GiftCards = () => {
     const [formData, setFormData] = useState({
         code: '',
         amount: '',
-        // Assuming the admin creates the card
+        category: 'Gift Cards',
     });
 
     const handleChange = (e) => {
@@ -19,6 +19,7 @@ const GiftCards = () => {
         setFormData({
             ...formData,
             [name]: value,
+            category: 'Gift Cards',
         });
     };
 

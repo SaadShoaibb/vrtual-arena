@@ -21,16 +21,17 @@ const AddProduct = () => {
         discount: "",
         shipping_info: "",
         images: [], // To store selected image files
-        is_active:true
+        is_active:true,
+        category: "VR Essentials" // Default category
     });
 
     const [errors, setErrors] = useState({});
 
     // Handle input changes
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type, checked } = e.target;
         setFormData((prevData) => {
-            const updatedData = { ...prevData, [name]: value };
+            const updatedData = { ...prevData, [name]: type === 'checkbox' ? checked : value };
 
             // Calculate discount price if original_price or discount changes
             if (name === "original_price" || name === "discount") {
@@ -83,6 +84,7 @@ const AddProduct = () => {
         data.append("size", formData.size);
         data.append("discount", formData.discount);
         data.append("shipping_info", formData.shipping_info);
+        data.append("category", formData.category);
         formData.images.forEach((image) => {
             data.append("images", image); // Append each image file
         });
@@ -105,6 +107,7 @@ const AddProduct = () => {
                     discount: "",
                     shipping_info: "",
                     images: [],
+                    category: "VR Essentials"
                 });
                 setErrors({});
             }
@@ -121,6 +124,13 @@ const AddProduct = () => {
         { value: '7-9', label: '7-9 days' },
         { value: '8-15', label: '8-15 days' },
         { value: '9-21', label: '9-21 days' },
+    ];
+
+    const categoryOptions = [
+        { value: 'VR Essentials', label: 'VR Essentials' },
+        { value: 'VR Hardware', label: 'VR Hardware' },
+        { value: 'Branded Merchandise', label: 'Branded Merchandise' },
+        { value: 'Gift Cards', label: 'Gift Cards & Experiences' },
     ];
 
     return (
@@ -263,6 +273,17 @@ const AddProduct = () => {
                         onChange={handleChange}
                         label="Active"
                     />
+
+                        {/* Category */}
+                        <FieldContainer label="Category" htmlFor="category">
+                            <Select
+                                name="category"
+                                value={formData.category}
+                                onChange={handleChange}
+                                options={categoryOptions}
+                                required
+                            />
+                        </FieldContainer>
                     </div>
 
                     {/* Submit Button */}

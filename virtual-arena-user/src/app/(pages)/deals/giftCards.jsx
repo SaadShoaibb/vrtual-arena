@@ -23,7 +23,8 @@ const GiftCardStore = () => {
         const fetchGiftCards = async () => {
             try {
                 const response = await axios.get(`${API_URL}/user/gift-cards`, getAuthHeaders());
-                setGiftCards(response.data.cards);
+                // Only show cards with category 'Gift Cards'
+                setGiftCards(response.data.cards.filter(card => card.category === 'Gift Cards'));
                 setLoading(false);
             } catch (err) {
                 setError('Failed to fetch gift cards. Please try again later.');

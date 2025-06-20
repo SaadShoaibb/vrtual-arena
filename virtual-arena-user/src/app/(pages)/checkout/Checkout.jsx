@@ -32,6 +32,14 @@ const Checkout = ({ cart }) => {
     useEffect(() => {
         setCartItems(cart);
         fetchUserAddress();
+        
+        // Set shipping price to 0 if cart only has tournament items
+        const onlyTournaments = cart.length > 0 && cart.every(item => item.item_type === 'tournament');
+        if (onlyTournaments) {
+            setShippingPrice(0);
+        } else {
+            setShippingPrice(shippingInfo.shippingMethod === 'express' ? 10.0 : 5.0);
+        }
     }, [cart]);
 
     const fetchUserAddress = async () => {
@@ -55,6 +63,9 @@ const Checkout = ({ cart }) => {
         }
     };
 
+    // Check if cart has any physical products
+    const hasPhysicalProducts = cartItems.some(item => !item.item_type || item.item_type === 'product');
+    
     const subtotal = cartItems.reduce((total, item) => total + item.discount_price * item.quantity, 0);
     const total = subtotal + shippingPrice;
 
@@ -75,10 +86,38 @@ const Checkout = ({ cart }) => {
     const handleShippingMethodChange = (e) => {
         const method = e.target.value;
         setShippingInfo({ ...shippingInfo, shippingMethod: method });
-        setShippingPrice(method === 'express' ? 10.0 : 5.0);
+        // Only charge shipping if there are physical products
+        if (hasPhysicalProducts) {
+            setShippingPrice(method === 'express' ? 10.0 : 5.0);
+        } else {
+            setShippingPrice(0);
+        }
     };
 
     const handleConfirmOrder = async () => {
+        // Validate required fields
+        const requiredFields = ['name', 'address', 'city', 'state', 'zip', 'country'];
+        const missingFields = [];
+        
+        // Check if all required fields are filled
+        requiredFields.forEach(field => {
+            if (!shippingInfo[field] || shippingInfo[field].trim() === '') {
+                missingFields.push(field);
+            }
+        });
+        
+        // If there are missing fields, show an alert and return
+        if (missingFields.length > 0) {
+            alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
+            return;
+        }
+        
+        // If cart is empty, show an alert and return
+        if (cartItems.length === 0) {
+            alert('Your cart is empty. Please add items to your cart before placing an order.');
+            return;
+        }
+
         const orderDetails = {
             cartItems,
             shippingInfo,
@@ -90,62 +129,98 @@ const Checkout = ({ cart }) => {
         };
 
         console.log('Order Details:', orderDetails);
-if(paymentMethod === "cod"){
-        try {
-            // Prepare the request payload for the merged controller
-            const payload = {
-                total_amount: total,
-                status: 'pending',
-                shipping_cost: shippingPrice,
-                payment_method: paymentMethod,
-                payment_status:"pending",
-                items: cartItems.map((item) => ({
-                    product_id: item.product_id,
-                    quantity: item.quantity,
-                    price: item.discount_price,
-                })),
-                shipping_address: {
-                    full_name: shippingInfo.name,
-                    address: shippingInfo.address,
-                    city: shippingInfo.city,
-                    state: shippingInfo.state,
-                    zip_code: shippingInfo.zip,
-                    country: shippingInfo.country,
-                },
-            };
+        if(paymentMethod === "cod"){
+            try {
+                // Prepare the request payload for the merged controller
+                const payload = {
+                    total_amount: total,
+                    status: 'pending',
+                    shipping_cost: shippingPrice,
+                    payment_method: paymentMethod,
+                    payment_status:"pending",
+                    items: cartItems.map((item) => {
+                        if (item.item_type === 'tournament') {
+                            return {
+                                tournament_id: item.tournament_id,
+                                quantity: item.quantity,
+                                price: item.discount_price,
+                                item_type: 'tournament'
+                            };
+                        } else {
+                            return {
+                                product_id: item.product_id,
+                                quantity: item.quantity,
+                                price: item.discount_price,
+                                item_type: 'product'
+                            };
+                        }
+                    }),
+                    shipping_address: {
+                        full_name: shippingInfo.name,
+                        address: shippingInfo.address,
+                        city: shippingInfo.city,
+                        state: shippingInfo.state,
+                        zip_code: shippingInfo.zip,
+                        country: shippingInfo.country,
+                    },
+                };
 
-            // Call the merged controller endpoint
-            const response = await axios.post(
-                `${API_URL}/user/create-order`,
-                payload,
-                getAuthHeaders()
-            );
+                // Call the merged controller endpoint
+                const response = await axios.post(
+                    `${API_URL}/user/create-order`,
+                    payload,
+                    getAuthHeaders()
+                );
 
-            if (response.data.success) {
-                alert('Order placed successfully!');
-                // Delete each cart item in the order
-                for (const item of cartItems) {
-                    await axios.delete(
-                        `${API_URL}/user/cart/${item.cart_id}`,
-                        getAuthHeaders()
-                    );
-                    console.log(`Cart item ${item.cart_id} deleted successfully.`);
+                if (response.data.success) {
+                    alert('Order placed successfully!');
+                    // Delete each cart item in the order
+                    for (const item of cartItems) {
+                        await axios.delete(
+                            `${API_URL}/user/cart/${item.cart_id}`,
+                            getAuthHeaders()
+                        );
+                        console.log(`Cart item ${item.cart_id} deleted successfully.`);
+                    }
+                    router.push('/orders');
+                } else {
+                    alert('Failed to place order. Please try again.');
                 }
-                router.push('/orders');
-            } else {
+            } catch (err) {
+                console.error('Error placing order:', err);
                 alert('Failed to place order. Please try again.');
             }
-        } catch (err) {
-            console.error('Error placing order:', err);
-            alert('Failed to place order. Please try again.');
+        }else{
+            setPaymentModel(true)
         }
-    }else{
-        setPaymentModel(true)
-    }
-
     };
 
     const handlePaymentSuccess = async () => {
+        // Validate required fields
+        const requiredFields = ['name', 'address', 'city', 'state', 'zip', 'country'];
+        const missingFields = [];
+        
+        // Check if all required fields are filled
+        requiredFields.forEach(field => {
+            if (!shippingInfo[field] || shippingInfo[field].trim() === '') {
+                missingFields.push(field);
+            }
+        });
+        
+        // If there are missing fields, show an alert and return
+        if (missingFields.length > 0) {
+            alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
+            setPaymentModel(false);
+            return;
+        }
+        
+        // If cart is empty, show an alert and return
+        if (cartItems.length === 0) {
+            alert('Your cart is empty. Please add items to your cart before placing an order.');
+            setPaymentModel(false);
+            return;
+        }
+        
         try {
             // Prepare the request payload for the merged controller
             const payload = {
@@ -154,11 +229,23 @@ if(paymentMethod === "cod"){
                 payment_status:"completed",
                 shipping_cost: shippingPrice,
                 payment_method: paymentMethod,
-                items: cartItems.map((item) => ({
-                    product_id: item.product_id,
-                    quantity: item.quantity,
-                    price: item.discount_price,
-                })),
+                items: cartItems.map((item) => {
+                    if (item.item_type === 'tournament') {
+                        return {
+                            tournament_id: item.tournament_id,
+                            quantity: item.quantity,
+                            price: item.discount_price,
+                            item_type: 'tournament'
+                        };
+                    } else {
+                        return {
+                            product_id: item.product_id,
+                            quantity: item.quantity,
+                            price: item.discount_price,
+                            item_type: 'product'
+                        };
+                    }
+                }),
                 shipping_address: {
                     full_name: shippingInfo.name,
                     address: shippingInfo.address,
@@ -229,7 +316,7 @@ if(paymentMethod === "cod"){
                             </label>
                         </div>
 
-                        <h2 className="text-2xl font-bold mb-4">Shipping Information</h2>
+                        <h2 className="text-2xl font-bold mb-4">{hasPhysicalProducts ? 'Shipping Information' : 'Contact Information'}</h2>
                         <form className="space-y-4">
                             <input
                                 type="text"
@@ -280,18 +367,20 @@ if(paymentMethod === "cod"){
                                 onChange={handleInputChange}
                                 className="w-full p-2 border border-gray-300 rounded bg-transparent"
                             />
-                            <div>
-                                <label className="block mb-2">Shipping Method</label>
-                                <select
-                                    name="shippingMethod"
-                                    value={shippingInfo.shippingMethod}
-                                    onChange={handleShippingMethodChange}
-                                    className="w-full p-2 border border-gray-300 rounded bg-transparent"
-                                >
-                                    <option value="standard">Standard Shipping ($5.00)</option>
-                                    <option value="express">Express Shipping ($10.00)</option>
-                                </select>
-                            </div>
+                            {hasPhysicalProducts && (
+                                <div>
+                                    <label className="block mb-2">Shipping Method</label>
+                                    <select
+                                        name="shippingMethod"
+                                        value={shippingInfo.shippingMethod}
+                                        onChange={handleShippingMethodChange}
+                                        className="w-full p-2 border border-gray-300 rounded bg-transparent"
+                                    >
+                                        <option value="standard">Standard Shipping ($5.00)</option>
+                                        <option value="express">Express Shipping ($10.00)</option>
+                                    </select>
+                                </div>
+                            )}
                         </form>
 
                       
@@ -303,7 +392,7 @@ if(paymentMethod === "cod"){
                             <table className="w-full">
                                 <thead>
                                     <tr>
-                                        <th className="text-left p-2">Product</th>
+                                        <th className="text-left p-2">Item</th>
                                         <th className="text-center p-2">Quantity</th>
                                         <th className="text-right p-2">Price</th>
                                     </tr>
@@ -311,7 +400,12 @@ if(paymentMethod === "cod"){
                                 <tbody>
                                     {cartItems.map((item) => (
                                         <tr key={item.cart_id} className="border-b">
-                                            <td className="p-2">{item.name}</td>
+                                            <td className="p-2">
+                                                {item.name}
+                                                {item.item_type === 'tournament' && 
+                                                    <span className="ml-2 text-xs bg-purple-700 text-white px-2 py-1 rounded">Tournament</span>
+                                                }
+                                            </td>
                                             <td className="text-center p-2">{item.quantity}</td>
                                             <td className="text-right p-2">${item.discount_price * item.quantity}</td>
                                         </tr>
@@ -323,10 +417,12 @@ if(paymentMethod === "cod"){
                                     <span>Subtotal</span>
                                     <span>${subtotal.toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between p-2">
-                                    <span>Shipping</span>
-                                    <span>${shippingPrice.toFixed(2)}</span>
-                                </div>
+                                {hasPhysicalProducts && (
+                                    <div className="flex justify-between p-2">
+                                        <span>Shipping</span>
+                                        <span>${shippingPrice.toFixed(2)}</span>
+                                    </div>
+                                )}
                                 <div className="flex justify-between p-2 font-bold">
                                     <span>Total</span>
                                     <span>${total.toFixed(2)}</span>

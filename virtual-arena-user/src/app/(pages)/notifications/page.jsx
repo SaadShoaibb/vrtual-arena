@@ -4,7 +4,7 @@ import AllNotifications from './AllNotifications'
 
 const NotificationPage = () => {
   return (
-    <MainLayout title={'Notifications'} btnTitle={"Notifications"}>
+    <MainLayout title={'Notifications'} btnTitle={"Notifications"} skipBreadcrumb={true}>
         <AllNotifications/>
       
     </MainLayout>

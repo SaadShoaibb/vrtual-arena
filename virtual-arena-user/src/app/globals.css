@@ -4,6 +4,74 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prevent horizontal scrolling */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+  position: relative;
+}
+
+/* Fix for French text that might be longer */
+.text-wrap-balance {
+  text-wrap: balance;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Responsive text classes */
+@media (max-width: 640px) {
+  .responsive-text-sm {
+    font-size: 0.875rem; /* 14px */
+  }
+  .responsive-text-md {
+    font-size: 1rem; /* 16px */
+  }
+  .responsive-text-lg {
+    font-size: 1.125rem; /* 18px */
+  }
+  
+  /* French text adjustments */
+  html[lang="fr"] .text-wrap-balance {
+    font-size: 0.9em;
+  }
+}
+
+/* Navbar specific fixes for mobile */
+@media (max-width: 1024px) {
+  .navbar-container {
+    width: 100%;
+    overflow-x: hidden;
+  }
+  
+  .navbar-button {
+    font-size: 0.875rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  /* Reduce button text size in French */
+  html[lang="fr"] .btn-text {
+    font-size: 0.875rem;
+  }
+}
+
+/* Component specific fixes for French */
+@media (max-width: 768px) {
+  html[lang="fr"] .long-text-container {
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
+  
+  html[lang="fr"] .btn-text {
+    font-size: 0.75rem;
+  }
+  
+  /* Adjust plan features for French */
+  html[lang="fr"] #plans .text-wrap-balance {
+    font-size: 0.9em;
+  }
+}
 
 .text-gradiant {
   background-image: linear-gradient(to right, #926BB9, #5A79FB,#2FBCF7);
@@ -11,12 +79,36 @@
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
 body {
   font-family: "Open Sans", serif;
   font-style: normal;
 }
 
+/* Button with text that might overflow */
+.btn-with-text {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
 
+.btn-with-text span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  text-wrap: balance;
+}
+
+/* Fix for z-index issues with dropdowns */
+.dropdown-container {
+  position: relative;
+  z-index: 1000;
+}
+
+.dropdown-menu {
+  position: absolute;
+  z-index: 1000;
+}
 
 @layer utilities{
   .bg-grad{

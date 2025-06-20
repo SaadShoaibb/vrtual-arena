@@ -1,173 +1,214 @@
 'use client'
-import React, { useState } from 'react'
-import { FaAngleLeft, FaAngleRight, FaStar } from 'react-icons/fa';
-import { FaLocationDot } from 'react-icons/fa6';
-const MerchandiseDetail = () => {
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const car = {
-        id: 2,
-        name: "VR Game Mug",
-        description: "Enjoy your favorite drink while playing with our VR game mug. Made of durable ceramic with a VR-themed design, perfect for game enthusiasts.",
-        price: 14.99,
-        category: "Accessories",
-        sizes: ["Standard"],
-        colors: ["White", "Black"],
-        stock: 100,
-        images: [
-            "https://images.unsplash.com/photo-1564557287817-3785e38ec1f5?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8aG9vZGllfGVufDB8fDB8fHww",
-            "https://plus.unsplash.com/premium_photo-1673827311290-d435f481152e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8aG9vZGllfGVufDB8fDB8fHww",
-            "https://images.unsplash.com/photo-1579572331145-5e53b299c64e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8aG9vZGllfGVufDB8fDB8fHww",
-            "https://images.unsplash.com/photo-1615397587950-3cbb55f95b77?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGhvb2RpZXxlbnwwfHwwfHx8MA%3D%3D",
-            "https://plus.unsplash.com/premium_photo-1681493944219-44118cf7754d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8aG9vZGllfGVufDB8fDB8fHww",
-            "https://images.unsplash.com/photo-1542556398-95fb5b9f9b48?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bXVnc3xlbnwwfHwwfHx8MA%3D%3D",
-            
-        ],
+import React, { useState, useEffect } from 'react'
+import { FaAngleLeft, FaAngleRight, FaStar } from 'react-icons/fa'
+import { useDispatch, useSelector } from 'react-redux'
+import { addToCart, fetchCart } from '@/Store/ReduxSlice/addToCartSlice'
+import { openSidebar } from '@/Store/ReduxSlice/cartSideBarSlice'
+import { openModal } from '@/Store/ReduxSlice/ModalSlice'
+import CardSidebar from '@/app/components/CartSidebar'
+import { MdOutlineShoppingCart } from 'react-icons/md'
+import { addToWishlist, fetchWishlist, removeFromWishlist } from '@/Store/ReduxSlice/wishlistSlice'
+import { FaHeart, FaRegHeart } from 'react-icons/fa'
+
+const MerchandiseDetail = ({ product }) => {
+    const [currentIndex, setCurrentIndex] = useState(0)
+    const dispatch = useDispatch()
+    const { isAuthenticated } = useSelector(state => state.userData)
+    const { isOpen } = useSelector(state => state.cartSidebar)
+    const { cart } = useSelector(state => state.cart)
+    const { wishlist } = useSelector(state => state.wishlist)
+    const [openSection, setOpenSection] = useState('Description') // Open description by default
+    const [localWishlist, setLocalWishlist] = useState(wishlist)
+
+    useEffect(() => {
+        setLocalWishlist(wishlist)
+    }, [wishlist])
+
+    // Function to get proper image URL
+    const getImageUrl = (imagePath) => {
+        if (!imagePath) return '/assets/d1.png';
         
-        rating: 4.5,
-        reviews: [
-          {
-            user: "Alice Johnson",
-            review: "Great mug! It's sturdy and the print is high-quality. I use it every day.",
-            rating: 5
-          },
-          {
-            user: "Mark Lee",
-            review: "Nice mug but the handle could be a bit bigger. Still, I love the VR design.",
-            rating: 4
-          }
-        ],
-        shipping: {
-          cost: 3.99,
-          deliveryTime: "5-7 business days"
-        },
-        returnPolicy: "Returns accepted within 30 days of purchase."
-      }
+        // If it's already a full URL, return it
+        if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+            return imagePath;
+        }
+        
+        // If it starts with a slash, it's a server path
+        if (imagePath.startsWith('/')) {
+            // For production, we might need to prepend the server URL
+            return `http://localhost:8080${imagePath}`;
+        }
+        
+        // Otherwise, it's a relative path
+        return `http://localhost:8080/${imagePath}`;
+    };
 
     // Handler to go to the next image
     const nextImage = () => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % car?.images?.length);
-    };
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % (product?.images?.length || 1))
+    }
 
     // Handler to go to the previous image
     const prevImage = () => {
         setCurrentIndex((prevIndex) =>
-            prevIndex === 0 ? car?.images?.length - 1 : prevIndex - 1
-        );
-    };
+            prevIndex === 0 ? (product?.images?.length - 1 || 0) : prevIndex - 1
+        )
+    }
 
     // Handler to set the main image when clicking on thumbnails
     const setMainImage = (index) => {
-        setCurrentIndex(index);
-    };
+        setCurrentIndex(index)
+    }
+
+    const handleToggle = (section) => {
+        setOpenSection(openSection === section ? null : section)
+    }
+
+    const handleAddToCart = () => {
+        if (isAuthenticated) {
+            // Dispatch addToCart action
+            dispatch(addToCart({ product_id: product.product_id, quantity: 1 }))
+
+            // Add a 500ms delay before fetching the updated cart
+            setTimeout(() => {
+                dispatch(openSidebar())
+                dispatch(fetchCart())
+            }, 500)
+        } else {
+            // If not authenticated, open the login modal
+            dispatch(openModal("LOGIN"))
+        }
+    }
+
+    const handleWishlistToggle = () => {
+        if (!isAuthenticated) {
+            dispatch(openModal("LOGIN"))
+            return
+        }
+        
+        const isInWishlist = localWishlist.map(item => item.product_id).includes(product.product_id)
+        if (isInWishlist) {
+            setLocalWishlist(localWishlist.filter(item => item.product_id !== product.product_id))
+            dispatch(removeFromWishlist(product.product_id))
+        } else {
+            setLocalWishlist([...localWishlist, { product_id: product.product_id }])
+            dispatch(addToWishlist(product.product_id))
+        }
+        setTimeout(() => {
+            dispatch(fetchWishlist())
+        }, 500)
+    }
+
+    // Details data for accordion
+    const detailsData = {
+        Description: product?.description || "No description available",
+        "Shipping Information": product?.shipping_info ? `${product.shipping_info} shipping days` : "Standard shipping applies",
+    }
+
+    if (!product) {
+        return null
+    }
+
     return (
         <>
-            <div id='contact' className={`w-full  h-full  bg-blackish `}>
-                <div className='w-full mx-auto max-w-[1600px] border-y pt-[91px] pb-[100px] flex-col flex   px-4 md:px-10 lg:px-16 xl:px-20 2xl:px-6'>
-
-                    <div className='grid grid-cols-5 gap-6 pb-10 bg-blackish'>
-                        <div className='col-span-5 lg:col-span-3'>
-                            <div className='flex justify-between '>
-                                <div className='flex flex-col mb-4 pl-4  md:pl-6  lg:pl-10'>
-                                    <h1 className='text-2xl font-semibold text-white'>{car.name}</h1>
-                                    <h3 className='flex items-center gap-1  text-white'>
-                                        <FaStar  className='text-white' /> 
-                                        <FaStar  className='text-white' /> 
-                                        <FaStar  className='text-white' /> 
-                                        <FaStar  className='text-white' /> {car.rating}
-                                        </h3>
-                                </div>
-
-                            </div>
+            <div id='contact' className={`w-full h-full bg-blackish`}>
+                <div className='w-full mx-auto max-w-[1600px] border-y pt-[91px] pb-[100px] flex-col flex px-4 md:px-10 lg:px-16 xl:px-20 2xl:px-6'>
+                    <div className='grid grid-cols-1 lg:grid-cols-2 gap-20 lg:gap-24'>
+                        <div className="relative flex flex-col">
                             <div className="relative flex justify-center items-center">
                                 <button
                                     onClick={prevImage}
-                                    className="absolute flex justify-center items-center left-0 w-10 h-10 text-24 leading-none bg-white text-purplelight rounded-full "
+                                    className="absolute flex justify-center items-center left-0 w-10 h-10 text-24 leading-none bg-white text-purplelight rounded-full z-10"
                                 >
                                     <FaAngleLeft />
                                 </button>
-                                <div className='px-4 pb-4 md:px-6 md:pb-6 lg:px-10 lg:pb-10'>
-
-                                    <img
-                                        src={car?.images && car.images.length > 0 ? car.images[currentIndex] : '/placeholder.jpg'}
-                                        alt={`Slide ${currentIndex + 1}`}
-                                        className="w-full h-[450px] object-cover"
-                                    />
-                                </div>
+                                <img
+                                    src={product.images && product.images.length > 0 ? getImageUrl(product.images[currentIndex]) : '/assets/d1.png'}
+                                    alt={`${product.name} - Image ${currentIndex + 1}`}
+                                    className="w-full min-h-[600px] max-h-[811px] object-cover"
+                                />
                                 <button
                                     onClick={nextImage}
-                                    className="absolute flex justify-center items-center right-0 w-10 h-10 text-24 leading-none bg-white text-purplelight rounded-full hover:bg-gray-600"
+                                    className="absolute flex justify-center items-center right-0 w-10 h-10 text-24 leading-none bg-white text-purplelight rounded-full hover:bg-gray-600 z-10"
                                 >
                                     <FaAngleRight />
                                 </button>
-
                             </div>
-                            <div className="flex justify-center items-center overflow-auto scrollbar-hide gap-2 mt-4">
-                                {car?.images?.map((img, index) => (
-                                    <img
-                                        key={index}
-                                        src={img}
-                                        alt={`Thumbnail ${index + 1}`}
-                                        className={` object-cover border-2 rounded-lg cursor-pointer anim3 ${index === currentIndex ? 'border-purplelight w-20 h-20' : 'border-gray w-16 h-16'
-                                            }`}
-                                        onClick={() => setMainImage(index)}
-                                    />
+                            {product?.images && product.images.length > 1 && (
+                                <div className="flex justify-center items-center overflow-auto scrollbar-hide gap-2 mt-4">
+                                    {product.images.map((img, index) => (
+                                        <img
+                                            key={index}
+                                            src={getImageUrl(img)}
+                                            alt={`Thumbnail ${index + 1}`}
+                                            className={`object-cover border-2 rounded-lg cursor-pointer anim3 ${index === currentIndex ? 'border-purplelight w-20 h-20' : 'border-gray w-16 h-16'}`}
+                                            onClick={() => setMainImage(index)}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                        <div className='text-white'>
+                            <h1 className='text-[40px] md:text-[50px] font-bold text-white'>{product.name}</h1>
+                            <div className='flex items-center gap-5 border-b pb-8'>
+                                <p className='text-[26px] leading-none'>
+                                    <span className='line-through'>${product.original_price}</span> 
+                                    <span className='font-bold'> ${product.discount_price}</span>
+                                </p>
+                                <h1 className='bg-white text-black py-2 px-3 rounded-md text-lg font-bold'>{Math.round(product.discount)}%</h1>
+                            </div>
+
+                            <button 
+                                onClick={handleAddToCart}
+                                className='text-xl mt-4 font-semibold flex items-center justify-center h-fit w-full my-auto py-2 md:py-4 px-6 md:px-8 gap-3 text-white rounded-lg bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7]'
+                            >
+                                <MdOutlineShoppingCart size={20} />
+                                <span>Add To Cart</span>
+                            </button>
+
+                            <div 
+                                onClick={handleWishlistToggle}
+                                className='flex items-center gap-2 cursor-pointer text-xl font-semibold pb-[18px] border-b mt-7'
+                            >
+                                {localWishlist.map(item => item.product_id).includes(product.product_id) ? (
+                                    <>
+                                        <FaHeart size={20} className="text-red-500" />
+                                        <span>Remove from Wishlist</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <FaRegHeart size={20} />
+                                        <span>Add to Wishlist</span>
+                                    </>
+                                )}
+                            </div>
+
+                            <div>
+                                {Object.keys(detailsData).map((section) => (
+                                    <div key={section} className="text-xl font-semibold mt-3 pb-[18px] border-b">
+                                        <div
+                                            className="flex justify-between items-center cursor-pointer"
+                                            onClick={() => handleToggle(section)}
+                                        >
+                                            <h1>{section}</h1>
+                                            <p>{openSection === section ? "−" : "+"}</p>
+                                        </div>
+                                        {openSection === section && (
+                                            <div className="mt-2 text-gray-400 whitespace-pre-wrap">
+                                                {section === "Description" ? (
+                                                    <div dangerouslySetInnerHTML={{ __html: detailsData[section].replace(/\n/g, '<br/>') }} />
+                                                ) : (
+                                                    detailsData[section]
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                 ))}
                             </div>
-
-
                         </div>
-                        <div className=' col-span-5 lg:col-span-2 shadow-shad p-5 h-fit '>
-                            <h1 className='text-xl font-medium robo uppercase text-white '>Details</h1>
-                            <div className='flex justify-between mt-8 rale pb-3 mb-2 border-b border-gray'>
-                                <h1 className='font-semibold text-white'>Price</h1>
-                                <h3 className='text-white'>{car.price}</h3>
-                            </div>
-                            <div className='flex justify-between  rale pb-3 mb-2 border-b border-gray'>
-                                <h1 className='font-semibold text-white'>Category</h1>
-                                <h3 className='text-white'>{car.category}</h3>
-                            </div>
-                            <div className='flex justify-between  rale pb-3 mb-2 border-b border-gray'>
-                                <h1 className='font-semibold text-white'>Sizes</h1>
-                                <h3 className='text-white'>{car.sizes.map((size)=>(
-                                    <span>{size}</span>
-                                ))}</h3>
-                            </div>
-                            <div className='flex justify-between  rale pb-3 mb-2 border-b border-gray'>
-                                <h1 className='font-semibold text-white'>Colors</h1>
-                                <h3 className='text-white'>{car.colors.map((size)=>(
-                                    <span>{size}</span>
-                                ))}</h3>
-                            </div>
-                            <div className='flex justify-between  rale pb-3 mb-2 border-b border-gray'>
-                                <h1 className='font-semibold text-white'>Stock</h1>
-                                <h3 className='text-white'>{car.stock}</h3>
-                            </div>
-                            <div className='flex justify-between  rale pb-3 mb-2 border-b border-gray'>
-                                <h1 className='font-semibold text-white'>Shipping Cost</h1>
-                                <h3 className='text-white'>{car.shipping.cost}</h3>
-                            </div>
-                            <div className='flex justify-between  rale pb-3 mb-2 border-b border-gray'>
-                                <h1 className='font-semibold text-white'>Delivery Time</h1>
-                                <h3 className='text-white'>{car.shipping.deliveryTime}</h3>
-                            </div>
-                            <div className='flex justify-between  rale pb-3 mb-2 border-b border-gray'>
-                                <h1 className='font-semibold text-white'>Return Policy</h1>
-                                <h3 className='text-white'>{car.returnPolicy}</h3>
-                            </div>
-                           
-                           
-                           
-                          
-                            <div className='flex flex-col w-full gap-3 rale pb-3 mb-2 mt-5'>
-                                <button className='bg-green py-2 px-4 rounded-md text-black bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7]'>Add To Cart</button>
-                                <button className='bg-red py-2 px-4 rounded-md text-black  bg-white'>Checkout</button>
-                            </div>
-
-                        </div>
-
-                        
                     </div>
                 </div>
+                <CardSidebar isOpen={isOpen} cart={cart} />
             </div>
         </>
     )

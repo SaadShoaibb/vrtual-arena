@@ -6,7 +6,7 @@ import MainLayout from '@/app/components/MainLayout'
 const BookingPage = () => {
   return (
     <Suspense fallback={"loading..."}>
-             <MainLayout title={"My Bookings"} btnTitle={"Bookings"}>
+             <MainLayout title={"My Bookings"} btnTitle={"Bookings"} skipBreadcrumb={true}>
                <Booking/>
                </MainLayout>
         </Suspense>

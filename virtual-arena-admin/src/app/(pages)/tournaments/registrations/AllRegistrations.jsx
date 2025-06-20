@@ -24,6 +24,8 @@ const Registrations = () => {
         { header: 'User Name', accessor: 'user_name' },
         { header: 'Tournament Name', accessor: 'tournament_name' },
         { header: 'Status', accessor: 'status' },
+        { header: 'Payment Status', accessor: 'payment_status' },
+        { header: 'Payment Option', accessor: 'payment_option' },
     ];
 
     const data = registrations.map((registration) => ({
@@ -33,6 +35,8 @@ const Registrations = () => {
         status: registration.status,
         user_name: registration.user_name,
         tournament_name: registration.tournament_name,
+        payment_status: registration.payment_status || 'pending',
+        payment_option: registration.payment_option || 'online',
     }));
 
     const handleFetchRegistrations = async () => {
@@ -61,6 +65,8 @@ const Registrations = () => {
             user_id: updatedRegistration.user_id,
             tournament_id: updatedRegistration.tournament_id,
             status: updatedRegistration.status,
+            payment_status: updatedRegistration.payment_status,
+            payment_option: updatedRegistration.payment_option,
         };
 
         try {
@@ -140,6 +146,8 @@ const Registrations = () => {
         { label: 'User Name', value: selectedRegistration?.user_name },
         { label: 'Tournament Name', value: selectedRegistration?.tournament_name },
         { label: 'Status', value: selectedRegistration?.status },
+        { label: 'Payment Status', value: selectedRegistration?.payment_status || 'pending' },
+        { label: 'Payment Option', value: selectedRegistration?.payment_option || 'online' },
     ];
 
     return (

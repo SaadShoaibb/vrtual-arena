@@ -6,24 +6,27 @@ import Navbar from '@/app/components/Navbar'
 import React from 'react'
 import Deals from './Deals'
 import GiftCards from './giftCards'
+import { useSearchParams } from 'next/navigation'
 
 const DealsPage = () => {
+  const searchParams = useSearchParams();
+  const locale = searchParams.get('locale') || 'en';
 
-return (
-  <>
-  
-  <div className="relative">
-  <Navbar  />
-    <HeroHeader
-    btn='Deals & Membership'
-    title='Deals & Membership'
-    bg='bg-dealbg'
-    />
-   <Deals/>
-   <GiftCards/>
-    <Connected/>
-    <Footer/>
-    </div>
+  return (
+    <>
+      <div className="relative">
+        <Navbar locale={locale} />
+        <HeroHeader
+          btn='Deals & Membership'
+          title='Deals & Membership'
+          bg='bg-dealbg'
+          locale={locale}
+        />
+        <Deals locale={locale} />
+        <GiftCards locale={locale} />
+        <Connected locale={locale} />
+        <Footer locale={locale} />
+      </div>
     </>
   )
 }

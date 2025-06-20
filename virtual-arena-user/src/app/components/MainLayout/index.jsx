@@ -14,7 +14,7 @@ const MainLayout = ({children,btnTitle,title}) => {
         {/* Hero Section */}
         <div className="h-[400px] overflow-x-hidden relative -mt-[90px] md:-mt-[110px]">
           {/* Background Images */}
-          <div className="absolute inset-0 z-0 bg-black bg-gradient-to-tr from-[#00000000] to-[#00000080] bg-opacity-50"></div>
+          <div className="absolute inset-0 z-0 bg-black bg-opacity-50"></div>
           <img src="/assets/header.png" alt="" className="absolute z-0 top-0 w-full h-full" />
           <img src="/assets/header2.png" alt="" className="absolute z-0 top-0 w-full h-full" />
 
@@ -42,9 +42,9 @@ const MainLayout = ({children,btnTitle,title}) => {
             </div>
           </div>
         </div>
-
         
-       {children}
+        {/* Main Content */}
+        {children}
 
         {/* Connected Section */}
         <Connected />

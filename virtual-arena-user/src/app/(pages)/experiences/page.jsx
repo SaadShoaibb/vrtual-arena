@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import Image from 'next/image'
 import Navbar from '@/app/components/Navbar'
 import Footer from '@/app/components/Footer'
+import { useSearchParams } from 'next/navigation'
 
 const LazyMedia = ({ type, src, index, poster }) => {
   const ref = useRef(null)
@@ -78,6 +79,8 @@ export default function GalleryPage() {
   const [mediaItems, setMediaItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const searchParams = useSearchParams();
+  const locale = searchParams.get('locale') || 'en';
 
   useEffect(() => {
     const fetchMedia = async () => {
@@ -127,7 +130,7 @@ export default function GalleryPage() {
 
   return (
     <div className="relative bg-gradient-to-b from-black via-gray-900 to-black text-white min-h-screen">
-      <Navbar />
+      <Navbar locale={locale} />
 
       <section className="px-4 py-12 sm:px-6 lg:px-24 2xl:px-48">
         <h1 className="text-4xl sm:text-5xl font-extrabold text-center mb-12 tracking-tight animate-pulse text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.7)]">
@@ -157,7 +160,7 @@ export default function GalleryPage() {
         )}
       </section>
 
-      <Footer />
+      <Footer locale={locale} />
     </div>
   )
 }

@@ -3,7 +3,7 @@ import { closeModal, openModal } from '@/Store/ReduxSlice/ModalSlice';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react'
-import { FaBars, FaRegHeart } from "react-icons/fa";
+import { FaBars, FaRegHeart, FaMapMarkerAlt, FaClock, FaSearch } from "react-icons/fa";
 import { IoCartOutline, IoCloseCircleSharp } from "react-icons/io5";
 import { useDispatch, useSelector } from 'react-redux';
 import AuthModel from '../AuthModal';
@@ -18,28 +18,52 @@ import { fetchCart } from '@/Store/ReduxSlice/addToCartSlice';
 import { FaRegCircleUser } from 'react-icons/fa6';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationDropdown from './Notification';
+import { IoIosArrowDown } from "react-icons/io";
+import LanguageSwitcher from '../common/LanguageSwitcher';
+import { translations } from '@/app/translations';
 
-const Navbar = () => {
-    const navBtn = [
-        { title: "Home", path: '/' },
-        { title: "About Us", path: '/about' },
-        { title: "Experience", path: '/experience' },
-        { title: "Pricing", path: '/pricing' },
-        { title: "Deals & Membership", path: '/deals' },
-        { title: "Contact Us", path: '/contact' },
-        { title: "Merchandise", path: '/merchandise' }
+const Navbar = ({ locale = 'en' }) => {
+    // Get translations
+    const t = translations[locale] || translations.en;
+    
+    // Define navigation structure
+    const primaryNavItems = [
+        { title: t.home, path: `/?locale=${locale}` },
+        {
+            title: t.experiences,
+            path: `/experiences?locale=${locale}`,
+            hasDropdown: true,
+            dropdownItems: [
+                { title: t.ufoSpaceship, path: `/experiences/ufo-spaceship?locale=${locale}`, description: '5 seats' },
+                { title: t.vr360, path: `/experiences/vr-360?locale=${locale}`, description: '2 seats' },
+                { title: t.vrBattle, path: `/experiences/vr-battle?locale=${locale}`, description: '2 players' },
+                { title: t.vrWarrior, path: `/experiences/vr-warrior?locale=${locale}`, description: 'Kids - 2 players' },
+                { title: t.vrCat, path: `/experiences/vr-cat?locale=${locale}`, description: 'Kids - 2 machines' },
+                { title: t.freeRoaming, path: `/experiences/free-roaming-arena?locale=${locale}`, description: '34x49 feet, up to 10 players' },
+                { title: t.photoBooth, path: `/gallery?locale=${locale}`, description: 'Photo experiences' },
+            ]
+        },
+        { title: t.pricing, path: `/pricing?locale=${locale}` },
+        { title: "Events & Parties", path: `/events?locale=${locale}` },
+        { title: "Shop", path: `/merchandise?locale=${locale}` },
+        { title: t.aboutUs, path: `/about?locale=${locale}` },
+        { title: t.contactUs, path: `/contact?locale=${locale}` },
     ];
 
     const pathname = usePathname()
     const dispatch = useDispatch()
     const { showModal } = useSelector((state) => state.modal)
     const { showBookModal } = useSelector((state) => state.bookModal)
-    const [showDropdown, setShowDropdown] = useState(false);
+    const [activeDropdown, setActiveDropdown] = useState(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { isAuthenticated } = useSelector((state) => state.userData)
     const { cart } = useSelector((state) => state.cart)
-    const menuRef = useRef(null);
+    const dropdownRefs = useRef([]);
+    const userMenuRef = useRef(null);
     const [showSidebar, setShowSidebar] = useState(false)
+    const [showMobileSubmenu, setShowMobileSubmenu] = useState(null);
+    const [scrolled, setScrolled] = useState(false);
+    const [showSearchInput, setShowSearchInput] = useState(false);
     const router = useRouter()
 
     useEffect(() => {
@@ -47,22 +71,94 @@ const Navbar = () => {
         dispatch(fetchCart());
     }, [])
 
+    // Handle body scroll lock when mobile menu is open
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (menuRef.current && !menuRef.current.contains(event.target)) {
-                setIsMenuOpen(false);
+        if (showSidebar) {
+            // Lock scroll
+            document.body.style.overflow = 'hidden';
+        } else {
+            // Unlock scroll
+            document.body.style.overflow = 'unset';
+        }
+        
+        // Cleanup function
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [showSidebar]);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const offset = window.scrollY;
+            if (offset > 50) {
+                setScrolled(true);
+            } else {
+                setScrolled(false);
             }
         };
-        if (isMenuOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
+
+        window.addEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            // Close dropdowns when clicking outside
+            if (!dropdownRefs.current.some(ref => ref && ref.contains(event.target))) {
+                setActiveDropdown(null);
+            }
+            
+            // Close user menu when clicking outside
+            if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+                setIsMenuOpen(false);
+            }
+            
+            // Close search input when clicking outside
+            if (!event.target.closest('.search-container')) {
+                setShowSearchInput(false);
+            }
+        };
+        
+        document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [isMenuOpen]);
+    }, []);
 
-    const toggleMenu = () => {
+    // Check if a path is active
+    const isActivePath = (path) => {
+        if (path === `/?locale=${locale}`) {
+            return pathname === '/' || pathname === '';
+        }
+        return pathname.startsWith(path.split('?')[0]);
+    };
+
+    const toggleDropdown = (index) => {
+        setActiveDropdown(activeDropdown === index ? null : index);
+    };
+
+    const toggleUserMenu = () => {
         setIsMenuOpen(!isMenuOpen);
+    };
+
+    const toggleMobileSubmenu = (index) => {
+        setShowMobileSubmenu(showMobileSubmenu === index ? null : index);
+    };
+
+    const toggleSearchInput = () => {
+        setShowSearchInput(!showSearchInput);
+    };
+
+    const handleSearch = (e) => {
+        if (e.key === 'Enter') {
+            const searchTerm = e.target.value.trim();
+            if (searchTerm) {
+                router.push(`/search?q=${encodeURIComponent(searchTerm)}&locale=${locale}`);
+                setShowSearchInput(false);
+            }
+        }
     };
 
     const dropdownVariants = {
@@ -86,21 +182,13 @@ const Navbar = () => {
     }
 
     const handleLink = (path) => {
-        if (path === '/experience' || path === '/about') {
-            setTimeout(() => {
-                const element = document.getElementById(path === '/experience' ? 'experience' : 'about');
-                if (element) {
-                    element.scrollIntoView({ behavior: 'smooth' });
-                }
-            }, 100);
-            router.push('/');
-        } else {
-            router.push(path);
-        }
+        router.push(path);
         setShowSidebar(false);
+        setActiveDropdown(null);
+        setShowMobileSubmenu(null);
     };
 
-    const handelShowSidebar = () => {
+    const toggleSidebar = () => {
         setShowSidebar(!showSidebar)
     }
 
@@ -108,7 +196,7 @@ const Navbar = () => {
         try {
             localStorage.removeItem('token')
             dispatch(clearAuth());
-            toast.success("Logout Successfully")
+            toast.success(t.logoutSuccess)
         } catch (error) {
             console.log(error)
         }
@@ -116,143 +204,426 @@ const Navbar = () => {
 
     return (
         <>
-            <div className='w-full bg-gradient-to-tr sticky top-0 shadow-md from-[#023B6299] to-[#49094F66] z-30'>
-                <div className='w-full mx-auto max-w-[1600px] pt-[15px] pb-[10px] flex justify-between items-center px-4 md:px-10 lg:px-16 xl:px-20 2xl:px-6'>
-                    <div className='flex items-center gap-4 sm:gap-[42px]'>
-                        {/* Logo - visible only on md and up */}
-                        <img src="/assets/logo.png" alt="Logo" className='hidden sm:block w-[150px] md:w-[199px] h-[60px] md:h-[85px]' />
-
-                        {/* Nav buttons */}
-                        <div className='hidden xl:flex gap-6'>
-                            {navBtn.slice(0, 4).map((btn, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => handleLink(btn.path)}
-                                    className={`text-white text-lg font-semibold ${pathname === btn.path ? 'border-b-2 border-[#DB1FEB]' : ''}`}
-                                >
-                                    {btn.title}
-                                </button>
-                            ))}
-                            <div className="relative">
-                                <button onClick={() => setShowDropdown(!showDropdown)} className="text-white text-lg font-semibold">
-                                    More ▼
-                                </button>
-                                {showDropdown && (
-                                    <div className="absolute top-full left-0 bg-black shadow-lg rounded-lg mt-2 w-52 z-50">
-                                        {navBtn.slice(4).map((btn, i) => (
-                                            <button
-                                                key={i}
-                                                onClick={() => {
-                                                    handleLink(btn.path);
-                                                    setShowDropdown(false);
-                                                }}
-                                                className="block px-4 py-2 text-white hover:bg-gray-700 w-full text-left"
-                                            >
-                                                {btn.title}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
+            {/* Main navigation container */}
+            <div className={`w-full ${scrolled ? 'bg-gradient-to-tr from-[#023B6299] to-[#49094F66]' : 'bg-[#0C1339]'} ${scrolled ? 'fixed' : 'sticky'} top-0 shadow-md z-20 transition-all duration-300 border-t-0`}>
+                <div className="container mx-auto px-4">
+                    {/* Top utility bar - Secondary Navigation */}
+                    <div className="hidden md:flex justify-between items-center py-2 ">
+                        {/* Location and Hours */}
+                        <div className="flex items-center space-x-4 text-sm">
+                            <div className="flex items-center">
+                                <FaMapMarkerAlt className="mr-1 text-[#DB1FEB]" />
+                                <span className="text-white">Edmonton, AB</span>
+                            </div>
+                            <div className="flex items-center">
+                                <FaClock className="mr-1 text-[#DB1FEB]" />
+                                <span className="text-white">Mon-Sun: 10AM-10PM</span>
                             </div>
                         </div>
-                    </div>
-
-                    {/* Right section */}
-                    <div className='flex items-center gap-5'>
-                        {isAuthenticated ? (
-                            <>
-                                <div className='relative'>
-                                    <span className='absolute -top-2 -right-2 h-5 w-5 text-xs bg-white text-black rounded-full flex justify-center items-center'>
-                                        {cart?.length}
-                                    </span>
-                                    <Link href={'/cart'}>
-                                        <IoCartOutline size={26} className="text-white cursor-pointer" />
+                        
+                        {/* Right side secondary navigation */}
+                        <div className="flex items-center space-x-5">
+                            {/* Language Toggle */}
+                            <LanguageSwitcher 
+                                currentLocale={locale} 
+                                showLabel={false}
+                                buttonStyle="text" 
+                                size="md"
+                            />
+                            
+                            {/* Search */}
+                            <div className="search-container relative">
+                                <button 
+                                    onClick={toggleSearchInput}
+                                    className="text-white hover:text-[#DB1FEB]"
+                                    aria-label="Search"
+                                >
+                                    <FaSearch />
+                                </button>
+                                <AnimatePresence>
+                                    {showSearchInput && (
+                                        <motion.div
+                                            initial={{ width: 0, opacity: 0 }}
+                                            animate={{ width: '200px', opacity: 1 }}
+                                            exit={{ width: 0, opacity: 0 }}
+                                            className="absolute right-0 top-0 z-10"
+                                        >
+                                            <input
+                                                type="text"
+                                                placeholder={t.search}
+                                                className="w-full py-1 px-3 bg-gray-800 text-white rounded-full focus:outline-none focus:ring-1 focus:ring-[#DB1FEB]"
+                                                autoFocus
+                                                onKeyDown={handleSearch}
+                                            />
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                            
+                            {/* Cart Icon for authenticated users */}
+                            {isAuthenticated && (
+                                <div className="relative">
+                                    <Link href={`/cart?locale=${locale}`}>
+                                        <div className="relative">
+                                            <IoCartOutline size={20} className="text-white hover:text-[#DB1FEB]" />
+                                            {cart?.length > 0 && (
+                                                <span className="absolute -top-2 -right-2 h-4 w-4 text-xs bg-[#DB1FEB] text-white rounded-full flex justify-center items-center">
+                                                    {cart.length}
+                                                </span>
+                                            )}
+                                        </div>
                                     </Link>
                                 </div>
-
-                                <NotificationDropdown />
-
-                                <div className='relative'>
-                                    <FaRegCircleUser
-                                        size={26}
-                                        className="text-white cursor-pointer"
-                                        onClick={toggleMenu}
-                                    />
+                            )}
+                            
+                            {/* Login/Signup or User Account */}
+                            {!isAuthenticated ? (
+                                <div className="flex items-center space-x-3">
+                                    <button 
+                                        onClick={() => handleShowModal('LOGIN')} 
+                                        className="text-sm text-white hover:text-[#DB1FEB] transition-colors navbar-button"
+                                    >
+                                        {t.login}
+                                    </button>
+                                    <span className="text-white">|</span>
+                                    <button 
+                                        onClick={() => handleShowModal('REGISTER')} 
+                                        className="text-sm text-white hover:text-[#DB1FEB] transition-colors navbar-button"
+                                    >
+                                        {t.signup}
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="relative" ref={userMenuRef}>
+                                    <button 
+                                        onClick={toggleUserMenu}
+                                        className="flex items-center text-sm text-white hover:text-[#DB1FEB] transition-colors"
+                                    >
+                                        <FaRegCircleUser className="mr-1" size={18} />
+                                        <span>Account</span>
+                                        <IoIosArrowDown className={`ml-1 transition-transform ${isMenuOpen ? 'rotate-180' : ''}`} />
+                                    </button>
                                     <AnimatePresence>
                                         {isMenuOpen && (
-                                            <motion.div
-                                                ref={menuRef}
-                                                className='absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50'
-                                                variants={dropdownVariants}
+                                                                                            <motion.div
+                                                    className="absolute right-0 mt-2 w-48 bg-black bg-opacity-90 shadow-lg rounded-lg z-40"
+                                                    variants={dropdownVariants}
                                                 initial="hidden"
                                                 animate="visible"
                                                 exit="exit"
                                                 transition={{ duration: 0.2 }}
                                             >
-                                                <div className='py-2'>
-                                                    <Link href={'/wishlist'}>
-                                                        <div className='flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100'>
-                                                            <FaRegHeart size={20} className="mr-2" />
-                                                            <span>Wishlist</span>
+                                                <div className="py-2">
+                                                    <Link href={`/wishlist?locale=${locale}`}>
+                                                        <div className="flex items-center px-4 py-2 text-white hover:text-[#DB1FEB] transition-colors">
+                                                            <FaRegHeart size={16} className="mr-2" />
+                                                            <span>{t.wishlist}</span>
                                                         </div>
                                                     </Link>
-                                                    <Link href={'/bookings'}>
-                                                        <div className='px-4 py-2 hover:bg-gray-100 text-gray-700'>Bookings</div>
+                                                    <Link href={`/bookings?locale=${locale}`}>
+                                                        <div className="px-4 py-2 text-white hover:text-[#DB1FEB] transition-colors">{t.bookings}</div>
                                                     </Link>
-                                                    <Link href={'/orders'}>
-                                                        <div className='px-4 py-2 hover:bg-gray-100 text-gray-700'>Orders</div>
+                                                    <Link href={`/orders?locale=${locale}`}>
+                                                        <div className="px-4 py-2 text-white hover:text-[#DB1FEB] transition-colors">{t.orders}</div>
                                                     </Link>
-                                                    <Link href={'/tournaments'}>
-                                                        <div className='px-4 py-2 hover:bg-gray-100 text-gray-700'>Tournaments</div>
+                                                    <Link href={`/tournaments?locale=${locale}`}>
+                                                        <div className="px-4 py-2 text-white hover:text-[#DB1FEB] transition-colors">{t.tournaments}</div>
                                                     </Link>
-                                                    <button onClick={handleLogout} className='w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100'>
-                                                        Logout
+                                                    <button 
+                                                        onClick={handleLogout} 
+                                                        className="w-full text-left px-4 py-2 text-white hover:text-[#DB1FEB] transition-colors"
+                                                    >
+                                                        {t.logout}
                                                     </button>
                                                 </div>
                                             </motion.div>
                                         )}
                                     </AnimatePresence>
                                 </div>
-                            </>
-                        ) : (
-                            <div className='hidden md:flex gap-4 items-center'>
-                                <button onClick={() => handleShowModal('LOGIN')} className='text-white text-lg font-semibold'>Login</button>
-                                <span className='text-white'>|</span>
-                                <button onClick={() => handleShowModal('REGISTER')} className='text-white text-lg font-semibold'>Signup</button>
+                            )}
+                            
+                            {/* Book Now button - always visible */}
+                            <div>
+                                <BookNowButton locale={locale} margin="" />
                             </div>
-                        )}
+                        </div>
+                    </div>
 
-                        <BookNowButton />
-                        <FaBars className='text-white xl:hidden' size={28} onClick={handelShowSidebar} />
+                    {/* Main navbar with logo and navigation */}
+                    <div className="py-3 flex justify-between items-center">
+                        {/* Logo */}
+                        <Link href={`/?locale=${locale}`} className="flex-shrink-0">
+                            <img 
+                                src="/assets/logo.png" 
+                                alt="Virtual Arena" 
+                                className="h-10 md:h-12 w-auto object-contain" 
+                            />
+                        </Link>
+
+                        {/* Desktop Navigation */}
+                        <div className="hidden lg:flex items-center justify-center flex-grow">
+                            {/* Primary Navigation */}
+                            <nav className="flex items-center justify-center space-x-6 xl:space-x-8">
+                                {primaryNavItems.map((item, index) => (
+                                    <div 
+                                        key={index} 
+                                        className="relative"
+                                        ref={el => dropdownRefs.current[index] = el}
+                                    >
+                                        {item.hasDropdown ? (
+                                            <>
+                                                <button
+                                                    onClick={() => toggleDropdown(index)}
+                                                    className={`text-white text-sm xl:text-base font-medium hover:text-[#DB1FEB] flex items-center ${isActivePath(item.path) || activeDropdown === index ? 'text-[#DB1FEB] border-b-2 border-[#DB1FEB]' : ''}`}
+                                                >
+                                                    {item.title}
+                                                    <IoIosArrowDown className={`ml-1 transition-transform ${activeDropdown === index ? 'rotate-180' : ''}`} />
+                                                </button>
+                                                <AnimatePresence>
+                                                    {activeDropdown === index && (
+                                                        <motion.div
+                                                            className="absolute left-0 mt-2 w-64 bg-black bg-opacity-90 shadow-lg rounded-lg z-40 py-2"
+                                                            variants={dropdownVariants}
+                                                            initial="hidden"
+                                                            animate="visible"
+                                                            exit="exit"
+                                                            transition={{ duration: 0.2 }}
+                                                        >
+                                                            {item.dropdownItems.map((subItem, subIndex) => (
+                                                                <button
+                                                                    key={subIndex}
+                                                                    onClick={() => handleLink(subItem.path)}
+                                                                    className="block w-full text-left px-4 py-2 hover:bg-gray-800"
+                                                                >
+                                                                    <div className={`${isActivePath(subItem.path) ? 'text-[#DB1FEB]' : 'text-white'} hover:text-[#DB1FEB]`}>
+                                                                        {subItem.title}
+                                                                    </div>
+                                                                    <div className="text-xs text-gray-400">{subItem.description}</div>
+                                                                </button>
+                                                            ))}
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+                                            </>
+                                        ) : (
+                                            <button
+                                                onClick={() => handleLink(item.path)}
+                                                className={`text-white whitespace-nowrap text-sm xl:text-base font-medium hover:text-[#DB1FEB] text-wrap-balance ${isActivePath(item.path) ? 'text-[#DB1FEB] border-b-2 border-[#DB1FEB]' : ''}`}
+                                            >
+                                                {item.title}
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
+                            </nav>
+                        </div>
+
+                        {/* Mobile Navigation Controls */}
+                        <div className="flex items-center space-x-2 sm:space-x-3 lg:hidden">
+                            {isAuthenticated && (
+                                <div className="relative">
+                                    <Link href={`/cart?locale=${locale}`}>
+                                        <div className="relative">
+                                            <IoCartOutline size={20} className="text-white" />
+                                            {cart?.length > 0 && (
+                                                <span className="absolute -top-2 -right-2 h-4 w-4 text-xs bg-[#DB1FEB] text-white rounded-full flex justify-center items-center">
+                                                    {cart.length}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </Link>
+                                </div>
+                            )}
+                            
+                            {/* User account icon for mobile */}
+                            {isAuthenticated ? (
+                                <button 
+                                    onClick={() => setShowSidebar(true)}
+                                    className="text-white"
+                                >
+                                    <FaRegCircleUser size={20} />
+                                </button>
+                            ) : (
+                                <button 
+                                    onClick={() => handleShowModal('LOGIN')}
+                                    className="text-white"
+                                >
+                                    <FaRegCircleUser size={20} />
+                                </button>
+                            )}
+                            
+                            {/* Use smaller button size on mobile */}
+                            <BookNowButton locale={locale} margin="" size={locale === 'fr' ? 'compact' : 'small'} />
+                            
+                            <button 
+                                onClick={toggleSidebar}
+                                className="text-white p-1"
+                                aria-label="Menu"
+                            >
+                                <FaBars size={20} />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
             {/* Mobile Sidebar */}
-            <div className={`fixed top-0 right-0 transition-transform duration-300 z-40 min-h-screen w-full max-w-sm bg-blackish px-6 py-8 ${showSidebar ? "translate-x-0" : "translate-x-full"}`}>
-                <IoCloseCircleSharp className='text-white absolute top-4 right-4' size={28} onClick={handelShowSidebar} />
-                {/* Logo inside mobile menu */}
-                <div className='flex justify-center mb-8 sm:hidden'>
-                    <img src="/assets/logo.png" alt="Logo" className='w-[160px]' />
+            <div className={`fixed top-0 right-0 transition-transform duration-300 z-30 h-screen w-full max-w-[300px] bg-[#121212] px-6 py-8 overflow-y-auto ${showSidebar ? "translate-x-0" : "translate-x-full"}`}>
+                <div className="flex justify-between items-center mb-8">
+                    <Link href={`/?locale=${locale}`} onClick={() => setShowSidebar(false)}>
+                        <img src="/assets/logo.png" alt="Logo" className="w-[140px] object-contain" />
+                    </Link>
+                    <button onClick={toggleSidebar} className="text-white">
+                        <IoCloseCircleSharp size={24} />
+                    </button>
                 </div>
-                <div className='flex flex-col gap-6'>
-                    {navBtn.map((btn, i) => (
-                        <button key={i} onClick={() => handleLink(btn.path)} className='text-white text-lg font-semibold'>
-                            {btn.title}
-                        </button>
-                    ))}
+                
+                {/* Language switcher */}
+                <div className="flex justify-center mb-6">
+                    <LanguageSwitcher 
+                        currentLocale={locale} 
+                        showLabel={true}
+                        buttonStyle="pill" 
+                        size="sm"
+                    />
                 </div>
-                {!isAuthenticated && (
-                    <div className='flex gap-6 mt-8 justify-center text-lg font-semibold'>
-                        <button onClick={() => handleShowModal('LOGIN')} className='text-white'>Login</button>
-                        <span className='text-white'>|</span>
-                        <button onClick={() => handleShowModal('REGISTER')} className='text-white'>Signup</button>
+                
+                {/* Search input */}
+                <div className="mb-6">
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder={t.search}
+                            className="w-full py-2 px-4 bg-gray-800 text-white rounded-full focus:outline-none"
+                            onKeyDown={handleSearch}
+                        />
+                        <FaSearch className="absolute right-4 top-3 text-gray-400" />
                     </div>
-                )}
+                </div>
+                
+                {/* Mobile navigation items */}
+                <nav className="flex flex-col space-y-4">
+                    {primaryNavItems.map((item, index) => (
+                        <div key={index}>
+                            {item.hasDropdown ? (
+                                <>
+                                    <button
+                                        onClick={() => toggleMobileSubmenu(index)}
+                                        className={`flex items-center justify-between w-full text-white text-lg font-medium hover:text-[#DB1FEB] ${isActivePath(item.path) ? 'text-[#DB1FEB]' : ''}`}
+                                    >
+                                        <span>{item.title}</span>
+                                        <IoIosArrowDown className={`transition-transform ${showMobileSubmenu === index ? 'rotate-180' : ''}`} />
+                                    </button>
+                                    
+                                    <AnimatePresence>
+                                        {showMobileSubmenu === index && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: 'auto', opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                className="overflow-hidden"
+                                            >
+                                                <div className="pl-4 mt-2 flex flex-col space-y-3">
+                                                    {item.dropdownItems.map((subItem, subIndex) => (
+                                                        <button
+                                                            key={subIndex}
+                                                            onClick={() => handleLink(subItem.path)}
+                                                            className="text-left"
+                                                        >
+                                                            <div className={`${isActivePath(subItem.path) ? 'text-[#DB1FEB]' : 'text-white'} hover:text-[#DB1FEB]`}>
+                                                                {subItem.title}
+                                                            </div>
+                                                            <div className="text-xs text-gray-400">{subItem.description}</div>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </>
+                            ) : (
+                                <button
+                                    onClick={() => handleLink(item.path)}
+                                    className={`text-white text-lg font-medium hover:text-[#DB1FEB] text-left ${isActivePath(item.path) ? 'text-[#DB1FEB]' : ''}`}
+                                >
+                                    {item.title}
+                                </button>
+                            )}
+                        </div>
+                    ))}
+                </nav>
+                
+                {/* Mobile user account section */}
+                <div className="mt-8 pt-6 border-t border-gray-800">
+                    {isAuthenticated ? (
+                        <div className="flex flex-col space-y-3">
+                            <h3 className="text-[#DB1FEB] font-medium mb-2">My Account</h3>
+                            <Link href={`/wishlist?locale=${locale}`} onClick={() => setShowSidebar(false)}>
+                                <div className="text-white hover:text-[#DB1FEB]">{t.wishlist}</div>
+                            </Link>
+                            <Link href={`/bookings?locale=${locale}`} onClick={() => setShowSidebar(false)}>
+                                <div className="text-white hover:text-[#DB1FEB]">{t.bookings}</div>
+                            </Link>
+                            <Link href={`/orders?locale=${locale}`} onClick={() => setShowSidebar(false)}>
+                                <div className="text-white hover:text-[#DB1FEB]">{t.orders}</div>
+                            </Link>
+                            <Link href={`/tournaments?locale=${locale}`} onClick={() => setShowSidebar(false)}>
+                                <div className="text-white hover:text-[#DB1FEB]">{t.tournaments}</div>
+                            </Link>
+                            <button 
+                                onClick={() => {
+                                    handleLogout();
+                                    setShowSidebar(false);
+                                }}
+                                className="text-white hover:text-[#DB1FEB] text-left"
+                            >
+                                {t.logout}
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col space-y-4">
+                            <button 
+                                onClick={() => {
+                                    handleShowModal('LOGIN');
+                                    setShowSidebar(false);
+                                }} 
+                                className="bg-transparent border border-[#DB1FEB] text-white py-2 px-4 rounded-full hover:bg-[#DB1FEB] transition-colors"
+                            >
+                                {t.login}
+                            </button>
+                            <button 
+                                onClick={() => {
+                                    handleShowModal('REGISTER');
+                                    setShowSidebar(false);
+                                }} 
+                                className="bg-[#DB1FEB] text-white py-2 px-4 rounded-full hover:bg-opacity-80 transition-colors"
+                            >
+                                {t.signup}
+                            </button>
+                        </div>
+                    )}
+                </div>
+                
+                {/* Business info */}
+                <div className="mt-8 pt-6 border-t border-gray-800 text-sm text-gray-400">
+                    <div className="flex items-center mb-2">
+                        <FaMapMarkerAlt className="mr-2 text-[#DB1FEB]" />
+                        <span>Edmonton, AB</span>
+                    </div>
+                    <div className="flex items-center">
+                        <FaClock className="mr-2 text-[#DB1FEB]" />
+                        <span>Mon-Sun: 10AM-10PM</span>
+                    </div>
+                </div>
             </div>
 
-            {/* Backdrop */}
-            {showSidebar && <div className="fixed inset-0 bg-black bg-opacity-30 z-30" onClick={handelShowSidebar} />}
+            {/* Backdrop for mobile sidebar */}
+            {showSidebar && (
+                <div 
+                    className="fixed inset-0 bg-black bg-opacity-50 z-20" 
+                    onClick={toggleSidebar}
+                />
+            )}
 
             {/* Modals */}
             {showModal && (

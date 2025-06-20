@@ -1,8 +1,11 @@
 'use client'
 import Link from 'next/link'
 import React from 'react'
+import { translations } from '../../translations'
 
-const Package = () => {
+const Package = ({ locale = 'en' }) => {
+    const t = translations[locale] || translations.en;
+    
     return (
         <>
             <div className='w-full bg-blackish h-[197px] overflow-hidden'></div>
@@ -14,16 +17,16 @@ const Package = () => {
                 <div className='w-full mx-auto max-w-[1600px] py-[100px] flex items-center px-4 md:px-10 lg:px-16 xl:px-20 2xl:px-6 relative z-10'>
 
                     <div className='w-full max-w-[858px]'>
-                        <h3 className='text-white text-[26px] md:text-[30px]'>Ready to Dive In?</h3>
+                        <h3 className='text-white text-[26px] md:text-[30px]'>{t.readyToDive}</h3>
                         <h1 className='text-white text-[50px] md:text-[60px] mt-3 font-bold leading-tight'>
-                            Let's Get Started
+                            {t.letsGetStarted}
                         </h1>
                         <p className='text-[18px] text-white mt-4'>
-                            Whether you're a gamer, developer, or business innovator — our immersive VR packages are built to accelerate your experience. Choose the one that fits you best and get started today.
+                            {t.packageDescription}
                         </p>
-                        <Link href={'/deals'}>
+                        <Link href={`/deals?locale=${locale}`}>
                             <button className='text-xl mt-5 font-semibold flex items-center py-2 md:py-4 px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7]'>
-                                Explore VR Packages
+                                {t.exploreVrPackages}
                                 <img src="/icons/arrow.svg" alt="" className='h-[22px] w-[22px] ml-[11px] rounded-full' />
                             </button>
                         </Link>
