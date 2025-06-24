@@ -7,7 +7,7 @@ import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
 
 const getCheckoutSession = async (sessionId) => {
-    const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY || 'pk_test_51QqzpyFLqQszUfi0KlXuam1QElLMCBnGyOrIx0nf5CnasIfgRi3t1hx5tfU1x15zHymJpUdAHVSPFOZnzRZ33ogS00b6uDZsMu', {
+    const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY , {
         apiVersion: '2025-01-27.acacia',
     });
 
