@@ -5,6 +5,7 @@ import { Elements, CardElement, useStripe, useElements } from '@stripe/react-str
 import { API_URL, getAuthHeaders } from '@/utils/ApiUrl';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
 
 const stripePromise = loadStripe('pk_test_51R1sVDPhzbqEOoSjq3Oyx0YSzQmwzsUaW2wsa3WLzv6ECsNv10SL0ymASJIES5yAi4k6lexmPFd1B3yPeaTxqHY500mRSfYdQq'); // Use your Stripe publishable key
 
@@ -13,6 +14,7 @@ const PaymentForm = ({ entity, userId, amount, onSuccess, onClose, type }) => {
     const elements = useElements();
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -32,6 +34,7 @@ const PaymentForm = ({ entity, userId, amount, onSuccess, onClose, type }) => {
         }
 
         try {
+            // Create a payment intent on the server
             const response = await axios.post(
                 `${API_URL}/payment/create-payment-intent`,
                 {
@@ -43,26 +46,77 @@ const PaymentForm = ({ entity, userId, amount, onSuccess, onClose, type }) => {
                 getAuthHeaders()
             );
 
-            console.log('API Response:', response.data);
+            console.log('Payment Intent Created:', response.data);
 
             const clientSecret = response.data?.clientSecret;
             if (!clientSecret) {
                 throw new Error('Missing clientSecret in API response');
             }
 
+            // Confirm the payment with Stripe.js
             const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-                payment_method: { card: cardElement },
+                payment_method: { 
+                    card: cardElement,
+                    billing_details: {
+                        // You can add billing details here if available
+                        // name: 'Customer Name',
+                        // email: 'customer@example.com',
+                    }
+                },
             });
 
             if (stripeError) {
+                console.error('Stripe Error:', stripeError);
                 setError(stripeError.message);
-            } else {
+            } else if (paymentIntent.status === 'succeeded') {
+                console.log('Payment succeeded:', paymentIntent.id);
+                // Payment succeeded - call onSuccess to complete the order
                 onSuccess();
+                onClose();
+            } else {
+                // Payment requires additional action or is processing
+                console.log('Payment status:', paymentIntent.status);
+                // You might want to show a different message based on the status
+                onSuccess(); // Still call onSuccess as the webhook will handle the final status
                 onClose();
             }
         } catch (err) {
             setError(err.message || 'Payment failed');
             console.error('Payment Error:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Alternative: Use Stripe Checkout Session
+    const handleCheckoutSession = async () => {
+        setLoading(true);
+        try {
+            // Create a checkout session on the server
+            const response = await axios.post(
+                `${API_URL}/payment/create-checkout-session`,
+                {
+                    user_id: userId,
+                    entity_id: entity,
+                    entity_type: type,
+                    amount,
+                },
+                getAuthHeaders()
+            );
+
+            const { sessionId } = response.data;
+            
+            // Redirect to Stripe Checkout
+            const result = await stripe.redirectToCheckout({
+                sessionId: sessionId
+            });
+
+            if (result.error) {
+                setError(result.error.message);
+            }
+        } catch (err) {
+            setError(err.message || 'Failed to create checkout session');
+            console.error('Checkout Error:', err);
         } finally {
             setLoading(false);
         }
@@ -89,13 +143,21 @@ const PaymentForm = ({ entity, userId, amount, onSuccess, onClose, type }) => {
                 disabled={!stripe || loading}
                 className="bg-white w-full text-black max-w-sm mx-auto px-4 py-2 rounded disabled:bg-gray-400"
             >
-                {loading ? 'Processing...' : 'Pay'}
+                {loading ? 'Processing...' : 'Pay with Card'}
+            </button>
+            <button
+                type="button"
+                onClick={handleCheckoutSession}
+                disabled={!stripe || loading}
+                className="bg-blue-500 w-full text-white max-w-sm mx-auto px-4 py-2 rounded disabled:bg-gray-400 mt-2"
+            >
+                {loading ? 'Processing...' : 'Checkout with Stripe'}
             </button>
         </form>
     );
 };
 
-const PaymentModal = ({ isOpen, onClose, entity, userId, amount, onSuccess, type,onRedeemSuccess }) => {
+const PaymentModal = ({ isOpen, onClose, entity, userId, amount, onSuccess, type, onRedeemSuccess }) => {
     const [option, setOption] = useState('card'); // 'card' or 'giftCard'
     const [code, setCode] = useState(''); // State for gift card code
     const { userData } = useSelector((state) => state.userData)
