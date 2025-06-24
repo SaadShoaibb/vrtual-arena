@@ -7,8 +7,8 @@ import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
 
 const getCheckoutSession = async (sessionId) => {
-    const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY || 'sk_test_51R1sVDPhzbqEOoSjq3Oyx0YSzQmwzsUaW2wsa3WLzv6ECsNv10SL0ymASJIES5yAi4k6lexmPFd1B3yPeaTxqHY500mRSfYdQq', {
-        apiVersion: '2023-10-16',
+    const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY || 'pk_test_51QqzpyFLqQszUfi0KlXuam1QElLMCBnGyOrIx0nf5CnasIfgRi3t1hx5tfU1x15zHymJpUdAHVSPFOZnzRZ33ogS00b6uDZsMu', {
+        apiVersion: '2025-01-27.acacia',
     });
 
     return stripe.checkout.sessions.retrieve(sessionId);
