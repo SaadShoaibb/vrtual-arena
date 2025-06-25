@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
-import { API_URL, getAuthHeaders } from '@/utils/ApiUrl';
+import { API_URL, getAuthHeaders, validateToken } from '@/utils/ApiUrl';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
@@ -23,6 +23,23 @@ const PaymentForm = ({ entity, userId, amount, onSuccess, onClose, type }) => {
     // Create a payment intent when the component mounts
     const createPaymentIntent = async () => {
       try {
+        // Debug: Log auth headers before sending request
+        console.log('AUTH HEADERS', getAuthHeaders());
+        
+        // Debug: Check if user is authenticated in Redux
+        const isAuthenticated = localStorage.getItem('token') ? true : false;
+        console.log('Is user authenticated:', isAuthenticated);
+        
+        // Validate token before making the request
+        if (isAuthenticated) {
+          const isTokenValid = await validateToken();
+          console.log('Is token valid:', isTokenValid);
+          
+          if (!isTokenValid) {
+            console.error('Token validation failed, attempting to proceed anyway');
+          }
+        }
+        
         const response = await axios.post(
           `${API_URL}/payment/create-payment-intent`,
           {
