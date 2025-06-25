@@ -254,7 +254,7 @@ const PaymentModal = ({ isOpen, onClose, entity, userId, amount, onSuccess, onRe
   // Options for the Stripe Elements instance
   const options = {
     mode: 'payment',
-    amount: amount * 100, // Convert to cents
+    amount: Math.round(amount * 100), // Convert to cents and ensure it's an integer
     currency: 'usd',
     appearance,
   };
