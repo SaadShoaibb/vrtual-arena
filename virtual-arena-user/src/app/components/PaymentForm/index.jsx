@@ -1,112 +1,123 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Elements, CardElement, useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
 import { API_URL, getAuthHeaders } from '@/utils/ApiUrl';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 
-const stripePromise = loadStripe('pk_test_51R1sVDPhzbqEOoSjq3Oyx0YSzQmwzsUaW2wsa3WLzv6ECsNv10SL0ymASJIES5yAi4k6lexmPFd1B3yPeaTxqHY500mRSfYdQq'); // Use your Stripe publishable key
+// Load the Stripe publishable key from environment variable
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_51QqzplJwuqd2a0tdgYOnwfBMxMzO66QWFCqzLN1winM5eGPI3iw4lMRriZrJvQF2kB76CxssHNDyJUpG54DJreHY00g79mEHeC')
 
 const PaymentForm = ({ entity, userId, amount, onSuccess, onClose, type }) => {
-    const stripe = useStripe();
-    const elements = useElements();
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const router = useRouter();
+  const stripe = useStripe();
+  const elements = useElements();
+  const [error, setError] = useState(null);
+  const [processing, setProcessing] = useState(false);
+  const [succeeded, setSucceeded] = useState(false);
+  const [clientSecret, setClientSecret] = useState('');
+  const router = useRouter();
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        setLoading(true);
+  useEffect(() => {
+    // Create a payment intent when the component mounts
+    const createPaymentIntent = async () => {
+      try {
+        const response = await axios.post(
+          `${API_URL}/payment/create-payment-intent`,
+          {
+            amount,
+            userId,
+            entity_id: entity.id,
+            entity_type: type,
+            connected_account_id: entity.connected_account_id || null,
+          },
+          {
+            headers: getAuthHeaders(),
+          }
+        );
 
-        if (!stripe || !elements) {
-            setError('Stripe has not loaded yet. Please try again.');
-            setLoading(false);
-            return;
-        }
+        setClientSecret(response.data.clientSecret);
+      } catch (err) {
+        console.error('Error creating payment intent:', err);
+        setError(`Payment setup failed: ${err.message || 'Unknown error'}`);
+      }
+    };
 
-        const cardElement = elements.getElement(CardElement);
-        if (!cardElement) {
-            setError('Card details are not entered.');
-            setLoading(false);
-            return;
-        }
+    if (amount > 0) {
+      createPaymentIntent();
+    }
+  }, [amount, entity.id, entity.connected_account_id, userId, type]);
 
-        try {
-            // Create a payment intent on the server
-            const response = await axios.post(
-                `${API_URL}/payment/create-payment-intent`,
-                {
-                    user_id: userId,
-                    entity_id: entity,
-                    entity_type: type,
-                    amount,
-                },
-                getAuthHeaders()
-            );
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setProcessing(true);
 
-            console.log('Payment Intent Created:', response.data);
+    if (!stripe || !elements) {
+      setProcessing(false);
+      return;
+    }
 
-            const clientSecret = response.data?.clientSecret;
-            if (!clientSecret) {
-                throw new Error('Missing clientSecret in API response');
-            }
+    try {
+      const { error: submitError } = await elements.submit();
+      
+      if (submitError) {
+        setError(submitError.message);
+        setProcessing(false);
+        return;
+      }
 
-            // Confirm the payment with Stripe.js
-            const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-                payment_method: { 
-                    card: cardElement,
-                    billing_details: {
-                        // You can add billing details here if available
-                        // name: 'Customer Name',
-                        // email: 'customer@example.com',
-                    }
-                },
-            });
+      // Confirm the payment with Stripe.js
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        clientSecret,
+        confirmParams: {
+          return_url: `${window.location.origin}/checkout/success`,
+        },
+        redirect: 'if_required',
+      });
 
-            if (stripeError) {
-                console.error('Stripe Error:', stripeError);
-                setError(stripeError.message);
-            } else if (paymentIntent.status === 'succeeded') {
-                console.log('Payment succeeded:', paymentIntent.id);
-                // Payment succeeded - call onSuccess to complete the order
-                onSuccess();
-                onClose();
-            } else {
-                // Payment requires additional action or is processing
-                console.log('Payment status:', paymentIntent.status);
-                // You might want to show a different message based on the status
-                onSuccess(); // Still call onSuccess as the webhook will handle the final status
-                onClose();
-            }
-        } catch (err) {
-            setError(err.message || 'Payment failed');
-            console.error('Payment Error:', err);
-        } finally {
-            setLoading(false);
-        }
+      if (error) {
+        setError(`Payment failed: ${error.message}`);
+        setProcessing(false);
+      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        setSucceeded(true);
+        setError(null);
+        setProcessing(false);
+        onSuccess(paymentIntent);
+      }
+    } catch (err) {
+      setError(`Payment failed: ${err.message || 'Unknown error'}`);
+      setProcessing(false);
+    }
     };
 
     // Alternative: Use Stripe Checkout Session
     const handleCheckoutSession = async () => {
-        setLoading(true);
+        setProcessing(true);
         try {
             // Create a checkout session on the server
             const response = await axios.post(
                 `${API_URL}/payment/create-checkout-session`,
                 {
                     user_id: userId,
-                    entity_id: entity,
+                    entity_id: entity.id,
                     entity_type: type,
                     amount,
+                    connected_account_id: entity.connected_account_id || null,
                 },
-                getAuthHeaders()
+                {
+                    headers: getAuthHeaders(),
+                }
             );
 
             const { sessionId } = response.data;
             
             // Redirect to Stripe Checkout
+            if (!stripe) {
+                throw new Error('Stripe failed to load');
+            }
+            
             const result = await stripe.redirectToCheckout({
                 sessionId: sessionId
             });
@@ -118,136 +129,209 @@ const PaymentForm = ({ entity, userId, amount, onSuccess, onClose, type }) => {
             setError(err.message || 'Failed to create checkout session');
             console.error('Checkout Error:', err);
         } finally {
-            setLoading(false);
+            setProcessing(false);
         }
     };
 
+  // Show loading state while waiting for clientSecret
+  if (!clientSecret && !error) {
     return (
-        <form onSubmit={handleSubmit} className="space-y-4 w-full flex flex-col items-center">
-            <div className="p-2 border rounded mx-auto w-full max-w-sm text-white">
-            <CardElement 
-        options={{ 
-            style: { 
-                base: { 
-                    fontSize: "16px",
-                    color: "white",
-                    "::placeholder": { color: "white" } // Ensures placeholder is white
-                } 
-            } 
-        }} 
-    />
-            </div>
-            {error && <div className="text-red-500">{error}</div>}
-            <button
-                type="submit"
-                disabled={!stripe || loading}
-                className="bg-white w-full text-black max-w-sm mx-auto px-4 py-2 rounded disabled:bg-gray-400"
-            >
-                {loading ? 'Processing...' : 'Pay with Card'}
-            </button>
-            <button
-                type="button"
-                onClick={handleCheckoutSession}
-                disabled={!stripe || loading}
-                className="bg-blue-500 w-full text-white max-w-sm mx-auto px-4 py-2 rounded disabled:bg-gray-400 mt-2"
-            >
-                {loading ? 'Processing...' : 'Checkout with Stripe'}
-            </button>
-        </form>
+      <div className="flex items-center justify-center p-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        <p className="ml-2">Loading payment form...</p>
+      </div>
     );
+  }
+
+  return (
+    <div className="payment-form-container p-4 bg-white rounded-lg shadow-md">
+      {error && (
+        <div className="payment-error mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+          {error}
+        </div>
+      )}
+
+      {clientSecret ? (
+        <form onSubmit={handleSubmit} className="payment-form space-y-4">
+          <PaymentElement />
+
+          <div className="payment-buttons flex flex-col space-y-2 mt-4">
+            <button
+              type="submit"
+              disabled={!stripe || processing}
+              className="payment-button w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {processing ? 'Processing...' : `Pay $${amount}`}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="cancel-button w-full py-2 px-4 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      ) : (
+        <div className="alternative-payment space-y-4">
+          <p className="text-center text-gray-700">Use our secure checkout page instead:</p>
+          <button
+            type="button"
+            onClick={handleCheckoutSession}
+            disabled={processing}
+            className="checkout-button w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {processing ? 'Processing...' : `Pay with Stripe Checkout`}
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="cancel-button w-full py-2 px-4 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+    </div>
+  );
 };
 
-const PaymentModal = ({ isOpen, onClose, entity, userId, amount, onSuccess, type, onRedeemSuccess }) => {
-    const [option, setOption] = useState('card'); // 'card' or 'giftCard'
-    const [code, setCode] = useState(''); // State for gift card code
-    const { userData } = useSelector((state) => state.userData)
-    if (!isOpen) return null;
+const PaymentModal = ({ isOpen, onClose, entity, userId, amount, onSuccess, onRedeemSuccess, type }) => {
+  const [paymentOption, setPaymentOption] = useState('online');
+  const [giftCardCode, setGiftCardCode] = useState('');
+  const [error, setError] = useState(null);
+  const [processing, setProcessing] = useState(false);
+  const [appearance, setAppearance] = useState({
+    theme: 'stripe',
+    variables: {
+      colorPrimary: '#0070f3',
+      colorBackground: '#ffffff',
+      colorText: '#30313d',
+      colorDanger: '#df1b41',
+      fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      spacingUnit: '4px',
+      borderRadius: '4px',
+    },
+  });
 
-    const handleOption = (selectedOption) => {
-        setOption(selectedOption);
-    };
+  const handleGiftCardRedeem = async () => {
+    if (!giftCardCode.trim()) {
+      setError('Please enter a gift card code');
+      return;
+    }
 
-    const handleInputChange = (e) => {
-        setCode(e.target.value);
-    };
+    setProcessing(true);
+    setError(null);
 
-    const handleRedeem = async () => {
-        try {
-            const response = await axios.post(
-                `${API_URL}/user/redeem`,
-                { user_id: userId, user_gift_card_code: code, amount_used: amount },
-                getAuthHeaders()
-            );
-
-            if (response.status === 200) {
-                alert(`Gift card redeemed successfully! Remaining balance: $${response.data.remaining_balance}`);
-                setCode('')
-               onRedeemSuccess()
-            }
-        } catch (err) {
-            console.log(err)
-            alert(err.response?.data?.message || 'Failed to redeem gift card.');
+    try {
+      const response = await axios.post(
+        `${API_URL}/gift-cards/redeem`,
+        {
+          code: giftCardCode,
+          amount,
+          entity_id: entity.id,
+          entity_type: type,
+        },
+        {
+          headers: getAuthHeaders(),
         }
-    };
+      );
 
-    return (
-        <div className='flex justify-center items-center flex-col mt-16 w-full'>
-            <h2 className="text-xl font-bold mb-4 text-white">Complete Your Purchase</h2>
-            <p className="mb-4 text-white">You will pay: <span className="font-bold">${amount}</span></p>
+      if (response.data.success) {
+        onRedeemSuccess(response.data);
+      } else {
+        setError(response.data.message || 'Failed to redeem gift card');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to redeem gift card');
+    } finally {
+      setProcessing(false);
+    }
+  };
 
-            {/* Payment Options */}
-            <div className='mb-6'>
+  if (!isOpen) return null;
+
+  // Options for the Stripe Elements instance
+  const options = {
+    mode: 'payment',
+    amount: amount * 100, // Convert to cents
+    currency: 'usd',
+    appearance,
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg max-w-md w-full shadow-xl">
+        <h2 className="text-xl font-bold mb-4 text-gray-800">Payment Options</h2>
+
+        <div className="mb-4">
+          <div className="flex space-x-4 mb-4">
+            <button
+              className={`px-4 py-2 rounded ${paymentOption === 'online' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}
+              onClick={() => setPaymentOption('online')}
+            >
+              Online Payment
+            </button>
+            <button
+              className={`px-4 py-2 rounded ${paymentOption === 'gift-card' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}
+              onClick={() => setPaymentOption('gift-card')}
+            >
+              Gift Card
+            </button>
+          </div>
+
+          {paymentOption === 'online' ? (
+            <Elements stripe={stripePromise} options={options}>
+              <PaymentForm
+                entity={entity}
+                userId={userId}
+                amount={amount}
+                onSuccess={onSuccess}
+                onClose={onClose}
+                type={type}
+              />
+            </Elements>
+          ) : (
+            <div className="gift-card-form bg-gray-50 p-4 rounded-md">
+              <div className="mb-4">
+                <label htmlFor="gift-card" className="block text-sm font-medium text-gray-700 mb-1">
+                  Gift Card Code
+                </label>
+                <input
+                  type="text"
+                  id="gift-card"
+                  value={giftCardCode}
+                  onChange={(e) => setGiftCardCode(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter gift card code"
+                />
+              </div>
+
+              {error && <div className="text-red-500 mb-4 p-2 bg-red-50 rounded">{error}</div>}
+
+              <div className="flex space-x-2">
                 <button
-                    className={`${option === "card" ? "bg-grad rounded-lg" : ""} px-6 text-white py-2`}
-                    onClick={() => handleOption('card')}
+                  type="button"
+                  onClick={handleGiftCardRedeem}
+                  disabled={processing}
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                    Online
+                  {processing ? 'Processing...' : 'Redeem'}
                 </button>
                 <button
-                    className={`${option === "giftCard" ? "bg-grad rounded-lg" : ""} px-6 text-white py-2`}
-                    onClick={() => handleOption('giftCard')}
+                  type="button"
+                  onClick={onClose}
+                  className="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
                 >
-                    Gift Card
+                  Cancel
                 </button>
+              </div>
             </div>
-
-            {/* Online Payment (Stripe) */}
-            {option === "card" && (
-                <Elements stripe={stripePromise} className="w-full">
-                    <PaymentForm
-                        entity={entity}
-                        userId={userId}
-                        amount={amount}
-                        onSuccess={onSuccess}
-                        onClose={onClose}
-                        type={type}
-                    />
-                </Elements>
-            )}
-
-            {/* Gift Card Payment */}
-            {option === "giftCard" && (
-                <div className=''>
-                    <h2 className="text-white text-xl font-bold mb-4">Complete Your Purchase</h2>
-                    <p className="mb-4 text-white">You will pay: <span className="font-bold">${amount}</span></p>
-                    <input
-                        type="text"
-                        placeholder="Enter gift card code"
-                        value={code}
-                        onChange={handleInputChange}
-                        className="w-full p-2 border rounded bg-transparent text-white mb-2"
-                    />
-                    <button
-                        onClick={handleRedeem}
-                        className="mt-3 w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded"
-                    >
-                        Buy with Card
-                    </button>
-                </div>
-            )}
+          )}
         </div>
-           
-    );
+      </div>
+    </div>
+  );
 };
 
 export default PaymentModal;

@@ -1,30 +1,71 @@
 'use client';
-import { redirect } from "next/navigation";
-import Stripe from "stripe";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
 
-const getCheckoutSession = async (sessionId) => {
-    const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY , {
-        apiVersion: '2025-01-27.acacia',
-    });
-
-    return stripe.checkout.sessions.retrieve(sessionId);
-};
-
-const CheckoutSuccessPage = async ({ searchParams }) => {
+const CheckoutSuccessPage = ({ searchParams }) => {
+    const router = useRouter();
     const session_id = searchParams.session_id;
+    const [session, setSession] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    if (!session_id) {
-        redirect('/');
+    useEffect(() => {
+        if (!session_id) {
+            router.push('/');
+            return;
+        }
+
+        const fetchSession = async () => {
+            try {
+                const response = await axios.get(`/api/checkout/session?session_id=${session_id}`);
+                setSession(response.data);
+            } catch (err) {
+                console.error('Error fetching session:', err);
+                setError('Failed to load checkout information');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchSession();
+    }, [session_id, router]);
+
+    if (loading) {
+        return (
+            <div className="bg-blackish text-white">
+                <Navbar />
+                <div className='min-h-[60vh] flex items-center justify-center'>
+                    <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto'></div>
+                </div>
+                <Footer />
+            </div>
+        );
     }
 
-    const session = await getCheckoutSession(session_id);
-
-    if (!session) {
-        redirect("/");
+    if (error || !session) {
+        return (
+            <div className="bg-blackish text-white">
+                <Navbar />
+                <div className='min-h-[60vh] flex items-center justify-center'>
+                    <div className='max-w-md w-full mx-auto p-6'>
+                        <div className='bg-gray-900 rounded-2xl shadow-xl p-6 text-center'>
+                            <h1 className='text-2xl font-bold text-white mb-2'>Something went wrong</h1>
+                            <p className='text-red-500 mb-6'>{error || 'Could not find checkout session'}</p>
+                            <button 
+                                onClick={() => router.push('/')} 
+                                className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+                            >
+                                Return to home
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <Footer />
+            </div>
+        );
     }
 
     return (
@@ -42,13 +83,30 @@ const CheckoutSuccessPage = async ({ searchParams }) => {
                         <p className='text-gray-400 mb-6'>
                             We have received your order, and will send you a confirmation email shortly!
                         </p>
-                        <div className='text-sm text-gray-400'>
+                        <div className='text-sm text-gray-400 mb-2'>
                             Order total: {new Intl.NumberFormat('en-US', {
                                 style: 'currency',
-                                currency: session.currency || 'CAD',
+                                currency: session.currency || 'USD',
                             }).format((session.amount_total || 0) / 100)}
                         </div>
-                        <div className='text-sm text-gray-400'>Order email: {session.customer_details?.email}</div>
+                        <div className='text-sm text-gray-400 mb-2'>Order email: {session.customer_details?.email}</div>
+                        {session.metadata?.entity_type && (
+                            <div className='text-sm text-gray-400 mb-4'>Type: {session.metadata.entity_type}</div>
+                        )}
+                        <div className='mt-6 space-y-3'>
+                            <button
+                                onClick={() => router.push('/orders')}
+                                className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+                            >
+                                View Your Orders
+                            </button>
+                            <button
+                                onClick={() => router.push('/')}
+                                className="w-full bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-600 transition"
+                            >
+                                Continue Shopping
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
