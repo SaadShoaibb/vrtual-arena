@@ -1,5 +1,5 @@
 
-import { API_URL, getAuthHeaders } from '@/utils/ApiUrl';
+import { API_URL, getAuthHeaders, getMediaBaseUrl } from '@/utils/ApiUrl';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
@@ -20,6 +20,26 @@ const Cart = ({ cart }) => {
   const hasPhysicalProducts = cartItems.some(item => !item.item_type || item.item_type === 'product');
   
   const subtotal = cartItems.reduce((total, item) => total + item.discount_price * item.quantity, 0);
+
+  // Helper: return correct image URL or null
+  const getImageSrc = (cartItem) => {
+    if (cartItem.item_type === 'tournament') return '/assets/tournament.png';
+
+    if (cartItem.images) {
+      // images can be an array or comma-separated string
+      if (Array.isArray(cartItem.images) && cartItem.images.length) {
+        let img = cartItem.images[0];
+        if (img.startsWith('/')) img = `${getMediaBaseUrl()}${img}`;
+        return img;
+      }
+      if (typeof cartItem.images === 'string' && cartItem.images.length) {
+        let img = cartItem.images.split(',')[0];
+        if (img.startsWith('/')) img = `${getMediaBaseUrl()}${img}`;
+        return img;
+      }
+    }
+    return null; // no image available
+  };
 
   const incrementQuantity = async (cart_id) => {
     try {
@@ -83,7 +103,9 @@ const Cart = ({ cart }) => {
                         <button onClick={() => removeItem(item.cart_id)} >
                           <IoClose size={24} />
                         </button>
-                        <img src={item.item_type === 'tournament' ? '/assets/tournament.png' : '/assets/d1.png'} className="h-20 w-20 object-cover" alt={item.name} />
+                        {getImageSrc(item) && (
+                            <img src={getImageSrc(item)} className="h-20 w-20 object-cover" alt={item.name} />
+                          )}
                         <div>
                           <h2 className="text-lg font-semibold">{item.name}</h2>
                           {item.item_type === 'tournament' && 
@@ -122,7 +144,9 @@ const Cart = ({ cart }) => {
                   <button onClick={() => removeItem(item.cart_id)} >
                     <IoClose size={24} />
                   </button>
-                  <img src={item.item_type === 'tournament' ? '/assets/tournament.png' : '/assets/d1.png'} className="h-20 w-20 object-cover" alt={item.name} />
+                  {getImageSrc(item) && (
+                            <img src={getImageSrc(item)} className="h-20 w-20 object-cover" alt={item.name} />
+                          )}
                   <div>
                     <h2 className="text-lg font-semibold text-nowrap">{item.name}</h2>
                     {item.item_type === 'tournament' && 

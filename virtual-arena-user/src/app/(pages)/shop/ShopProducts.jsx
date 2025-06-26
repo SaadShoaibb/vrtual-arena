@@ -78,6 +78,7 @@ const ShopProducts = ({ category }) => {
                 case 'branded':
                     return product.name?.toLowerCase().includes('shirt') || 
                            product.name?.toLowerCase().includes('hat') ||
+                           product.name?.toLowerCase().includes('mug') ||
                            product.name?.toLowerCase().includes('cap');
                 case 'gift-cards':
                     return product.name?.toLowerCase().includes('gift') || 

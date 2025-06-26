@@ -213,7 +213,7 @@ const Navbar = ({ locale = 'en' }) => {
                         <div className="flex items-center space-x-4 text-sm">
                             <div className="flex items-center">
                                 <FaMapMarkerAlt className="mr-1 text-[#DB1FEB]" />
-                                <span className="text-white">Edmonton, AB</span>
+                                <span className="text-white">8109 102 St NW, Edmonton, AB T6E 4A4</span>
                             </div>
                             <div className="flex items-center">
                                 <FaClock className="mr-1 text-[#DB1FEB]" />
@@ -608,7 +608,7 @@ const Navbar = ({ locale = 'en' }) => {
                 <div className="mt-8 pt-6 border-t border-gray-800 text-sm text-gray-400">
                     <div className="flex items-center mb-2">
                         <FaMapMarkerAlt className="mr-2 text-[#DB1FEB]" />
-                        <span>Edmonton, AB</span>
+                        <span>8109 102 St NW, Edmonton, AB T6E 4A4</span>
                     </div>
                     <div className="flex items-center">
                         <FaClock className="mr-2 text-[#DB1FEB]" />

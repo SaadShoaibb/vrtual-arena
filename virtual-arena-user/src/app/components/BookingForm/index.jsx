@@ -1,5 +1,12 @@
 'use client'
 import React, { useEffect, useState } from 'react'
+
+// Helper to format Date object to YYYY-MM-DDTHH:MM in LOCAL time (suitable for datetime-local input)
+const formatLocalDateTimeInput = (date) => {
+    const pad = (n) => n.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+};
+
 import Form from '../common/Form';
 import FieldContainer from '../common/FieldContainer';
 import Input from '../common/Input';
@@ -12,14 +19,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { closeBookModal } from '@/Store/ReduxSlice/bookModalSlice';
 import toast from 'react-hot-toast';
 import { fetchUserData } from '@/Store/Actions/userActions';
+
 const MODE = {
     BOOKING: "BOOKING",
     DETAIL: "DETAIL",
     CHECKOUT: "CHECKOUT",
     SUCCESS: "SUCCESS",
 }
+
 const BookingForm = () => {
-    const [formData, setFormData] = useState( {
+    const [formData, setFormData] = useState({
         machine_type: "",
         start_time: "",
         end_time: "",
@@ -30,7 +39,7 @@ const BookingForm = () => {
     const [selectedSession, setSelectedSession] = useState({})
     // const [bookings,setBookings] = useState([])
     const [selectedSessionId, setSelectedSessionId] = useState(""); // Track selected session ID
-    const {bookings} = useSelector((state)=>state.userData)
+    const { bookings } = useSelector((state) => state.userData)
     const dispatch = useDispatch()
     const handleFetchSession = async () => {
         try {
@@ -41,7 +50,7 @@ const BookingForm = () => {
         }
     };
 
-    
+
 
     useEffect(() => {
         handleFetchSession();
@@ -50,7 +59,7 @@ const BookingForm = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-    
+
         if (name === "machine_type") {
             setSelectedSessionId(value);
             const selectedSession = sessions.find(session => session.session_id === parseInt(value));
@@ -66,17 +75,17 @@ const BookingForm = () => {
             if (selectedSession) {
                 const startTime = new Date(value);
                 const now = new Date();
-    
+
                 // Prevent past time selection
                 if (startTime < now) {
                     alert("Start time cannot be in the past.");
                     return;
                 }
-    
+
                 // Calculate end time correctly
                 const endTime = new Date(startTime.getTime() + selectedSession.duration_minutes * 60000);
-                const formattedEndTime = endTime.toISOString().slice(0, 16);
-    
+                const formattedEndTime = formatLocalDateTimeInput(endTime);
+
                 setFormData(prev => ({
                     ...prev,
                     start_time: value,

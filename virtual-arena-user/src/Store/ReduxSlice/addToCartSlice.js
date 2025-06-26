@@ -81,7 +81,12 @@ const initialState = {
 const cartSlice = createSlice({
   name: 'cart',
   initialState,
-  reducers: {},
+  reducers: {
+    // Clears cart items locally
+    resetCart: (state) => {
+      state.cart = [];
+    }
+  },
   extraReducers: (builder) => {
     builder
       // Fetch Cart
@@ -111,5 +116,7 @@ const cartSlice = createSlice({
       });
   },
 });
+
+export const { resetCart } = cartSlice.actions;
 
 export default cartSlice.reducer;

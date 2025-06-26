@@ -232,16 +232,6 @@ const AuthComponents = () => {
                             <span className='text-xl font-semibold'>OR</span>
                             <span className='border-b w-full border-white'></span>
                         </div>
-                        <div className='flex flex-col md:flex-row gap-4 md:gap-10 justify-between items-center'>
-                            <button className='bg-white w-full text-black flex items-center gap-3 text-[12px] font-medium rounded-lg py-4 px-8'>
-                                <img src="/assets/google.png" alt="Google logo" />
-                                <span>Sign up with Google</span>
-                            </button>
-                            <button className='bg-white w-full text-black flex items-center gap-3 text-[12px] font-medium rounded-lg py-4 px-8'>
-                                <img src="/assets/apple.png" alt="Apple logo" />
-                                <span>Sign up with Apple</span>
-                            </button>
-                        </div>
                     </>
                 )}
 

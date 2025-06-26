@@ -118,7 +118,7 @@ export const translations = {
     
     // Contact Information
     ourLocation: 'Our Location',
-    locationAddress: '8109 102 street Edmonton, Alberta',
+    locationAddress: '8109 102 St NW, Edmonton, AB T6E 4A4',
     corporation: 'Corporation: ABOUDA Enterprise Inc.',
     businessHours: 'Business Hours',
     mondayToFriday: 'Monday - Friday',
@@ -136,10 +136,10 @@ export const translations = {
     onsiteAssistance: 'On-site Assistance',
     
     // Contact Info Cards
-    phoneNumber1: '+1 (763) 478-6014',
-    phoneNumber2: '+1 (800) 328-146',
+    phoneNumber1: '+1 780-901-0804',
+    phoneNumber2: '+1 780-901-0804',
     phoneDesc: 'Our customer support team is ready to assist you during business hours. Callback service available for after-hours inquiries.',
-    emailAddress: 'hello@vrtualarena.com',
+    emailAddress: 'contact@vrtualarena.ca',
     emailDesc: 'For bookings, inquiries, or feedback, send us an email. We strive to respond to all emails within 24 hours during business days.',
     liveChatTitle: 'Live Chat Support',
     liveChatDesc: 'Get immediate assistance through our live chat service during business hours. Connect with our support team in real-time for quick solutions.',
@@ -173,9 +173,9 @@ export const translations = {
     newsletter: "Newsletter",
     emailPlaceholder: "Your email address",
     copyright: "Copyright © 2024 Virtual Arena All Rights Reserved.",
-    phoneNumbers: "+1 (763) 478-6014   +1 (800) 328-1466",
-    emailContact: "hello@vrtualarena.com",
-    physicalAddress: "3900 Arrowhead Dr, Hamel, MN 55340",
+    phoneNumbers: "+1 780-901-0804  +1 780-901-0804",
+    emailContact: "contact@vrtualarena.ca",
+    physicalAddress: "8109 102 St NW, Edmonton, AB T6E 4A4",
     
     // Information
     information: 'Information',
@@ -481,7 +481,7 @@ export const translations = {
     
     // Contact Information
     ourLocation: 'Notre Emplacement',
-    locationAddress: '8109 102 street Edmonton, Alberta',
+    locationAddress: '8109 102 St NW, Edmonton, AB T6E 4A4',
     corporation: 'Corporation: ABOUDA Enterprise Inc.',
     businessHours: 'Heures d\'Ouverture',
     mondayToFriday: 'Lundi - Vendredi',
@@ -499,10 +499,10 @@ export const translations = {
     onsiteAssistance: 'Assistance sur Place',
     
     // Contact Info Cards
-    phoneNumber1: '+1 (763) 478-6014',
-    phoneNumber2: '+1 (800) 328-146',
+    phoneNumber1: '+1 780-901-0804',
+    phoneNumber2: '+1 780-901-0804',
     phoneDesc: 'Notre équipe de support client est prête à vous aider pendant les heures d\'ouverture. Service de rappel disponible pour les demandes en dehors des heures d\'ouverture.',
-    emailAddress: 'hello@vrtualarena.com',
+    emailAddress: 'contact@vrtualarena.ca',
     emailDesc: 'Pour les réservations, les demandes ou les commentaires, envoyez-nous un email. Nous nous efforçons de répondre à tous les emails dans les 24 heures pendant les jours ouvrables.',
     liveChatTitle: 'Support Chat en Direct',
     liveChatDesc: 'Obtenez une assistance immédiate grâce à notre service de chat en direct pendant les heures d\'ouverture. Connectez-vous avec notre équipe de support en temps réel pour des solutions rapides.',
@@ -536,9 +536,9 @@ export const translations = {
     newsletter: "Bulletin d'information",
     emailPlaceholder: "Votre adresse e-mail",
     copyright: "Copyright © 2024 Virtual Arena Tous droits réservés.",
-    phoneNumbers: "+1 (763) 478-6014   +1 (800) 328-1466",
-    emailContact: "hello@vrtualarena.com",
-    physicalAddress: "3900 Arrowhead Dr, Hamel, MN 55340",
+    phoneNumbers: "+1 780-901-0804",
+    emailContact: "contact@vrtualarena.ca",
+    physicalAddress: "8109 102 St NW, Edmonton, AB T6E 4A4",
     
     // Information
     information: 'Information',

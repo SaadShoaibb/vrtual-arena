@@ -1,6 +1,6 @@
 'use client';
 import { closeSidebar } from '@/Store/ReduxSlice/cartSideBarSlice';
-import { API_URL, getAuthHeaders } from '@/utils/ApiUrl';
+import { API_URL, getAuthHeaders, getMediaBaseUrl } from '@/utils/ApiUrl';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -98,7 +98,29 @@ const CardSidebar = ({ isOpen, cart }) => {
 
                                 {cartItems?.map((item) => (
                                     <div key={item.cart_id} className="flex items-center justify-between gap-2">
-                                        <img src='/assets/d1.png' alt="" className="h-20 w-20 object-center" />
+                                        {(() => {
+                                            // Determine correct image source dynamically
+                                            const getImageSrc = (cartItem) => {
+                                                if (cartItem.item_type === 'tournament') return '/assets/tournament.png';
+                                                if (cartItem.images) {
+                                                    if (Array.isArray(cartItem.images) && cartItem.images.length) {
+                                                        let img = cartItem.images[0];
+                                                    if (img.startsWith('/')) img = `${getMediaBaseUrl()}${img}`;
+                                                    return img;
+                                                    }
+                                                    if (typeof cartItem.images === 'string' && cartItem.images.length) {
+                                                        let img = cartItem.images.split(',')[0];
+                                                    if (img.startsWith('/')) img = `${getMediaBaseUrl()}${img}`;
+                                                    return img;
+                                                    }
+                                                }
+                                                return null;
+                                            };
+                                            const src = getImageSrc(item);
+                                            return src ? (
+                                                <img src={src} alt={item.name} className="h-20 w-20 object-cover" />
+                                            ) : null;
+                                        })()}
                                         <div className="flex flex-col gap-5 w-1/2">
                                             <h1 className="text-lg font-semibold capitalize text-white">{item.name}</h1>
                                             <p className="text-white">${item.discount_price}</p>

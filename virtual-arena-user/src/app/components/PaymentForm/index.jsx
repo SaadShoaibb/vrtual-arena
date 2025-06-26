@@ -1,223 +1,106 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
-import { API_URL, getAuthHeaders, validateToken } from '@/utils/ApiUrl';
+import { Elements, useStripe, useElements } from '@stripe/react-stripe-js';
+import { API_URL, getAuthHeaders } from '@/utils/ApiUrl';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 
-// Load the Stripe publishable key from environment variable
+/**
+ * Load the Stripe publishable key from environment variable
+ * This is used to initialize the Stripe instance for both payment intents and checkout sessions
+ */
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_51QqzplJwuqd2a0tdgYOnwfBMxMzO66QWFCqzLN1winM5eGPI3iw4lMRriZrJvQF2kB76CxssHNDyJUpG54DJreHY00g79mEHeC')
 
+/**
+ * PaymentForm component handles payment processing using Stripe
+ * It supports both direct payment intents and checkout sessions
+ * For most payment types, checkout sessions are preferred for simplicity and security
+ */
 const PaymentForm = ({ entity, userId, amount, onSuccess, onClose, type }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [error, setError] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
-  const [clientSecret, setClientSecret] = useState('');
   const router = useRouter();
 
-  useEffect(() => {
-    // Create a payment intent when the component mounts
-    const createPaymentIntent = async () => {
-      try {
-        // Debug: Log auth headers before sending request
-        console.log('AUTH HEADERS', getAuthHeaders());
-        
-        // Debug: Check if user is authenticated in Redux
-        const isAuthenticated = localStorage.getItem('token') ? true : false;
-        console.log('Is user authenticated:', isAuthenticated);
-        
-        // Validate token before making the request
-        if (isAuthenticated) {
-          const isTokenValid = await validateToken();
-          console.log('Is token valid:', isTokenValid);
-          
-          if (!isTokenValid) {
-            console.error('Token validation failed, attempting to proceed anyway');
-          }
-        }
-        
-        const response = await axios.post(
-          `${API_URL}/payment/create-payment-intent`,
-          {
-            amount,
-            userId,
-            entity_id: entity.id,
-            entity_type: type,
-            connected_account_id: entity.connected_account_id || null,
-          },
-          {
-            headers: getAuthHeaders(),
-          }
-        );
-
-        setClientSecret(response.data.clientSecret);
-      } catch (err) {
-        console.error('Error creating payment intent:', err);
-        setError(`Payment setup failed: ${err.message || 'Unknown error'}`);
-      }
-    };
-
-    if (amount > 0) {
-      createPaymentIntent();
-    }
-  }, [amount, entity.id, entity.connected_account_id, userId, type]);
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  /**
+   * Handle payment using Stripe Checkout Session
+   * This is the preferred payment method for most payment types
+   */
+  const handleCheckoutSession = async () => {
     setProcessing(true);
-
-    if (!stripe || !elements) {
+    
+    // Convert amount to number if it's a string
+    const amountNumber = typeof amount === 'string' ? parseFloat(amount) : amount;
+    
+    // Validate amount
+    if (typeof amountNumber !== 'number' || isNaN(amountNumber) || amountNumber < 0.50) {
+      setError('Amount must be a number and at least 0.50 USD');
       setProcessing(false);
       return;
     }
-
+    
     try {
-      const { error: submitError } = await elements.submit();
-      
-      if (submitError) {
-        setError(submitError.message);
-        setProcessing(false);
-        return;
-      }
-
-      // Confirm the payment with Stripe.js
-      const { error, paymentIntent } = await stripe.confirmPayment({
-        elements,
-        clientSecret,
-        confirmParams: {
-          return_url: `${window.location.origin}/checkout/success`,
+      const response = await axios.post(
+        `${API_URL}/payment/create-checkout-session`,
+        {
+          user_id: userId,
+          amount: amountNumber,
+          entity_type: type,
+          entity_id: entity || 0,
         },
-        redirect: 'if_required',
+        { headers: getAuthHeaders() }
+      );
+
+      const { sessionId } = response.data;
+      const { error } = await stripe.redirectToCheckout({
+        sessionId,
       });
 
       if (error) {
-        setError(`Payment failed: ${error.message}`);
+        setError(error.message);
         setProcessing(false);
-      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        setSucceeded(true);
-        setError(null);
-        setProcessing(false);
-        onSuccess(paymentIntent);
       }
     } catch (err) {
-      setError(`Payment failed: ${err.message || 'Unknown error'}`);
+      console.error('Error creating checkout session:', err);
+      setError(`Checkout failed: ${err.response?.data?.message || err.message}`);
       setProcessing(false);
     }
-    };
-
-    // Alternative: Use Stripe Checkout Session
-    const handleCheckoutSession = async () => {
-        setProcessing(true);
-        try {
-            // Create a checkout session on the server
-            const response = await axios.post(
-                `${API_URL}/payment/create-checkout-session`,
-                {
-                    user_id: userId,
-                    entity_id: entity.id,
-                    entity_type: type,
-                    amount,
-                    connected_account_id: entity.connected_account_id || null,
-                },
-                {
-                    headers: getAuthHeaders(),
-                }
-            );
-
-            const { sessionId } = response.data;
-            
-            // Redirect to Stripe Checkout
-            if (!stripe) {
-                throw new Error('Stripe failed to load');
-            }
-            
-            const result = await stripe.redirectToCheckout({
-                sessionId: sessionId
-            });
-
-            if (result.error) {
-                setError(result.error.message);
-            }
-        } catch (err) {
-            setError(err.message || 'Failed to create checkout session');
-            console.error('Checkout Error:', err);
-        } finally {
-            setProcessing(false);
-        }
-    };
-
-  // Show loading state while waiting for clientSecret
-  if (!clientSecret && !error) {
-    return (
-      <div className="flex items-center justify-center p-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-        <p className="ml-2">Loading payment form...</p>
-      </div>
-    );
-  }
+  };
 
   return (
-    <div className="payment-form-container p-4 bg-white rounded-lg shadow-md">
-      {error && (
-        <div className="payment-error mb-4 p-3 bg-red-100 text-red-700 rounded-md">
-          {error}
-        </div>
-      )}
-
-      {clientSecret ? (
-        <form onSubmit={handleSubmit} className="payment-form space-y-4">
-          <PaymentElement />
-
-          <div className="payment-buttons flex flex-col space-y-2 mt-4">
-            <button
-              type="submit"
-              disabled={!stripe || processing}
-              className="payment-button w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {processing ? 'Processing...' : `Pay $${amount}`}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="cancel-button w-full py-2 px-4 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      ) : (
-        <div className="alternative-payment space-y-4">
-          <p className="text-center text-gray-700">Use our secure checkout page instead:</p>
-          <button
-            type="button"
-            onClick={handleCheckoutSession}
-            disabled={processing}
-            className="checkout-button w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {processing ? 'Processing...' : `Pay with Stripe Checkout`}
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className="cancel-button w-full py-2 px-4 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
-          >
-            Cancel
-          </button>
-        </div>
-      )}
+    <div className="payment-form">
+      {error && <div className="text-red-500 mb-4 p-2 bg-red-50 rounded">{error}</div>}
+      <button
+        onClick={handleCheckoutSession}
+        disabled={processing}
+        className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+      >
+        {processing ? 'Processing...' : `Pay $${amount}`}
+      </button>
+      <button
+        onClick={onClose}
+        className="w-full mt-2 bg-gray-200 text-gray-800 py-2 rounded hover:bg-gray-300"
+        disabled={processing}
+      >
+        Cancel
+      </button>
     </div>
   );
 };
 
+/**
+ * PaymentModal component that provides options for online payment or gift card redemption
+ */
 const PaymentModal = ({ isOpen, onClose, entity, userId, amount, onSuccess, onRedeemSuccess, type }) => {
   const [paymentOption, setPaymentOption] = useState('online');
   const [giftCardCode, setGiftCardCode] = useState('');
   const [error, setError] = useState(null);
   const [processing, setProcessing] = useState(false);
+  const [redeemSuccess, setRedeemSuccess] = useState(false);
   const [appearance, setAppearance] = useState({
     theme: 'stripe',
     variables: {
@@ -231,6 +114,10 @@ const PaymentModal = ({ isOpen, onClose, entity, userId, amount, onSuccess, onRe
     },
   });
 
+  /**
+   * Handle gift card redemption
+   * This sends the gift card code to the server for validation and redemption
+   */
   const handleGiftCardRedeem = async () => {
     if (!giftCardCode.trim()) {
       setError('Please enter a gift card code');
@@ -241,6 +128,13 @@ const PaymentModal = ({ isOpen, onClose, entity, userId, amount, onSuccess, onRe
     setError(null);
 
     try {
+      const authHeaders = getAuthHeaders();
+      if (!authHeaders.Authorization) {
+        setError('Authentication token not found. Please log in again.');
+        setProcessing(false);
+        return;
+      }
+      
       const response = await axios.post(
         `${API_URL}/gift-cards/redeem`,
         {
@@ -250,11 +144,12 @@ const PaymentModal = ({ isOpen, onClose, entity, userId, amount, onSuccess, onRe
           entity_type: type,
         },
         {
-          headers: getAuthHeaders(),
+          headers: authHeaders
         }
       );
 
       if (response.data.success) {
+        setRedeemSuccess(true);
         onRedeemSuccess(response.data);
       } else {
         setError(response.data.message || 'Failed to redeem gift card');
@@ -268,13 +163,27 @@ const PaymentModal = ({ isOpen, onClose, entity, userId, amount, onSuccess, onRe
 
   if (!isOpen) return null;
 
-  // Options for the Stripe Elements instance
-  const options = {
-    mode: 'payment',
-    amount: Math.round(amount * 100), // Convert to cents and ensure it's an integer
-    currency: 'usd',
-    appearance,
-  };
+  // Show success state for gift card redemption
+  if (paymentOption === 'gift-card' && redeemSuccess) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-6 rounded-lg max-w-md w-full shadow-xl">
+          <div className="p-4 text-center">
+            <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">
+              <p className="font-bold">Gift card redeemed successfully!</p>
+              <p>Thank you for your purchase.</p>
+            </div>
+            <button
+              onClick={onClose}
+              className="px-4 py-2 bg-purple-600 text-white rounded"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -284,21 +193,27 @@ const PaymentModal = ({ isOpen, onClose, entity, userId, amount, onSuccess, onRe
         <div className="mb-4">
           <div className="flex space-x-4 mb-4">
             <button
-              className={`px-4 py-2 rounded ${paymentOption === 'online' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}
-              onClick={() => setPaymentOption('online')}
+              className={`px-4 py-2 rounded ${paymentOption === 'online' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-800'}`}
+              onClick={() => {
+                setPaymentOption('online');
+                setError(null);
+              }}
             >
               Online Payment
             </button>
             <button
-              className={`px-4 py-2 rounded ${paymentOption === 'gift-card' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}
-              onClick={() => setPaymentOption('gift-card')}
+              className={`px-4 py-2 rounded ${paymentOption === 'gift-card' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-800'}`}
+              onClick={() => {
+                setPaymentOption('gift-card');
+                setError(null);
+              }}
             >
               Gift Card
             </button>
           </div>
 
           {paymentOption === 'online' ? (
-            <Elements stripe={stripePromise} options={options}>
+            <Elements stripe={stripePromise}>
               <PaymentForm
                 entity={entity}
                 userId={userId}
@@ -321,6 +236,7 @@ const PaymentModal = ({ isOpen, onClose, entity, userId, amount, onSuccess, onRe
                   onChange={(e) => setGiftCardCode(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter gift card code"
+                  disabled={processing}
                 />
               </div>
 
@@ -329,18 +245,19 @@ const PaymentModal = ({ isOpen, onClose, entity, userId, amount, onSuccess, onRe
               <div className="flex space-x-2">
                 <button
                   type="button"
-                  onClick={handleGiftCardRedeem}
+                  onClick={onClose}
+                  className="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
                   disabled={processing}
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  {processing ? 'Processing...' : 'Redeem'}
+                  Cancel
                 </button>
                 <button
                   type="button"
-                  onClick={onClose}
-                  className="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
+                  onClick={handleGiftCardRedeem}
+                  disabled={processing}
+                  className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  Cancel
+                  {processing ? 'Processing...' : 'Redeem Gift Card'}
                 </button>
               </div>
             </div>
