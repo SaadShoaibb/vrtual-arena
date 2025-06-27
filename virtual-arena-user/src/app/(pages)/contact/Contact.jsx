@@ -80,7 +80,7 @@ const Contact = ({ locale = 'en' }) => {
                         {/* Google Map Integration */}
                         <div className="mb-8 rounded-xl overflow-hidden h-[300px]">
                             <iframe 
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2370.7014574285746!2d-113.49635492300147!3d53.5428333723013!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x53a0224580e3f663%3A0x411fa3c4e54c396f!2s8109%20102%20St%20NW%2C%20Edmonton%2C%20AB!5e0!3m2!1sen!2sca!4v1654871234567!5m2!1sen!2sca" 
+                                src="https://maps.google.com/maps?q=8109+102+St+NW,+Edmonton,+AB+T6E+4A4&output=embed" 
                                 width="100%" 
                                 height="100%" 
                                 style={{border:0}} 

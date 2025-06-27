@@ -19,7 +19,8 @@ const Cart = ({ cart }) => {
   // Check if cart has any physical products
   const hasPhysicalProducts = cartItems.some(item => !item.item_type || item.item_type === 'product');
   
-  const subtotal = cartItems.reduce((total, item) => total + item.discount_price * item.quantity, 0);
+  const getPrice = (val) => Number(val) || 0;
+  const subtotal = cartItems.reduce((total, item) => total + getPrice(item.discount_price) * (Number(item.quantity) || 0), 0);
 
   // Helper: return correct image URL or null
   const getImageSrc = (cartItem) => {
@@ -129,7 +130,7 @@ const Cart = ({ cart }) => {
                         </div>
                       </td>
                       <td className='p-2 text-center'>
-                        ${item.discount_price * item.quantity}
+                        ${(Number(item.discount_price) || 0) * item.quantity}
                       </td>
                     </tr>
                   ))}
@@ -172,7 +173,7 @@ const Cart = ({ cart }) => {
                     </div>
                   </div>
                   <div className='p-2 text-center'>
-                    ${item.discount_price * item.quantity}
+                    ${(Number(item.discount_price) || 0) * item.quantity}
                   </div>
                 </div>
               </div>
