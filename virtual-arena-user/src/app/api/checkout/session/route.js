@@ -15,7 +15,7 @@ export async function GET(request) {
   try {
     // Initialize Stripe with your secret key (not the public one)
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2025-01-27.acacia',
+      apiVersion: '2025-05-28.basil',
     });
     
     const session = await stripe.checkout.sessions.retrieve(sessionId);

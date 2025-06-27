@@ -23,7 +23,7 @@ export async function POST(request) {
   let event;
   try {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2025-01-27.acacia',
+      apiVersion: '2025-05-28.basil',
     });
     
     // Verify the webhook signature

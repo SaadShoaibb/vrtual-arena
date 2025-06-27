@@ -11,7 +11,9 @@ import { useRouter } from 'next/navigation';
  * Load the Stripe publishable key from environment variable
  * This is used to initialize the Stripe instance for both payment intents and checkout sessions
  */
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_51QqzplJwuqd2a0tdgYOnwfBMxMzO66QWFCqzLN1winM5eGPI3iw4lMRriZrJvQF2kB76CxssHNDyJUpG54DJreHY00g79mEHeC')
+// Ensure we use the live (or explicitly provided) publishable key only.
+// No fallback to test keys so that test card numbers are rejected in production.
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
 /**
  * PaymentForm component handles payment processing using Stripe
