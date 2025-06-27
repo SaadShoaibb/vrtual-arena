@@ -79,8 +79,10 @@ const Merchandises = () => {
 
         const imageUrl = images[0];
 
-        // If it's already absolute, use it as-is
-        if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
+        // If it's already absolute, ensure it uses https when pointing to vrtualarena.ca
+        if (/^https?:\/\//i.test(imageUrl)) {
+            return imageUrl.replace('http://', 'https://');
+        }
 
         const base = getMediaBaseUrl();
 
