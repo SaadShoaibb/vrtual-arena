@@ -15,8 +15,13 @@ export const getMediaBaseUrl = () => {
   if (typeof window !== 'undefined' && window.location) {
     const origin = window.location.origin;
     // In development the frontend usually runs on localhost:3000 while the backend is 8080
+    // Development: if site is served from localhost:3000 or 127.x.x.x:3000 or any host:3000, map to backend 8080 where images reside
+    const devBackend = origin.replace(':3000', ':8080');
     if (origin.includes('localhost')) {
       return 'http://localhost:8080';
+    }
+    if (origin.endsWith(':3000')) {
+      return devBackend;
     }
     return origin; // e.g. https://vrtualarena.ca
   }
