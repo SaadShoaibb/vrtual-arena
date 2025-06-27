@@ -9,6 +9,7 @@ import { openSidebar } from '@/Store/ReduxSlice/cartSideBarSlice'
 import { openModal } from '@/Store/ReduxSlice/ModalSlice'
 import { FaHeart, FaRegHeart } from 'react-icons/fa'
 import CardSidebar from '@/app/components/CartSidebar'
+import { getMediaBaseUrl } from '@/utils/ApiUrl';
 
 const Merchandises = () => {
     const dispatch = useDispatch()
@@ -72,24 +73,19 @@ const Merchandises = () => {
         }, 500)
     }
     
-    // Function to get proper image URL
+    // Function to get proper image URL (works in dev & prod)
     const getImageUrl = (images) => {
         if (!images || !images.length) return '/assets/d1.png';
-        
+
         const imageUrl = images[0];
-        // If it's already a full URL, return it
-        if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-            return imageUrl;
-        }
-        
-        // If it starts with a slash, it's a server path
-        if (imageUrl.startsWith('/')) {
-            // For production, we might need to prepend the server URL
-            return `http://localhost:8080${imageUrl}`;
-        }
-        
-        // Otherwise, it's a relative path
-        return `http://localhost:8080/${imageUrl}`;
+
+        // If it's already absolute, use it as-is
+        if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
+
+        const base = getMediaBaseUrl();
+
+        // imageUrl may start with '/' (stored correctly) or without
+        return imageUrl.startsWith('/') ? `${base}${imageUrl}` : `${base}/${imageUrl}`;
     };
 
     // Filter products based on selected category

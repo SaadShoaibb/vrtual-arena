@@ -1,5 +1,6 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
+import { getMediaBaseUrl } from '@/utils/ApiUrl';
 import { FaAngleLeft, FaAngleRight, FaStar } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux'
 import { addToCart, fetchCart } from '@/Store/ReduxSlice/addToCartSlice'
@@ -24,23 +25,15 @@ const MerchandiseDetail = ({ product }) => {
         setLocalWishlist(wishlist)
     }, [wishlist])
 
-    // Function to get proper image URL
+    // Function to get proper image URL (works in dev & prod)
     const getImageUrl = (imagePath) => {
         if (!imagePath) return '/assets/d1.png';
-        
-        // If it's already a full URL, return it
-        if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-            return imagePath;
-        }
-        
-        // If it starts with a slash, it's a server path
-        if (imagePath.startsWith('/')) {
-            // For production, we might need to prepend the server URL
-            return `http://localhost:8080${imagePath}`;
-        }
-        
-        // Otherwise, it's a relative path
-        return `http://localhost:8080/${imagePath}`;
+
+        // Already absolute
+        if (/^https?:\/\//i.test(imagePath)) return imagePath;
+
+        const base = getMediaBaseUrl();
+        return imagePath.startsWith('/') ? `${base}${imagePath}` : `${base}/${imagePath}`;
     };
 
     // Handler to go to the next image
