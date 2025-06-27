@@ -7,7 +7,9 @@ import Input from '../common/Input';
 import PaymentModal from '../PaymentForm';
 import { useSelector } from 'react-redux';
 
-const CheckoutForm = ({ bookingSummary, onCheckout,handleRedeem }) => {
+const CheckoutForm = ({ bookingSummary, onCheckout, handleRedeem, setMode }) => {
+ const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(true);
+ 
  const {userData} = useSelector((state)=>state.userData)
     
     return (
@@ -25,15 +27,22 @@ const CheckoutForm = ({ bookingSummary, onCheckout,handleRedeem }) => {
             </div>
  
                           
-                                <PaymentModal
-                               isOpen={true}
-                                    entity={bookingSummary?.session_id}
-                                    userId={userData?.user_id}
-                                    amount={bookingSummary?.price} // Assuming the tournament has a ticket_price field
-                                    onSuccess={onCheckout}
-                                    type="booking"
-                                    onRedeemSuccess={handleRedeem}
-                                />
+                                {isPaymentModalOpen && (
+                                    <PaymentModal
+                                        isOpen={isPaymentModalOpen}
+                                        onClose={() => {
+                                            setIsPaymentModalOpen(false);
+                                            // If parent provided setMode, go back to previous screen
+                                            if (setMode) setMode('DETAIL');
+                                        }}
+                                        entity={bookingSummary?.session_id}
+                                        userId={userData?.user_id}
+                                        amount={bookingSummary?.price}
+                                        onSuccess={onCheckout}
+                                        onRedeemSuccess={handleRedeem}
+                                        type="booking"
+                                    />
+                                )}
                            
                             
         </>
