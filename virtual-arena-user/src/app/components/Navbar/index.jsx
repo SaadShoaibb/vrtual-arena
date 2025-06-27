@@ -15,6 +15,7 @@ import { closeBookModal } from '@/Store/ReduxSlice/bookModalSlice';
 import BookingForm from '../BookingForm';
 import BookNowButton from '../common/BookNowButton';
 import { fetchCart } from '@/Store/ReduxSlice/addToCartSlice';
+import { fetchProducts } from '@/Store/ReduxSlice/productSlice';
 import { FaRegCircleUser } from 'react-icons/fa6';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationDropdown from './Notification';
@@ -64,12 +65,48 @@ const Navbar = ({ locale = 'en' }) => {
     const [showMobileSubmenu, setShowMobileSubmenu] = useState(null);
     const [scrolled, setScrolled] = useState(false);
     const [showSearchInput, setShowSearchInput] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [suggestions, setSuggestions] = useState([]);
+    const { products: allProducts, status: productsStatus } = useSelector((state) => state.products);
+
+    // Predefined pages for search suggestions
+    const predefinedSearchItems = [
+        { title: t.home, path: `/?locale=${locale}` },
+        { title: t.experiences, path: `/experiences?locale=${locale}` },
+        { title: t.pricing, path: `/pricing?locale=${locale}` },
+        { title: 'Gallery', path: `/gallery?locale=${locale}` },
+        { title: 'Shop', path: `/merchandise?locale=${locale}` },
+    ];
     const router = useRouter()
 
     useEffect(() => {
-        dispatch(fetchUserData())
+        dispatch(fetchUserData());
         dispatch(fetchCart());
-    }, [])
+        dispatch(fetchProducts());
+    }, []);
+
+    // Compute live search suggestions when user types
+    useEffect(() => {
+        if (!searchTerm.trim()) {
+            setSuggestions([]);
+            return;
+        }
+        const term = searchTerm.toLowerCase();
+
+        const pageResults = predefinedSearchItems.filter(item =>
+            item.title.toLowerCase().includes(term)
+        );
+
+        const productResults = (allProducts || [])
+            .filter(p => p.name && p.name.toLowerCase().includes(term))
+            .slice(0, 5)
+            .map(p => ({
+                title: p.name,
+                path: `/merchandise/${p.product_id}?locale=${locale}`,
+            }));
+
+        setSuggestions([...pageResults.slice(0, 5), ...productResults]);
+    }, [searchTerm, allProducts, locale]);
 
     // Handle body scroll lock when mobile menu is open
     useEffect(() => {
@@ -149,6 +186,7 @@ const Navbar = ({ locale = 'en' }) => {
 
     const toggleSearchInput = () => {
         setShowSearchInput(!showSearchInput);
+        setSearchTerm('');
     };
 
     const handleSearch = (e) => {
@@ -159,6 +197,12 @@ const Navbar = ({ locale = 'en' }) => {
                 setShowSearchInput(false);
             }
         }
+    };
+
+    const handleSuggestionClick = (path) => {
+        router.push(path);
+        setShowSearchInput(false);
+        setSearchTerm('');
     };
 
     const dropdownVariants = {
@@ -251,10 +295,25 @@ const Navbar = ({ locale = 'en' }) => {
                                             <input
                                                 type="text"
                                                 placeholder={t.search}
+                                                value={searchTerm}
+                                                onChange={(e) => setSearchTerm(e.target.value)}
                                                 className="w-full py-1 px-3 bg-gray-800 text-white rounded-full focus:outline-none focus:ring-1 focus:ring-[#DB1FEB]"
                                                 autoFocus
                                                 onKeyDown={handleSearch}
                                             />
+                                            {suggestions.length > 0 && (
+                                                <ul className="absolute left-0 mt-1 w-full bg-gray-800 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                                    {suggestions.map((item, idx) => (
+                                                        <li
+                                                            key={idx}
+                                                            onClick={() => handleSuggestionClick(item.path)}
+                                                            className="px-3 py-2 hover:bg-gray-700 cursor-pointer text-sm text-white"
+                                                        >
+                                                            {item.title}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
