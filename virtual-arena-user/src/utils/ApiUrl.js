@@ -1,8 +1,8 @@
 // src/constants.js or wherever this file is
 
 // Use relative URLs that will be proxied by Nginx
-// export const API_URL = '/api/v1';
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+export const API_URL = '/api/v1';
+// export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
 
 // Helper function to get the base URL for media/assets
 export const getMediaBaseUrl = () => {
