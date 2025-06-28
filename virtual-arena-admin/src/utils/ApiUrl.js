@@ -1,8 +1,8 @@
 // import { useSelector } from "react-redux";
 
 // export const API_URL = 'https://virtual-arena-backend.vercel.app/api/v1';
-// export const API_URL = '/api/v1';
-export const API_URL = 'http://localhost:8080/api/v1';
+export const API_URL = '/api/v1';
+// export const API_URL = 'http://localhost:8080/api/v1';
 
 export const SOCKET_URL = '/socket';
 // export const useAuthToken = () => {
