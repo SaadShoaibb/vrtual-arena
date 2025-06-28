@@ -1,4 +1,5 @@
 "use client";
+import { jsPDF } from 'jspdf';
 import { fetchReviews } from '@/Store/ReduxSlice/fetchReviewSlice';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,9 +24,33 @@ const DetailView = ({ data, title, type,id }) => {
     if (error) {
         return <p>Error: {error}</p>;
     }
+    const handleDownloadReceipt = () => {
+        const doc = new jsPDF();
+        doc.setFontSize(16);
+        doc.text(title || 'Booking Receipt', 10, 10);
+        let y = 20;
+        (data || []).forEach((item) => {
+            doc.setFontSize(12);
+            doc.text(`${item.label}: ${item.value}`, 10, y);
+            y += 8;
+            if (y > 280) {
+              doc.addPage();
+              y = 20;
+            }
+        });
+        doc.save(`booking-receipt-${id || Date.now()}.pdf`);
+    };
+
     return (
         <div className="text-white">
             <h2 className="text-xl font-bold mb-4 text-gradiant">{title}</h2>
+            <button
+                onClick={handleDownloadReceipt}
+                className="mb-4 px-4 py-2 bg-gradient-to-tr from-pink-500 via-purple-500 to-indigo-500 rounded text-white hover:opacity-90"
+            >
+                Download Receipt
+            </button>
+
             {data?.map((item, index) => (
                 <p
                     key={index}

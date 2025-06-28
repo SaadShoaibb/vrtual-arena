@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
   showBookModal: false,
+  bookingPrefill: null,
 }
 
 const bookModalSlice = createSlice({
@@ -9,10 +10,12 @@ const bookModalSlice = createSlice({
   initialState,
   reducers: {
     openBookModal: (state, action) => {
-      state.showBookModal = true // Set mode when opening
+      state.showBookModal = true;
+      state.bookingPrefill = action.payload || null;
     },
     closeBookModal: (state) => {
-      state.showBookModal = false
+      state.showBookModal = false;
+      state.bookingPrefill = null;
     },
   },
 })

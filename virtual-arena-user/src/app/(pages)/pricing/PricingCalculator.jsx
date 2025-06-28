@@ -2,8 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { translations } from '@/app/translations';
+import { useDispatch, useSelector } from 'react-redux';
+import { openModal } from '@/Store/ReduxSlice/ModalSlice';
+import { fetchUserData } from '@/Store/Actions/userActions';
+import PaymentModal from '@/app/components/PaymentForm';
 
 const PricingCalculator = ({ locale = 'en' }) => {
+  const dispatch = useDispatch();
+  const { isAuthenticated, userData } = useSelector(state => state.userData);
   const router = useRouter();
   const t = translations[locale] || translations.en;
   
@@ -41,6 +47,7 @@ const PricingCalculator = ({ locale = 'en' }) => {
   const [discount, setDiscount] = useState(0);
   const [finalPrice, setFinalPrice] = useState(0);
   const [appliedDiscount, setAppliedDiscount] = useState(null);
+  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   
   // Handle experience selection
   const handleExperienceSelect = (experienceId) => {
@@ -138,25 +145,11 @@ const PricingCalculator = ({ locale = 'en' }) => {
   
   // Handle booking
   const handleBookNow = () => {
-    // Construct booking URL with selected options
-    let bookingPath = '/bookings';
-    
-    // Add query parameters based on selections
-    const params = new URLSearchParams();
-    
-    if (selectedPass) {
-      params.append('passType', selectedPass);
-    } else {
-      // Add selected experiences
-      selectedExperiences.forEach((exp, index) => {
-        params.append(`exp_${index}`, `${exp.experienceId}:${exp.sessions}`);
-      });
+    if (!isAuthenticated) {
+      dispatch(openModal('LOGIN'));
+      return;
     }
-    
-    params.append('people', peopleCount.toString());
-    
-    // Navigate to booking page with selections
-    router.push(`${bookingPath}?${params.toString()}`);
+    setIsPaymentOpen(true);
   };
   
   return (
@@ -360,6 +353,19 @@ const PricingCalculator = ({ locale = 'en' }) => {
           </svg>
         </button>
       </div>
+      
+      {isPaymentOpen && (
+        <PaymentModal
+          isOpen={isPaymentOpen}
+          onClose={() => setIsPaymentOpen(false)}
+          entity={0}
+          userId={userData?.user_id || 0}
+          amount={finalPrice.toFixed(2)}
+          onSuccess={() => { dispatch(fetchUserData()); setIsPaymentOpen(false); router.push('/bookings'); }}
+          onRedeemSuccess={() => { dispatch(fetchUserData()); setIsPaymentOpen(false); router.push('/bookings'); }}
+          type="booking"
+        />
+      )}
     </div>
   );
 };

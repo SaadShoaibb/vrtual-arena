@@ -181,11 +181,23 @@ const Bookings = () => {
     }
   }, [bookings, searchParams]);
 
-  const bookingData = [
-    { label: 'Name', value: selectedBooking?.machine_type },
-    { label: 'User Name', value: selectedBooking?.user_name },
-    { label: 'Payment Status', value: selectedBooking?.payment_status },
-  ];
+  // Build detailed booking data for sidebar & PDF
+  const bookingData = selectedBooking ? [
+    { label: 'Booking ID', value: selectedBooking.booking_id },
+    { label: 'User Name', value: selectedBooking.user_name },
+    { label: 'Session Name', value: selectedBooking.session_name ?? 'N/A' },
+    { label: 'Machine Type', value: selectedBooking.machine_type },
+    { label: 'Start Time', value: new Date(selectedBooking.start_time).toLocaleString() },
+    { label: 'End Time', value: new Date(selectedBooking.end_time).toLocaleString() },
+    { label: 'Members', value: selectedBooking.members ?? selectedBooking.people_count ?? selectedBooking.member_count ?? 'N/A' },
+    { label: 'Sessions', value: selectedBooking.sessions ?? selectedBooking.sessions_count ?? selectedBooking.session_count ?? selectedBooking.session_qty ?? 'N/A' },
+    { label: 'Pass Type', value: selectedBooking.pass_type ?? selectedBooking.pass ?? selectedBooking.passType ?? 'N/A' },
+    { label: 'Total Price', value: (() => {
+        const price = selectedBooking.price ?? selectedBooking.total_price ?? selectedBooking.final_price ?? selectedBooking.amount;
+        return price !== undefined ? `$${price}` : 'N/A';
+      })() },
+    { label: 'Payment Status', value: selectedBooking.payment_status }
+  ] : [];
 
   return (
     <div className="p-6">

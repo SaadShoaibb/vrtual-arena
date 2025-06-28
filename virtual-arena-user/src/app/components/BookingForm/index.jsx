@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
 
 // Helper to format Date object to YYYY-MM-DDTHH:MM in LOCAL time (suitable for datetime-local input)
 const formatLocalDateTimeInput = (date) => {
@@ -27,7 +28,8 @@ const MODE = {
     SUCCESS: "SUCCESS",
 }
 
-const BookingForm = () => {
+const BookingForm = ({ prefill = null, onClose }) => {
+    // Prefill-aware initial state
     const [formData, setFormData] = useState({
         machine_type: "",
         start_time: "",
@@ -35,13 +37,18 @@ const BookingForm = () => {
         price: ""
     });
     const [mode, setMode] = useState(MODE.BOOKING);
-    const [sessions, setSessions] = useState([]);
+    const [sessions, setSessions] = useState([]); // fetched or dummy
+    const [prefillDuration, setPrefillDuration] = useState(null);
     const [selectedSession, setSelectedSession] = useState({})
     // const [bookings,setBookings] = useState([])
     const [selectedSessionId, setSelectedSessionId] = useState(""); // Track selected session ID
     const { bookings } = useSelector((state) => state.userData)
     const dispatch = useDispatch()
     const handleFetchSession = async () => {
+        if(prefill){
+            // Skip fetching when using prefill – we'll create a dummy session
+            return;
+        }
         try {
             const { data } = await axios.get(`${API_URL}/user/get-sessions`, getAuthHeaders());
             setSessions(data?.sessions);
@@ -53,8 +60,29 @@ const BookingForm = () => {
 
 
     useEffect(() => {
-        handleFetchSession();
+        if(prefill){
+            // Build dummy session based on prefill data
+            const baseDuration = 30; // minutes per single session
+            const sessionsCount = prefill.sessionsCount || 1;
+            const duration_minutes = baseDuration * sessionsCount;
 
+            const dummySession = {
+                session_id: -1,
+                name: prefill.machine_type || 'Custom Booking',
+                duration_minutes,
+                price: prefill.price,
+            };
+            setSessions([dummySession]);
+            setSelectedSessionId(-1);
+            setPrefillDuration(duration_minutes);
+            setFormData(prev => ({
+                ...prev,
+                machine_type: dummySession.name,
+                price: dummySession.price,
+            }));
+        }
+        handleFetchSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleChange = (e) => {
@@ -71,7 +99,10 @@ const BookingForm = () => {
                 }));
             }
         } else if (name === "start_time") {
-            const selectedSession = sessions.find(session => session.session_id === parseInt(selectedSessionId));
+            let selectedSession = sessions.find(session => session.session_id === parseInt(selectedSessionId));
+        if(!selectedSession && prefillDuration){
+            selectedSession = { duration_minutes: prefillDuration };
+        }
             if (selectedSession) {
                 const startTime = new Date(value);
                 const now = new Date();
@@ -149,7 +180,8 @@ console.log(bookings)
             } catch (error) {
                 console.log(error)
             }
-        dispatch(closeBookModal())
+        dispatch(closeBookModal());
+    if(onClose) onClose();
 
     }
     
@@ -250,6 +282,11 @@ console.log(bookings)
             }
         </div>
     );
+};
+
+BookingForm.propTypes = {
+    prefill: PropTypes.object,
+    onClose: PropTypes.func,
 };
 
 export default BookingForm;

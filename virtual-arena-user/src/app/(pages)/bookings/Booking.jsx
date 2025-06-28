@@ -76,6 +76,61 @@ const Booking = () => {
         router.push('/bookings'); // Clear URL query
     };
 
+    // Download booking receipt as PDF
+    const downloadReceipt = async () => {
+        if (!selectedBooking) return;
+
+        const html2pdf = (await import('html2pdf.js')).default;
+
+        // Derive values with graceful fallbacks
+        const price =
+            selectedBooking.price ??
+            selectedBooking.total_price ??
+            selectedBooking.final_price ??
+            selectedBooking.amount ??
+            'N/A';
+
+        const sessions =
+            selectedBooking.sessions ??
+            selectedBooking.sessions_count ??
+            selectedBooking.session_count ??
+            selectedBooking.session_qty ??
+            'N/A';
+
+        const passType =
+            selectedBooking.pass_type ??
+            selectedBooking.pass ??
+            selectedBooking.passType ??
+            'N/A';
+
+        const members =
+            selectedBooking.members ??
+            selectedBooking.people_count ??
+            selectedBooking.member_count ??
+            selectedBooking.participants ??
+            'N/A';
+
+        const receiptTemplate = document.createElement('div');
+        receiptTemplate.innerHTML = `
+            <div class="p-6 bg-white text-black">
+                <img src='/assets/logo.png' class="w-[179px] md:w-[199px] mb-10" />
+                <h1 class="text-2xl font-bold mb-4">Booking Receipt</h1>
+                <p><strong>Booking ID:</strong> ${selectedBooking.booking_id}</p>
+                <p><strong>User Name:</strong> ${selectedBooking.user_name}</p>
+                <p><strong>Session Name:</strong> ${selectedBooking.session_name}</p>
+                <p><strong>Machine Type:</strong> ${selectedBooking.machine_type}</p>
+                <p><strong>Start Time:</strong> ${new Date(selectedBooking.start_time).toLocaleString()}</p>
+                <p><strong>End Time:</strong> ${new Date(selectedBooking.end_time).toLocaleString()}</p>
+                <p><strong>Members:</strong> ${members}</p>
+                <p><strong>Sessions:</strong> ${sessions}</p>
+                <p><strong>Pass Type:</strong> ${passType}</p>
+                <p><strong>Total Price:</strong> $${price}</p>
+                <p><strong>Payment Status:</strong> ${selectedBooking.payment_status}</p>
+            </div>`;
+
+        await html2pdf().from(receiptTemplate).save(`booking-receipt-${selectedBooking.booking_id}.pdf`);
+    };
+
     // Check URL query on component mount
     useEffect(() => {
         const bookingId = searchParams.get('booking_id');
@@ -265,8 +320,13 @@ const Booking = () => {
                                     <p className='flex justify-between items-center border-b mb-2'><strong>Machine Type:</strong> {selectedBooking.machine_type}</p>
                                     <p className='flex justify-between items-center border-b mb-2'><strong>Start Time:</strong> {new Date(selectedBooking.start_time).toLocaleString()}</p>
                                     <p className='flex justify-between items-center border-b mb-2'><strong>End Time:</strong> {new Date(selectedBooking.end_time).toLocaleString()}</p>
+                                    <p className='flex justify-between items-center border-b mb-2'><strong>Members:</strong> {selectedBooking.members ?? selectedBooking.people_count ?? selectedBooking.member_count ?? 'N/A'}</p>
+                                    <p className='flex justify-between items-center border-b mb-2'><strong>Total Price:</strong> {selectedBooking.price ? `$${selectedBooking.price}` : selectedBooking.total_price ? `$${selectedBooking.total_price}` : selectedBooking.final_price ? `$${selectedBooking.final_price}` : 'N/A'}</p>
                                     <p className='flex justify-between items-center border-b mb-2'><strong>Payment Status:</strong> {selectedBooking.payment_status}</p>
                                     <p className='flex justify-between items-center border-b mb-2'><strong>User Name:</strong> {selectedBooking.user_name}</p>
+                                    <button onClick={downloadReceipt} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                        Download Receipt
+                                    </button>
                                 </div>
                             )}
                         </div>
