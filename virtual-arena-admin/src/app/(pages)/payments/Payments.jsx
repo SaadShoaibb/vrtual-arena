@@ -12,12 +12,25 @@ const Payments = () => {
     // Table columns
     const columns = [
         { header: 'Payment ID', accessor: 'payment_id' },
+        { header: 'Customer Name', accessor: 'customer_name' },
+        { header: 'Email', accessor: 'customer_email' },
+        {
+            header: 'Type',
+            accessor: 'customer_type',
+            render: (value) => (
+                <span className={`px-2 py-1 rounded text-xs font-medium ${
+                    value === 'Guest'
+                        ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                        : 'bg-blue-100 text-blue-800 border border-blue-200'
+                }`}>
+                    {value === 'Guest' ? '👤 Guest' : '🔐 User'}
+                </span>
+            )
+        },
         { header: 'Amount', accessor: 'amount' },
         { header: 'Status', accessor: 'status' },
-        { header: 'Payment Date', accessor: 'created_at' },
-        { header: 'User', accessor: 'user_name' },
         { header: 'Entity Type', accessor: 'entity_type' },
-        { header: 'Entity ID', accessor: 'entity_id' },
+        { header: 'Payment Date', accessor: 'created_at' },
     ];
 
     // State for payments
@@ -30,12 +43,15 @@ const Payments = () => {
     // Transform payments data for the table
     const data = filteredPayments?.map((payment) => ({
         payment_id: payment?.payment_id,
+        customer_name: payment?.customer_name || 'Unknown Customer',
+        customer_email: payment?.customer_email || 'N/A',
+        customer_type: payment?.user_id ? 'Registered User' : 'Guest',
         amount: `$${payment?.amount}`,
         status: payment?.status,
-        created_at: new Date(payment?.created_at).toLocaleDateString(),
-        user_name: payment?.user_id,
         entity_type: payment?.entity_type,
-        entity_id: payment?.entity_id,
+        created_at: new Date(payment?.created_at).toLocaleDateString(),
+        // Keep original data for detail view
+        ...payment
     }));
 
     // State for sidebar and selected payment

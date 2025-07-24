@@ -21,7 +21,21 @@ const Registrations = () => {
     const searchParams = useSearchParams();
 
     const columns = [
-        { header: 'User Name', accessor: 'user_name' },
+        { header: 'Registrant Name', accessor: 'registrant_name' },
+        { header: 'Email', accessor: 'registrant_email' },
+        {
+            header: 'Type',
+            accessor: 'registration_type',
+            render: (value) => (
+                <span className={`px-2 py-1 rounded text-xs font-medium ${
+                    value === 'Guest'
+                        ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                        : 'bg-blue-100 text-blue-800 border border-blue-200'
+                }`}>
+                    {value === 'Guest' ? '👤 Guest' : '🔐 User'}
+                </span>
+            )
+        },
         { header: 'Tournament Name', accessor: 'tournament_name' },
         { header: 'Status', accessor: 'status' },
         { header: 'Payment Status', accessor: 'payment_status' },
@@ -33,7 +47,9 @@ const Registrations = () => {
         user_id: registration.user_id,
         tournament_id: registration.tournament_id,
         status: registration.status,
-        user_name: registration.user_name,
+        registrant_name: registration.registrant_name || registration.user_name || 'Unknown',
+        registrant_email: registration.registrant_email || registration.email || 'N/A',
+        registration_type: registration.registration_type || (registration.is_guest_registration ? 'Guest' : 'Registered User'),
         tournament_name: registration.tournament_name,
         payment_status: registration.payment_status || 'pending',
         payment_option: registration.payment_option || 'online',
@@ -41,12 +57,20 @@ const Registrations = () => {
 
     const handleFetchRegistrations = async () => {
         try {
+            console.log('Fetching tournament registrations...');
             const response = await axios.get(`${API_URL}/admin/tournament-registrations/`, getAuthHeaders());
             console.log('Tournament registrations response:', response);
             setRegistrations(response?.data?.registrations || []);
+            console.log(`✅ Loaded ${response?.data?.registrations?.length || 0} tournament registrations`);
         } catch (error) {
             console.error('Error fetching tournament registrations:', error);
-            toast.error('Error fetching tournament registrations');
+            console.error('Error details:', error.response?.data);
+
+            if (error.response?.status === 500) {
+                toast.error('Database error. Please restart the server to apply migrations.');
+            } else {
+                toast.error('Error fetching tournament registrations');
+            }
         }
     };
 

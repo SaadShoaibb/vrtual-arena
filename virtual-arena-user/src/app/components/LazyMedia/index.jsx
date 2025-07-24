@@ -20,10 +20,10 @@ const LazyMedia = ({
   const [retryCount, setRetryCount] = useState(0)
   const maxRetries = 2
 
-  // Memoize intersection observer options
+  // Memoize intersection observer options - more aggressive for performance
   const observerOptions = useMemo(() => ({
-    rootMargin: '50px', // Reduced from 100px for better performance
-    threshold: 0.01
+    rootMargin: '100px', // Reduced for better performance
+    threshold: 0.01 // Lower threshold for earlier loading
   }), [])
 
   // Memoize intersection observer callback
@@ -106,7 +106,7 @@ const LazyMedia = ({
             alt={alt || `Gallery Image ${index + 1}`}
             fill
             priority={priority}
-            quality={75}
+            quality={priority ? 70 : 50} // Reduced quality for better performance
             onError={handleError}
             onLoad={handleLoad}
             className={`object-cover transition-all duration-300 hover:scale-105 ${
@@ -115,6 +115,7 @@ const LazyMedia = ({
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             placeholder="blur"
             blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+            loading={priority ? "eager" : "lazy"}
           />
         </div>
       ) : (

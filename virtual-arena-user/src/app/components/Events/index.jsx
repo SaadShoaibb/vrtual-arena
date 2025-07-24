@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchTournaments } from '@/Store/ReduxSlice/tournamentSlice';
 import TournamentBookingForm from './TournamentBookingForm';
 import AuthModel from '../AuthModal';
+import PaymentOptionsModal from '../PaymentOptionsModal';
 import axios from 'axios';
 import { API_URL, getAuthHeaders } from '@/utils/ApiUrl';
 import toast from 'react-hot-toast';
@@ -22,7 +23,8 @@ const Calender = ({ locale = 'en' }) => {
     const [tournamentModel, setTournamentModel] = useState(false)
     const [paymentModel, setPaymentModel] = useState(false)
     const [selectedTournament, setSelectedTournament] = useState(null)
-    const { userData, registrations } = useSelector((state) => state.userData)
+    const [showPaymentOptions, setShowPaymentOptions] = useState(false)
+    const { userData, registrations, isAuthenticated } = useSelector((state) => state.userData)
     const [option, setOption] = useState('card')
     const dispatch = useDispatch();
     const router = useRouter()
@@ -41,52 +43,27 @@ const Calender = ({ locale = 'en' }) => {
         setOption(option)
     }
 
-    const [showPaymentOptions, setShowPaymentOptions] = useState(false);
-    const [currentTournament, setCurrentTournament] = useState(null);
-    const [paymentChoice, setPaymentChoice] = useState('online'); // 'online' or 'at_event'
+    // Removed duplicate state variables - using the ones defined above
 
     const handleSelectTournament = (tournament) => {
-        if (registrations?.includes(tournament?.tournament_id)) {
-            toast.error("You have already registered this tournament")
-        } else {
-            // Show payment options instead of directly adding to cart
-            setCurrentTournament(tournament);
-            setShowPaymentOptions(true);
+        console.log('Buy Tickets clicked for tournament:', tournament);
+        console.log('Is authenticated:', isAuthenticated);
+
+        // Check if already registered (only for authenticated users)
+        if (isAuthenticated && registrations?.includes(tournament?.tournament_id)) {
+            toast.error("You have already registered for this tournament")
+            return;
         }
+
+        // Show payment options modal (supports both guest and user registration)
+        console.log('Setting selected tournament and showing payment options');
+        setSelectedTournament(tournament);
+        setShowPaymentOptions(true);
     };
     
-    const handlePaymentOptionSelect = () => {
-        // Add tournament to cart with payment choice
-        dispatch(addToCart({
-            tournament_id: currentTournament.tournament_id,
-            quantity: 1,
-            item_type: 'tournament',
-            payment_option: paymentChoice // Add payment option to cart item
-        }))
-            .unwrap()
-            .then((response) => {
-                setShowPaymentOptions(false);
-                
-                if (paymentChoice === 'at_event') {
-                    // For 'Pay at Event', show success message but don't redirect to cart
-                    toast.success(response?.message || "You have been registered for the tournament. Payment will be collected at the event.");
-                    dispatch(fetchUserData()); // Refresh user data to update registrations
-                } else {
-                    // For online payment, add to cart and redirect
-                    toast.success("Tournament ticket added to cart");
-                    dispatch(fetchCart()); // Refresh cart data
-                    router.push('/cart'); // Redirect to cart page
-                }
-            })
-            .catch((error) => {
-                console.error('Error adding to cart:', error);
-                toast.error(error?.message || error?.response?.data?.message || "Failed to add tournament to cart");
-            });
-    };
+    // Removed old payment logic - now handled by PaymentOptionsModal
     
-    const handlePaymentChoiceChange = (choice) => {
-        setPaymentChoice(choice);
-    };
+    // Removed unused payment choice handler - now handled by PaymentOptionsModal
 
     const handleCloseTournamentModel = () => {
         setTournamentModel(false)
@@ -154,7 +131,7 @@ const Calender = ({ locale = 'en' }) => {
             </div>
 
             <div className='w-full h-full bg-blackish'>
-                <div className='w-full mx-auto max-w-[1600px] flex-col flex px-4 md:px-10 lg:px-16 xl:px-20 2xl:px-6'>
+                <div className='w-full mx-auto max-w-[1600px] flex-col flex px-4 md:px-6 lg:px-10 xl:px-16 2xl:px-20'>
                     {tournaments?.length > 0 ? tournaments?.map((e, i) => {
                         const startDate = new Date(e.start_date);
                         const endDate = new Date(e.end_date);
@@ -166,27 +143,42 @@ const Calender = ({ locale = 'en' }) => {
                         const time = `${startTime} – ${endTime}`;
 
                         return (
-                            <div className='grid grid-cols-5 border-b gap-6 py-[35px]' key={i}>
-                                <div className='flex items-center gap-3 col-span-5 xl:col-span-1'>
-                                    <h1 className='text-[80px] text-white font-bold leading-none'>{day}</h1>
-                                    <h1 className='text-[32px] text-white leading-none'>{month}, <br />{year}</h1>
+                            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 border-b gap-4 lg:gap-6 py-[35px]' key={i}>
+                                {/* Date Section */}
+                                <div className='flex items-center gap-3 col-span-1 md:col-span-2 lg:col-span-1 justify-center md:justify-start mb-4 md:mb-0'>
+                                    <h1 className='text-[50px] sm:text-[60px] md:text-[70px] lg:text-[80px] text-white font-bold leading-none flex-shrink-0'>{day}</h1>
+                                    <div className='flex flex-col min-w-0'>
+                                        <h1 className='text-[20px] sm:text-[24px] md:text-[28px] lg:text-[32px] text-white leading-tight whitespace-nowrap'>{month},</h1>
+                                        <h1 className='text-[20px] sm:text-[24px] md:text-[28px] lg:text-[32px] text-white leading-tight'>{year}</h1>
+                                    </div>
                                 </div>
-                                <div className='col-span-5 lg:col-span-3 flex flex-col text-white justify-center'>
-                                    <h1 className='text-[40px] xl:text-[50px] font-semibold leading-none mb-2.5 capitalize'>{e?.name}</h1>
-                                    <div className='flex flex-col md:flex-row gap-2 md:gap-10 lg:gap-12 xl:gap-20 items-start xl:items-center'>
-                                        <div className='flex items-center gap-2 text-white'>
-                                            <IoLocationOutline size={26} />
-                                            <h1 className='text-xs xl:text-xl leading-none capitalize'>{e.city}, {e.country}</h1>
+
+                                {/* Event Details Section */}
+                                <div className='col-span-1 md:col-span-2 lg:col-span-3 flex flex-col text-white justify-center space-y-3 min-w-0'>
+                                    <h1 className='text-[24px] sm:text-[28px] md:text-[32px] lg:text-[36px] xl:text-[40px] 2xl:text-[50px] font-semibold leading-tight mb-2 capitalize break-words overflow-wrap-anywhere'>{e?.name}</h1>
+                                    <div className='flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-12 items-start sm:items-center'>
+                                        <div className='flex items-center gap-2 text-white min-w-0 flex-shrink-0'>
+                                            <IoLocationOutline size={18} className="flex-shrink-0 sm:w-5 sm:h-5" />
+                                            <h1 className='text-sm sm:text-base md:text-lg lg:text-xl leading-tight capitalize break-words overflow-wrap-anywhere'>{e.city}, {e.country}</h1>
                                         </div>
-                                        <div className='flex items-center gap-2 text-white'>
-                                            <IoMdTime size={26} />
-                                            <h1 className='text-xs xl:text-xl leading-none'>{time}</h1>
+                                        <div className='flex items-center gap-2 text-white min-w-0 flex-shrink-0'>
+                                            <IoMdTime size={18} className="flex-shrink-0 sm:w-5 sm:h-5" />
+                                            <h1 className='text-sm sm:text-base md:text-lg lg:text-xl leading-tight break-words overflow-wrap-anywhere'>{time}</h1>
                                         </div>
                                     </div>
                                 </div>
-                                <button onClick={() => handleSelectTournament(e)} className='col-span-5 lg:col-span-2 xl:col-span-1 text-xl font-semibold flex items-center h-fit w-fit justify-self-start lg:justify-self-end my-auto py-2 md:py-4 px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7]'>
-                                    Buy Tickets <img src="/icons/arrow.svg" alt="" className='h-[22px] w-[22px] ml-[11px] rounded-full' />
-                                </button>
+
+                                {/* Button Section */}
+                                <div className='col-span-1 md:col-span-2 lg:col-span-1 flex justify-center lg:justify-end items-center mt-4 lg:mt-0'>
+                                    <button
+                                        onClick={() => handleSelectTournament(e)}
+                                        className='text-sm sm:text-base md:text-lg lg:text-xl font-semibold flex items-center justify-center h-fit w-fit py-3 px-4 sm:px-6 lg:py-4 lg:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] hover:opacity-90 transition-opacity whitespace-nowrap min-w-fit'
+                                    >
+                                        <span className="hidden sm:inline">Buy Tickets</span>
+                                        <span className="sm:hidden">Buy</span>
+                                        <img src="/icons/arrow.svg" alt="" className='h-[16px] w-[16px] sm:h-[18px] sm:w-[18px] lg:h-[22px] lg:w-[22px] ml-2 lg:ml-3 rounded-full flex-shrink-0' />
+                                    </button>
+                                </div>
                             </div>
                         );
                     }) :
@@ -211,7 +203,7 @@ const Calender = ({ locale = 'en' }) => {
                     </>
                 }
                 
-                {showPaymentOptions && currentTournament && (
+                {false && (
                     <AuthModel onClose={() => setShowPaymentOptions(false)}>
                         <div className="bg-[#1E1E1E] p-6 rounded-lg max-w-md w-full">
                             <h2 className="text-white text-2xl font-bold mb-4">Payment Options</h2>
@@ -255,6 +247,16 @@ const Calender = ({ locale = 'en' }) => {
                             </div>
                         </div>
                     </AuthModel>
+                )}
+
+                {/* Payment Options Modal */}
+                {showPaymentOptions && selectedTournament && (
+                    <PaymentOptionsModal
+                        isOpen={showPaymentOptions}
+                        onClose={() => setShowPaymentOptions(false)}
+                        tournament={selectedTournament}
+                        type="tournament"
+                    />
                 )}
             </div>
         </>

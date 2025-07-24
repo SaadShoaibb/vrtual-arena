@@ -46,8 +46,18 @@ const PaymentForm = ({ entity, userId, amount, onSuccess, onClose, type }) => {
     }
     
     try {
+      // Construct payment URL that works for both local and production
+      let paymentUrl;
+      if (API_URL.includes('/user')) {
+        // Production: API_URL is like '/api/v1/user', replace 'user' with 'payment'
+        paymentUrl = API_URL.replace('/user', '/payment');
+      } else {
+        // Local: API_URL is like 'http://localhost:8080/api/v1', append '/payment'
+        paymentUrl = `${API_URL}/payment`;
+      }
+
       const response = await axios.post(
-        `${API_URL}/payment/create-checkout-session`,
+        `${paymentUrl}/create-checkout-session`,
         {
           user_id: userId,
           amount: amountNumber,

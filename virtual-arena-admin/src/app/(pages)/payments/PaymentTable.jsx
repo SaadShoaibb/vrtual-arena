@@ -46,7 +46,7 @@ const PaymentTable = ({
                                         key={colIndex}
                                         className="px-6 text-nowrap max-w-[250px] overflow-hidden text-ellipsis py-4 border-b border-gray-200 text-sm"
                                     >
-                                        {row[column.accessor]}
+                                        {column.render ? column.render(row[column.accessor]) : row[column.accessor]}
                                     </td>
                                 ))}
                                 {/* Detail Button Column */}

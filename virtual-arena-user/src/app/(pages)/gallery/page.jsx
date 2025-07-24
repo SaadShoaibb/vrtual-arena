@@ -1,86 +1,93 @@
 'use client'
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import { useDispatch } from 'react-redux'
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
-import LazyMedia from '@/app/components/LazyMedia';
+import SimpleImage from '@/app/components/SimpleImage';
+import BookModal from '@/app/components/BookModal';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import { openBookModal } from '@/Store/ReduxSlice/bookModalSlice';
 import { translations } from '@/app/translations';
 
 
 
+// Demo images for development - optimized with smaller file sizes
+const demoImages = [
+  '/gallery/gal1.png',
+  '/gallery/gal2.png',
+  '/gallery/gal3.png',
+  '/gallery/gal4.png',
+  '/gallery/gal5.jpg',
+  '/gallery/gal6.png',
+]
+
 const GalleryPage = () => {
-  const [mediaItems, setMediaItems] = useState([])
-  const [visibleItems, setVisibleItems] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  // Initialize with demo images immediately for instant page render
+  const demoData = demoImages.map((src, index) => ({
+    type: 'image',
+    src,
+    filename: `demo-${index}`,
+    index
+  }))
+
+  const [mediaItems, setMediaItems] = useState(demoData)
+  const [visibleItems, setVisibleItems] = useState(demoData.slice(0, 2))
+
+  const [hasMore, setHasMore] = useState(true)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+
   const searchParams = useSearchParams();
   const locale = searchParams.get('locale') || 'en';
   const t = translations[locale] || translations.en;
+  const dispatch = useDispatch();
 
-  // Demo images for development - optimized with smaller file sizes
-  const demoImages = [
-    '/gallery/gal1.png',
-    '/gallery/gal2.png',
-    '/gallery/gal3.png',
-    '/gallery/gal4.png',
-    '/gallery/gal5.png',
-    '/gallery/gal6.png',
-  ]
+  const handleBookNow = () => {
+    dispatch(openBookModal({
+      experienceType: 'Photo Booth',
+      sessionName: 'Photo Booth Experience'
+    }));
+  };
+
+  // Simplified media processing - only process what we need
+  const processMediaData = useCallback((data) => {
+    // Only process first 6 images for initial load (ignore videos for now)
+    const imageFiles = (data.images || []).slice(0, 6).map((item, index) => ({
+      type: 'image',
+      src: item.url || item,
+      filename: item.filename || `image-${index}`,
+      index
+    }))
+
+    setMediaItems(imageFiles)
+    // Show only first 2 items initially for ultra-fast loading
+    setVisibleItems(imageFiles.slice(0, 2))
+    setHasMore(imageFiles.length > 2)
+  }, [])
 
   const fetchMedia = useCallback(async () => {
+    // Demo images are already loaded, just try to fetch real data in background
     try {
-      setLoading(true)
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 3000)
+
       const res = await fetch('/api/gallery', {
-        cache: 'force-cache', // Cache the response for better performance
-        next: { revalidate: 3600 } // Revalidate every hour
+        signal: controller.signal,
+        cache: 'force-cache'
       })
+      clearTimeout(timeoutId)
 
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`)
+      if (res.ok) {
+        const data = await res.json()
+        if (!data.error && data.images && data.images.length > 0) {
+          // Update with real data if available
+          processMediaData(data)
+          console.log('Real gallery data loaded')
+        }
       }
-
-      const data = await res.json()
-
-      if (data.error) {
-        throw new Error(data.error)
-      }
-
-      // Process images with proper URLs
-      const imageFiles = (data.images || []).map((item, index) => ({
-        type: 'image',
-        src: item.url || item,
-        filename: item.filename || `image-${index}`,
-        index
-      }))
-
-      // Process videos with proper URLs and posters
-      const videoFiles = (data.videos || []).map((item, index) => ({
-        type: 'video',
-        src: item.url || item,
-        poster: item.poster || item.url?.replace(/\.(mp4|webm|ogg)$/i, '.jpg'),
-        filename: item.filename || `video-${index}`,
-        index
-      }))
-
-      const allMedia = [...imageFiles, ...videoFiles]
-      setMediaItems(allMedia)
-
-      // Initially show only the first 6 items for faster page load
-      setVisibleItems(allMedia.slice(0, 6))
-
-      setError(null)
     } catch (error) {
-      console.error('Failed to fetch gallery:', error)
-      setError(error.message)
-      // Use demo images if API fails
-      setVisibleItems(demoImages.map((src, index) => ({
-        type: 'image',
-        src,
-        index
-      })))
-    } finally {
-      setLoading(false)
+      // Silently fail - demo images are already showing
+      console.log('Gallery API unavailable, using demo images')
     }
   }, [])
 
@@ -88,41 +95,65 @@ const GalleryPage = () => {
     fetchMedia()
   }, [fetchMedia])
 
-  // Load more items as user scrolls
+  // Simple load more function
+  const loadMore = useCallback(() => {
+    if (isLoadingMore || !hasMore) return;
+
+    setIsLoadingMore(true);
+
+    // Load 1 more item at a time for maximum performance
+    const currentLength = visibleItems.length;
+    if (currentLength < mediaItems.length) {
+      const nextItem = mediaItems.slice(currentLength, currentLength + 1);
+      setVisibleItems(prev => [...prev, ...nextItem]);
+      setHasMore(currentLength + 1 < mediaItems.length);
+    } else {
+      setHasMore(false);
+    }
+
+    setIsLoadingMore(false);
+  }, [mediaItems, visibleItems, isLoadingMore, hasMore]);
+
+  // Simplified scroll handler
   useEffect(() => {
-    if (mediaItems.length <= 6) return;
-    
+    let timeoutId = null;
     const handleScroll = () => {
-      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000) {
-        const currentLength = visibleItems.length;
-        const nextBatch = mediaItems.slice(currentLength, currentLength + 6);
-        
-        if (nextBatch.length > 0) {
-          setVisibleItems(prev => [...prev, ...nextBatch]);
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        const scrollPosition = window.innerHeight + window.scrollY;
+        const documentHeight = document.body.offsetHeight;
+
+        if (scrollPosition >= documentHeight - 300 && hasMore && !isLoadingMore) {
+          loadMore();
         }
-      }
+      }, 300); // Longer delay for better performance
     };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [mediaItems, visibleItems]);
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(timeoutId);
+    };
+  }, [loadMore, hasMore, isLoadingMore]);
 
   return (
     <>
     <div className="bg-black text-white">
       <Navbar locale={locale} />
       
-      {/* Hero Section - Optimized image loading */}
-      <div className="relative h-[60vh] overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-80"></div>
-        <Image 
-          src="/assets/dealbg.png" 
-          alt="Photo Booth Experience" 
+      {/* Hero Section - Ultra-optimized loading */}
+      <div className="relative h-[60vh] overflow-hidden bg-gray-900">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-80 z-10"></div>
+        <Image
+          src="/assets/dealbg.png"
+          alt="Photo Booth Experience"
           className="w-full h-full object-cover"
           width={1920}
           height={1080}
           priority={true}
-          quality={85}
+          quality={75}
+          placeholder="blur"
+          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
         />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
           <div className="max-w-[1600px] mx-auto">
@@ -139,77 +170,29 @@ const GalleryPage = () => {
         <div>
           <h2 className="text-3xl font-bold mb-8 text-white">Our Gallery</h2>
           
-          {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-              {[1, 2, 3, 4, 5, 6].map((n) => (
-                <div key={n} className="w-full aspect-video animate-pulse bg-gray-700 rounded-2xl" />
-              ))}
-            </div>
-          ) : error && visibleItems.length === 0 ? (
-            <div className="text-center text-red-500 py-8">
-              <p>We're experiencing issues loading our gallery.</p>
-              <p className="text-sm mt-2">{error}</p>
-              <h3 className="text-xl font-bold mt-8 mb-4 text-white">Preview Gallery</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-                {demoImages.map((src, index) => (
-                  <div key={index} className="relative aspect-video overflow-hidden rounded-2xl shadow-lg">
-                    <Image
-                      src={src}
-                      alt={`Gallery Preview ${index + 1}`}
-                      width={640}
-                      height={360}
-                      quality={75}
-                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105 rounded-2xl"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : visibleItems.length === 0 ? (
-            <div>
-              <div className="text-center text-gray-400 py-8 mb-8">
-                <p>Our gallery is currently being updated with fresh content.</p>
-                <p>Check back soon for new images and videos!</p>
-              </div>
-              <h3 className="text-xl font-bold mt-8 mb-4 text-white">Preview Gallery</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-                {demoImages.map((src, index) => (
-                  <div key={index} className="relative aspect-video overflow-hidden rounded-2xl shadow-lg">
-                    <Image
-                      src={src}
-                      alt={`Gallery Preview ${index + 1}`}
-                      width={640}
-                      height={360}
-                      quality={75}
-                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105 rounded-2xl"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-              {visibleItems.map(({ type, src, index, poster, filename }) => (
-                <LazyMedia
-                  key={`${type}-${index}-${filename}`}
-                  type={type}
-                  src={src}
-                  index={index}
-                  poster={poster}
-                  alt={`Gallery ${type} ${index + 1}`}
-                  className="aspect-video rounded-2xl shadow-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-shadow duration-300"
-                  priority={index < 3} // Prioritize first 3 items
-                />
-              ))}
-            </div>
-          )}
-          
-          {/* Loading indicator for infinite scroll */}
-          {!loading && !error && mediaItems.length > visibleItems.length && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+            {visibleItems.map(({ src, index, filename }) => (
+              <SimpleImage
+                key={`image-${index}-${filename || index}`}
+                src={src}
+                index={index}
+                alt={`Gallery Image ${index + 1}`}
+                className="aspect-video rounded-2xl shadow-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-shadow duration-300"
+                priority={index === 0} // Only prioritize the very first item
+              />
+            ))}
+          </div>
+
+          {/* Load More Button for better UX */}
+          {hasMore && (
             <div className="flex justify-center mt-8">
-              <div className="w-12 h-12 border-4 border-gray-600 border-t-[#DB1FEB] rounded-full animate-spin"></div>
+              <button
+                onClick={loadMore}
+                disabled={isLoadingMore}
+                className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoadingMore ? 'Loading...' : 'Load More'}
+              </button>
             </div>
           )}
         </div>
@@ -275,8 +258,11 @@ const GalleryPage = () => {
                 </ul>
               </div>
               
-              <button className="w-full bg-gradient-to-r from-[#DB1FEB] to-[#7721F3] hover:from-[#7721F3] hover:to-[#DB1FEB] text-white font-medium py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 mt-4">
-                Book Now
+              <button
+                onClick={handleBookNow}
+                className="w-full bg-gradient-to-r from-[#DB1FEB] to-[#7721F3] hover:from-[#7721F3] hover:to-[#DB1FEB] text-white font-medium py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 mt-4"
+              >
+                {t.bookNow}
               </button>
             </div>
           </div>
@@ -284,6 +270,9 @@ const GalleryPage = () => {
       </div>
 
       <Footer locale={locale} />
+
+      {/* Booking Modal */}
+      <BookModal locale={locale} />
     </div>
     </>
   )

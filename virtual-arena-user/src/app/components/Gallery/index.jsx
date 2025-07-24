@@ -1,5 +1,6 @@
 'use client'
 import React from 'react'
+import Link from 'next/link'
 import { translations } from '@/app/translations'
 
 const Gallery = ({ locale = 'en' }) => {
@@ -16,7 +17,9 @@ const Gallery = ({ locale = 'en' }) => {
                         </div>
                         <div>
                             <p className='text-xl text-white font-light text-wrap-balance'>{t.galleryDescription}</p>
-                            <button className='text-xl font-semibold mt-[36px] flex items-center text-nowrap py-2 md:py-4 px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] '>{t.viewAll} <img src="/icons/arrow.svg" alt="Arrow icon" className='h-[22px] w-[22px] ml-[11px] rounded-full' /></button>
+                            <Link href={`/gallery?locale=${locale}`}>
+                                <button className='text-xl font-semibold mt-[36px] flex items-center text-nowrap py-2 md:py-4 px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] '>{t.viewAll} <img src="/icons/arrow.svg" alt="Arrow icon" className='h-[22px] w-[22px] ml-[11px] rounded-full' /></button>
+                            </Link>
                         </div>
                     </div>
 

@@ -45,7 +45,7 @@ const Experience = ({ locale = 'en' }) => {
                             {t.description}
                         </p>
                         <button
-                            onClick={() => router.push(`/experiences?locale=${locale}`)}
+                            onClick={() => router.push(`/gallery?locale=${locale}`)}
                             className="text-base sm:text-lg md:text-xl mt-4 hover:-translate-y-1 hover:transition hover:duration-500 font-semibold flex items-center py-2 md:py-4 px-4 sm:px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] overflow-hidden"
                         >
                             <span className="text-wrap-balance whitespace-normal">{t.exploreExperiences}</span>

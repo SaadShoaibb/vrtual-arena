@@ -1,8 +1,15 @@
 // src/constants.js or wherever this file is
 
 // Use relative URLs that will be proxied by Nginx
-export const API_URL = '/api/v1';
+export const API_URL = '/api/v1'; // this is for the production
 // export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+
+// Helper function to get payment API URL
+export const getPaymentApiUrl = () => {
+  // Since API_URL is always '/api/v1' in production and 'http://localhost:8080/api/v1' in development
+  // We can simply append '/payment' to get the payment endpoint
+  return `${API_URL}/payment`;
+};
 
 // Helper function to get the base URL for media/assets
 export const getMediaBaseUrl = () => {

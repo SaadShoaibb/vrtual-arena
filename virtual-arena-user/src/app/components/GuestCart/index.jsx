@@ -176,10 +176,13 @@ const GuestCart = () => {
                                 <div key={item.cart_id} className="flex items-center justify-between bg-blackish border border-gray-700 rounded-lg p-4">
                                     <div className="flex items-center space-x-4">
                                         {itemImage && (
-                                            <img 
-                                                src={itemImage} 
+                                            <img
+                                                src={itemImage.startsWith('http') ? itemImage : `${API_URL.replace('/api/v1', '')}${itemImage.startsWith('/') ? itemImage : `/${itemImage}`}`}
                                                 alt={itemName}
                                                 className="w-16 h-16 object-cover rounded-lg"
+                                                onError={(e) => {
+                                                    e.target.src = '/assets/d1.png';
+                                                }}
                                             />
                                         )}
                                         <div>

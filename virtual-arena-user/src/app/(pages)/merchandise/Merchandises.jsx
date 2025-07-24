@@ -9,7 +9,11 @@ import { openSidebar } from '@/Store/ReduxSlice/cartSideBarSlice'
 import { openModal } from '@/Store/ReduxSlice/ModalSlice'
 import { FaHeart, FaRegHeart } from 'react-icons/fa'
 import CardSidebar from '@/app/components/CartSidebar'
+import UnifiedCartSidebar from '@/app/components/UnifiedCartSidebar'
+import GuestProductModal from '@/app/components/GuestProductModal'
+
 import { getMediaBaseUrl } from '@/utils/ApiUrl';
+import toast from 'react-hot-toast';
 import { formatDisplayPrice } from '@/app/utils/currency';
 
 const Merchandises = ({ locale = 'en' }) => {
@@ -21,6 +25,9 @@ const Merchandises = ({ locale = 'en' }) => {
     const { wishlist } = useSelector(state => state.wishlist)
     const [localWishlist, setLocalWishlist] = useState(wishlist)
     const [activeCategory, setActiveCategory] = useState('all')
+    const [showGuestModal, setShowGuestModal] = useState(false)
+    const [selectedProduct, setSelectedProduct] = useState(null)
+    const [guestCartCount, setGuestCartCount] = useState(0)
     
     const categories = [
         { id: 'all', name: 'All Products' },
@@ -37,11 +44,97 @@ const Merchandises = ({ locale = 'en' }) => {
     useEffect(() => {
         dispatch(fetchProducts())
         dispatch(fetchWishlist())
-    }, [dispatch])
+
+        // Update guest cart count for non-authenticated users
+        if (!isAuthenticated) {
+            updateGuestCartCount()
+        }
+    }, [dispatch, isAuthenticated])
+
+    // Update guest cart count
+    const updateGuestCartCount = () => {
+        const guestCart = JSON.parse(localStorage.getItem('guestCart') || '[]')
+        const totalItems = guestCart.reduce((sum, item) => sum + item.quantity, 0)
+        setGuestCartCount(totalItems)
+    }
+
+    // Listen for guest cart updates
+    useEffect(() => {
+        const handleGuestCartUpdate = () => {
+            updateGuestCartCount()
+        }
+
+        window.addEventListener('guestCartUpdated', handleGuestCartUpdate)
+        return () => window.removeEventListener('guestCartUpdated', handleGuestCartUpdate)
+    }, [])
+
+    const addToGuestCart = (product_id, quantity = 1) => {
+        const product = products.find(p => p.product_id === product_id);
+        if (!product) return;
+
+        try {
+            // Get existing guest cart from localStorage
+            const existingCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
+
+            // Check if product already exists in cart
+            const existingItemIndex = existingCart.findIndex(item => item.product_id === product_id);
+
+            if (existingItemIndex >= 0) {
+                // Update quantity if item exists
+                existingCart[existingItemIndex].quantity += quantity;
+            } else {
+                // Process the image properly
+                let productImage = product.images || product.image;
+
+                // If images is an array, take the first one
+                if (Array.isArray(productImage)) {
+                    productImage = productImage[0];
+                } else if (typeof productImage === 'string' && productImage.includes(',')) {
+                    // If it's a comma-separated string, take the first one
+                    productImage = productImage.split(',')[0].trim();
+                }
+
+                // Add new item to cart
+                const cartItem = {
+                    product_id: product.product_id,
+                    name: product.name,
+                    image: productImage,
+                    original_price: product.original_price,
+                    discount_price: product.discount_price,
+                    discount: product.discount,
+                    price: product.price,
+                    quantity: quantity
+                };
+
+                console.log('Adding product to guest cart:', {
+                    product: product,
+                    cartItem: cartItem,
+                    originalImages: product.images,
+                    processedImage: productImage
+                });
+                existingCart.push(cartItem);
+            }
+
+            // Save updated cart to localStorage
+            localStorage.setItem('guestCart', JSON.stringify(existingCart));
+
+            // Update cart count and trigger events
+            updateGuestCartCount();
+            window.dispatchEvent(new Event('guestCartUpdated'));
+
+            // Open sidebar
+            dispatch(openSidebar());
+
+            toast.success(`${product.name} added to cart!`);
+        } catch (error) {
+            console.error('Error adding to guest cart:', error);
+            toast.error('Failed to add item to cart');
+        }
+    };
 
     const handleAddToCart = (product_id) => {
         if (isAuthenticated) {
-            // Dispatch addToCart action
+            // Dispatch addToCart action for authenticated users
             dispatch(addToCart({ product_id, quantity: 1 }))
 
             // Add a 500ms delay before fetching the updated cart and opening sidebar
@@ -50,8 +143,8 @@ const Merchandises = ({ locale = 'en' }) => {
                 dispatch(fetchCart())
             }, 500)
         } else {
-            // If not authenticated, open the login modal
-            dispatch(openModal("LOGIN"))
+            // For guests, add to guest cart and open sidebar
+            addToGuestCart(product_id, 1);
         }
     }
 
@@ -241,7 +334,35 @@ const Merchandises = ({ locale = 'en' }) => {
                     </div>
                 )}
             </div>
-            <CardSidebar isOpen={isOpen} cart={cart} />
+            <UnifiedCartSidebar isOpen={isOpen} cart={cart} />
+
+            {/* Guest Cart Button (for non-authenticated users) */}
+            {!isAuthenticated && guestCartCount > 0 && (
+                <button
+                    onClick={() => dispatch(openSidebar())}
+                    className="fixed bottom-20 right-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-full shadow-lg hover:from-blue-700 hover:to-purple-700 transition-colors z-40"
+                >
+                    <div className="flex items-center gap-2">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
+                        </svg>
+                        <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                            {guestCartCount}
+                        </span>
+                    </div>
+                </button>
+            )}
+
+
+
+            {/* Guest Product Modal */}
+            {showGuestModal && selectedProduct && (
+                <GuestProductModal
+                    isOpen={showGuestModal}
+                    onClose={() => setShowGuestModal(false)}
+                    product={selectedProduct}
+                />
+            )}
         </div>
     )
 }

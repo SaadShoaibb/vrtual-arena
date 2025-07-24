@@ -62,14 +62,49 @@ export const getProductImageUrl = (product, fallback = '/assets/d1.png') => {
  */
 export const getCartItemImageUrl = (cartItem) => {
     if (!cartItem) return '/assets/d1.png';
-    
+
     // Special handling for tournaments
     if (cartItem.item_type === 'tournament') {
         return '/assets/tournament.png';
     }
-    
-    // Handle regular products
-    return getImageUrl(cartItem.images, '/assets/d1.png');
+
+    // Handle regular products - check both 'images' and 'image' properties
+    const imageSource = cartItem.images || cartItem.image;
+    return getImageUrl(imageSource, '/assets/d1.png');
+};
+
+/**
+ * Get guest cart item image URL with proper base URL handling
+ * @param {object} item - Guest cart item object
+ * @returns {string} - Properly formatted image URL
+ */
+export const getGuestCartImageUrl = (item) => {
+    if (!item || !item.image) {
+        console.log('Guest cart image: No item or image found, using fallback');
+        return '/assets/d1.png';
+    }
+
+    // If already a full URL, return as is
+    if (item.image.startsWith('http://') || item.image.startsWith('https://')) {
+        console.log('Guest cart image: Using full URL:', item.image);
+        return item.image;
+    }
+
+    // Get the media base URL
+    const baseUrl = getMediaBaseUrl();
+
+    // Handle both /uploads/image.jpg and uploads/image.jpg formats
+    const imagePath = item.image.startsWith('/') ? item.image : `/${item.image}`;
+    const fullUrl = `${baseUrl}${imagePath}`;
+
+    console.log('Guest cart image details:', {
+        itemImage: item.image,
+        baseUrl: baseUrl,
+        imagePath: imagePath,
+        fullUrl: fullUrl
+    });
+
+    return fullUrl;
 };
 
 /**

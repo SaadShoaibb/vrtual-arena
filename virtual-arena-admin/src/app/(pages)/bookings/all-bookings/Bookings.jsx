@@ -24,10 +24,24 @@ const Bookings = () => {
   const searchParams = useSearchParams();
 
   const columns = [
-    { header: 'Name', accessor: 'machine_type' },
+    { header: 'Machine Type', accessor: 'machine_type' },
     { header: 'Start Time', accessor: 'startTime' },
     { header: 'End Time', accessor: 'endTime' },
-    { header: 'User Name', accessor: 'user_name' },
+    { header: 'Customer Name', accessor: 'user_name' },
+    { header: 'Email', accessor: 'user_email' },
+    {
+      header: 'Type',
+      accessor: 'booking_type',
+      render: (value) => (
+        <span className={`px-2 py-1 rounded text-xs font-medium ${
+          value === 'Guest'
+            ? 'bg-purple-100 text-purple-800 border border-purple-200'
+            : 'bg-blue-100 text-blue-800 border border-blue-200'
+        }`}>
+          {value === 'Guest' ? '👤 Guest' : '🔐 User'}
+        </span>
+      )
+    },
     { header: 'Session Status', accessor: 'session_status' },
     { header: 'Payment Status', accessor: 'status' },
   ];
@@ -51,6 +65,8 @@ const Bookings = () => {
     endTime: formatDateTime(booking.end_time),
     end_time: booking.end_time,
     user_name: booking.user_name,
+    user_email: booking.user_email,
+    booking_type: booking.is_guest_booking ? 'Guest' : 'Registered User',
     status: booking.payment_status,
     session_status: booking.session_status,
     payment_status: booking.payment_status,

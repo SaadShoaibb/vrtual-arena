@@ -17,6 +17,7 @@ import EnhancedBookingForm from '../EnhancedBookingForm';
 import BookNowButton from '../common/BookNowButton';
 import { fetchCart } from '@/Store/ReduxSlice/addToCartSlice';
 import { fetchProducts } from '@/Store/ReduxSlice/productSlice';
+import { openSidebar } from '@/Store/ReduxSlice/cartSideBarSlice';
 import { FaRegCircleUser } from 'react-icons/fa6';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationDropdown from './Notification';
@@ -66,6 +67,7 @@ const Navbar = ({ locale = 'en' }) => {
     const [showSidebar, setShowSidebar] = useState(false)
     const [showMobileSubmenu, setShowMobileSubmenu] = useState(null);
     const [scrolled, setScrolled] = useState(false);
+    const [guestCartCount, setGuestCartCount] = useState(0);
     const [showSearchInput, setShowSearchInput] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [suggestions, setSuggestions] = useState([]);
@@ -85,6 +87,30 @@ const Navbar = ({ locale = 'en' }) => {
         dispatch(fetchUserData());
         dispatch(fetchCart());
         dispatch(fetchProducts());
+    }, []); // Remove isAuthenticated dependency to prevent continuous calls
+
+    // Separate useEffect for guest cart count
+    useEffect(() => {
+        if (!isAuthenticated) {
+            updateGuestCartCount();
+        }
+    }, [isAuthenticated]);
+
+    // Update guest cart count
+    const updateGuestCartCount = () => {
+        const guestCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
+        const totalItems = guestCart.reduce((sum, item) => sum + item.quantity, 0);
+        setGuestCartCount(totalItems);
+    };
+
+    // Listen for guest cart updates
+    useEffect(() => {
+        const handleGuestCartUpdate = () => {
+            updateGuestCartCount();
+        };
+
+        window.addEventListener('guestCartUpdated', handleGuestCartUpdate);
+        return () => window.removeEventListener('guestCartUpdated', handleGuestCartUpdate);
     }, []);
 
     // Compute live search suggestions when user types
@@ -321,34 +347,42 @@ const Navbar = ({ locale = 'en' }) => {
                                 </AnimatePresence>
                             </div>
                             
-                            {/* Cart Icon for authenticated users */}
+                            {/* Cart Icon for authenticated users only */}
                             {isAuthenticated && (
                                 <div className="relative">
-                                    <Link href={`/cart?locale=${locale}`}>
-                                        <div className="relative">
-                                            <IoCartOutline size={20} className="text-white hover:text-[#DB1FEB]" />
-                                            {cart?.length > 0 && (
-                                                <span className="absolute -top-2 -right-2 h-4 w-4 text-xs bg-[#DB1FEB] text-white rounded-full flex justify-center items-center">
-                                                    {cart.length}
-                                                </span>
-                                            )}
-                                        </div>
-                                    </Link>
+                                    <button
+                                        onClick={() => dispatch(openSidebar())}
+                                        className="relative"
+                                    >
+                                        <IoCartOutline size={20} className="text-white hover:text-[#DB1FEB]" />
+                                        {cart?.length > 0 && (
+                                            <span className="absolute -top-2 -right-2 h-4 w-4 text-xs bg-[#DB1FEB] text-white rounded-full flex justify-center items-center">
+                                                {cart.length}
+                                            </span>
+                                        )}
+                                    </button>
                                 </div>
                             )}
                             
                             {/* Login/Signup or User Account */}
                             {!isAuthenticated ? (
                                 <div className="flex items-center space-x-3">
-                                    <button 
-                                        onClick={() => handleShowModal('LOGIN')} 
+                                    <Link
+                                        href="/guest-orders"
+                                        className="text-sm text-white hover:text-[#DB1FEB] transition-colors navbar-button"
+                                    >
+                                        📦 {t.trackOrders}
+                                    </Link>
+                                    <span className="text-white">|</span>
+                                    <button
+                                        onClick={() => handleShowModal('LOGIN')}
                                         className="text-sm text-white hover:text-[#DB1FEB] transition-colors navbar-button"
                                     >
                                         {t.login}
                                     </button>
                                     <span className="text-white">|</span>
-                                    <button 
-                                        onClick={() => handleShowModal('REGISTER')} 
+                                    <button
+                                        onClick={() => handleShowModal('REGISTER')}
                                         className="text-sm text-white hover:text-[#DB1FEB] transition-colors navbar-button"
                                     >
                                         {t.signup}
@@ -487,20 +521,20 @@ const Navbar = ({ locale = 'en' }) => {
 
                         {/* Mobile Navigation Controls */}
                         <div className="flex items-center space-x-2 sm:space-x-3 lg:hidden">
-                            {isAuthenticated && (
-                                <div className="relative">
-                                    <Link href={`/cart?locale=${locale}`}>
-                                        <div className="relative">
-                                            <IoCartOutline size={20} className="text-white" />
-                                            {cart?.length > 0 && (
-                                                <span className="absolute -top-2 -right-2 h-4 w-4 text-xs bg-[#DB1FEB] text-white rounded-full flex justify-center items-center">
-                                                    {cart.length}
-                                                </span>
-                                            )}
-                                        </div>
-                                    </Link>
-                                </div>
-                            )}
+                            {/* Mobile Cart Icon for all users */}
+                            <div className="relative">
+                                <button
+                                    onClick={() => dispatch(openSidebar())}
+                                    className="relative"
+                                >
+                                    <IoCartOutline size={20} className="text-white" />
+                                    {((isAuthenticated && cart?.length > 0) || (!isAuthenticated && guestCartCount > 0)) && (
+                                        <span className="absolute -top-2 -right-2 h-4 w-4 text-xs bg-[#DB1FEB] text-white rounded-full flex justify-center items-center">
+                                            {isAuthenticated ? cart.length : guestCartCount}
+                                        </span>
+                                    )}
+                                </button>
+                            </div>
                             
                             {/* User account icon for mobile */}
                             {isAuthenticated ? (
@@ -655,11 +689,19 @@ const Navbar = ({ locale = 'en' }) => {
                         </div>
                     ) : (
                         <div className="flex flex-col space-y-4">
-                            <button 
+                            <Link
+                                href={`/guest-orders?locale=${locale}`}
+                                onClick={() => setShowSidebar(false)}
+                                className="flex items-center text-white hover:text-[#DB1FEB] py-2"
+                            >
+                                <span className="mr-2">📦</span>
+                                {t.trackOrders || 'Track Orders'}
+                            </Link>
+                            <button
                                 onClick={() => {
                                     handleShowModal('LOGIN');
                                     setShowSidebar(false);
-                                }} 
+                                }}
                                 className="bg-transparent border border-[#DB1FEB] text-white py-2 px-4 rounded-full hover:bg-[#DB1FEB] transition-colors"
                             >
                                 {t.login}

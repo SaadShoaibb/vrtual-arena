@@ -149,13 +149,14 @@ const PricingCalculator = ({ locale = 'en' }) => {
   
   // Handle booking
   const handleBookNow = () => {
-    // For individual experiences, open the enhanced booking form
+    // For individual experiences, open the enhanced booking form (supports guest booking)
     if (selectedExperiences.length > 0) {
       setIsBookingOpen(true);
       return;
     }
 
-    // For passes, use the existing payment modal
+    // For passes, use the existing payment modal (requires authentication for now)
+    // TODO: Add guest support for passes in the future
     if (!isAuthenticated) {
       dispatch(openModal('LOGIN'));
       return;

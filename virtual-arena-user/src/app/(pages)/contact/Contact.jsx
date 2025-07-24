@@ -193,6 +193,51 @@ const Contact = ({ locale = 'en' }) => {
                                         <li>{t.liveChat}</li>
                                         <li>{t.onsiteAssistance}</li>
                                     </ul>
+
+                                    {/* Live Chat Button */}
+                                    <div className="mt-6">
+                                        <button
+                                            onClick={() => {
+                                                // Try multiple methods to open Tawk.to chat
+                                                if (typeof window !== 'undefined') {
+                                                    // Method 1: Try Tawk_API maximize
+                                                    if (window.Tawk_API && window.Tawk_API.maximize) {
+                                                        window.Tawk_API.maximize();
+                                                        return;
+                                                    }
+
+                                                    // Method 2: Try clicking the Tawk.to widget
+                                                    const tawkWidget = document.querySelector('#tawk-widget, .tawk-widget, [id*="tawk"]');
+                                                    if (tawkWidget) {
+                                                        tawkWidget.click();
+                                                        return;
+                                                    }
+
+                                                    // Method 3: Wait for Tawk.to to load and try again
+                                                    let attempts = 0;
+                                                    const checkTawk = setInterval(() => {
+                                                        attempts++;
+                                                        if (window.Tawk_API && window.Tawk_API.maximize) {
+                                                            window.Tawk_API.maximize();
+                                                            clearInterval(checkTawk);
+                                                        } else if (attempts > 10) {
+                                                            clearInterval(checkTawk);
+                                                            alert('Live chat is loading. Please try again in a moment or look for the chat widget in the bottom-right corner.');
+                                                        }
+                                                    }, 500);
+                                                }
+                                            }}
+                                            className="bg-gradient-to-r from-[#DB1FEB] to-[#24CBFF] hover:opacity-90 transition-opacity text-white font-bold py-3 px-6 rounded-full flex items-center gap-2"
+                                        >
+                                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
+                                            </svg>
+                                            Start Live Chat
+                                        </button>
+                                        <p className="text-gray-400 text-sm mt-2">
+                                            Or look for the chat widget in the bottom-right corner of your screen
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

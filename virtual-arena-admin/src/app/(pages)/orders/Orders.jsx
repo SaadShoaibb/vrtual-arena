@@ -17,12 +17,38 @@ const Orders = ({orders}) => {
     // Table columns
     const columns = [
         { header: 'Order ID', accessor: 'order_id' },
+        { header: 'Customer Name', accessor: 'customer_name' },
+        { header: 'Email', accessor: 'customer_email' },
+        {
+            header: 'Type',
+            accessor: 'customer_type',
+            render: (value) => (
+                <span className={`px-2 py-1 rounded text-xs font-medium ${
+                    value === 'Guest'
+                        ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                        : 'bg-blue-100 text-blue-800 border border-blue-200'
+                }`}>
+                    {value === 'Guest' ? '👤 Guest' : '🔐 User'}
+                </span>
+            )
+        },
         { header: 'Total Amount', accessor: 'total_amount' },
         { header: 'Status', accessor: 'status' },
         { header: 'Payment Status', accessor: 'payment_status' },
-        { header: 'Method', accessor: 'payment_method' },
+        {
+            header: 'Method',
+            accessor: 'payment_method',
+            render: (value) => (
+                <span className={`px-2 py-1 rounded text-xs font-medium ${
+                    value === 'cod'
+                        ? 'bg-orange-100 text-orange-800 border border-orange-200'
+                        : 'bg-green-100 text-green-800 border border-green-200'
+                }`}>
+                    {value === 'cod' ? '💵 COD' : '💳 Online'}
+                </span>
+            )
+        },
         { header: 'Order Date', accessor: 'created_at' },
-        { header: 'User', accessor: 'user_name' },
         { header: 'Items', accessor: 'items_count' },
     ];
     
@@ -37,15 +63,26 @@ const Orders = ({orders}) => {
     // Transform orders data for the table
     const data = filteredOrders?.map((order) => ({
         order_id: order.order_id,
+        customer_name: order.is_guest_order
+            ? order.guest_name || 'Guest Customer'
+            : order.user?.name || 'Unknown User',
+        customer_email: order.is_guest_order
+            ? order.guest_email || 'N/A'
+            : order.user?.email || 'N/A',
+        customer_type: order.is_guest_order ? 'Guest' : 'Registered User',
         total_amount: `$${order.total_amount}`,
         status: order.status,
         payment_status: order.payment_status,
         payment_method: order.payment_method,
         created_at: new Date(order.created_at).toLocaleDateString(),
-        user_name: order.user.name,
-        user_email: order.user.email,
-        items_count: order.items.length,
-        items: order.items, // Store items for detail view
+        user_name: order.is_guest_order
+            ? order.guest_name || 'Guest Customer'
+            : order.user?.name || 'Unknown User',
+        user_email: order.is_guest_order
+            ? order.guest_email || 'N/A'
+            : order.user?.email || 'N/A',
+        items_count: order.items?.length || 0,
+        items: order.items || [], // Store items for detail view
     }));
 
     // State for sidebar and selected order

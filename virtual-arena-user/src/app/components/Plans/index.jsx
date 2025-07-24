@@ -63,25 +63,37 @@ const Plans = ({ locale = 'en' }) => {
                     <div className='rounded-[20px] py-6 md:py-[31px] px-6 md:px-[33px] border'>
                         <div className='relative rounded-[20px] border border-[#23A1FF] flex flex-col justify-center items-center py-[30px] drop-shadow-xl shadow-[#209FFF]'>
                             <img src="/assets/shdow.png" alt="" className='absolute top-0 h-full z-0' />
-                            <h1 className='text-white text-[22px] sm:text-[26px] font-semibold z-10 text-wrap-balance'>{t.basicPlan}</h1>
+                            <h1 className='text-white text-[22px] sm:text-[26px] font-semibold z-10 text-wrap-balance'>Basic</h1>
                             <h1 className='text-[22px] sm:text-[26px] z-10'>
-                                <span className='text-[#23A1FF] text-[35px] sm:text-[40px] md:text-[50px] font-semibold'>$149.25</span>
+                                <span className='text-[#23A1FF] text-[35px] sm:text-[40px] md:text-[50px] font-semibold'>$49.99</span>
                                 <span className='text-white text-[16px] sm:text-[18px]'>{t.perMonth}</span>
                             </h1>
                         </div>
                         <p className='text-base sm:text-lg text-white mt-[28px] pb-[25px] leading-none border-b text-wrap-balance'>
-                            {t.soloDescription}
+                            4 free sessions + 10% off any other paid sessions
                         </p>
                         <div className='flex flex-col gap-2.5 mt-[34px]'>
-                            {t.features.map((plan, i) => (
-                                <div key={i} className='flex items-start gap-1.5'>
-                                    <img src="/icons/check.png" alt="" className="flex-shrink-0 mt-1" />
-                                    <span className="text-wrap-balance">{plan}</span>
-                                </div>
-                            ))}
+                            <div className='flex items-start gap-1.5'>
+                                <img src="/icons/check.png" alt="" className="flex-shrink-0 mt-1" />
+                                <span className="text-wrap-balance">4 Free VR Sessions Monthly</span>
+                            </div>
+                            <div className='flex items-start gap-1.5'>
+                                <img src="/icons/check.png" alt="" className="flex-shrink-0 mt-1" />
+                                <span className="text-wrap-balance">10% Discount on Additional Sessions</span>
+                            </div>
+                            <div className='flex items-start gap-1.5'>
+                                <img src="/icons/check.png" alt="" className="flex-shrink-0 mt-1" />
+                                <span className="text-wrap-balance">Access to All VR Experiences</span>
+                            </div>
+                            <div className='flex items-start gap-1.5'>
+                                <img src="/icons/check.png" alt="" className="flex-shrink-0 mt-1" />
+                                <span className="text-wrap-balance">Priority Booking</span>
+                            </div>
                         </div>
-                        <button className='text-base sm:text-lg md:text-xl mt-[43px] font-semibold flex items-center py-2 md:py-4 px-4 sm:px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] overflow-hidden'>
-                            <span className="text-wrap-balance whitespace-normal">{t.bookNow}</span>
+                        <button
+                            onClick={() => window.location.href = '/pricing'}
+                            className='text-base sm:text-lg md:text-xl mt-[43px] font-semibold flex items-center py-2 md:py-4 px-4 sm:px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] overflow-hidden'>
+                            <span className="text-wrap-balance whitespace-normal">View More</span>
                             <img src="/icons/arrow.svg" alt="" className='h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] ml-2 sm:ml-[11px] flex-shrink-0 rounded-full' />
                         </button>
                     </div>
@@ -91,25 +103,41 @@ const Plans = ({ locale = 'en' }) => {
                     <div className='rounded-[20px] py-6 md:py-[31px] px-6 md:px-[33px] border'>
                         <div className='relative rounded-[20px] border border-[#23A1FF] flex flex-col justify-center items-center py-[30px] drop-shadow-xl shadow-[#209FFF]'>
                             <img src="/assets/shdow.png" alt="" className='absolute top-0 h-full z-0' />
-                            <h1 className='text-white text-[22px] sm:text-[26px] font-semibold z-10 text-wrap-balance'>{t.basicPlan}</h1>
+                            <h1 className='text-white text-[22px] sm:text-[26px] font-semibold z-10 text-wrap-balance'>Premium</h1>
                             <h1 className='text-[22px] sm:text-[26px] z-10'>
-                                <span className='text-[#23A1FF] text-[35px] sm:text-[40px] md:text-[50px] font-semibold'>$149.25</span>
+                                <span className='text-[#23A1FF] text-[35px] sm:text-[40px] md:text-[50px] font-semibold'>$79.99</span>
                                 <span className='text-white text-[16px] sm:text-[18px]'>{t.perMonth}</span>
                             </h1>
                         </div>
                         <p className='text-base sm:text-lg text-white mt-[28px] pb-[25px] leading-none border-b text-wrap-balance'>
-                            {t.teamDescription}
+                            8 sessions + 15% off any additional sessions
                         </p>
                         <div className='flex flex-col gap-2.5 mt-[34px]'>
-                            {t.features.map((plan, i) => (
-                                <div key={i} className='flex items-start gap-1.5'>
-                                    <img src="/icons/check.png" alt="" className="flex-shrink-0 mt-1" />
-                                    <span className="text-wrap-balance">{plan}</span>
-                                </div>
-                            ))}
+                            <div className='flex items-start gap-1.5'>
+                                <img src="/icons/check.png" alt="" className="flex-shrink-0 mt-1" />
+                                <span className="text-wrap-balance">8 Free VR Sessions Monthly</span>
+                            </div>
+                            <div className='flex items-start gap-1.5'>
+                                <img src="/icons/check.png" alt="" className="flex-shrink-0 mt-1" />
+                                <span className="text-wrap-balance">15% Discount on Additional Sessions</span>
+                            </div>
+                            <div className='flex items-start gap-1.5'>
+                                <img src="/icons/check.png" alt="" className="flex-shrink-0 mt-1" />
+                                <span className="text-wrap-balance">Access to All VR Experiences</span>
+                            </div>
+                            <div className='flex items-start gap-1.5'>
+                                <img src="/icons/check.png" alt="" className="flex-shrink-0 mt-1" />
+                                <span className="text-wrap-balance">Priority Booking & Support</span>
+                            </div>
+                            <div className='flex items-start gap-1.5'>
+                                <img src="/icons/check.png" alt="" className="flex-shrink-0 mt-1" />
+                                <span className="text-wrap-balance">Exclusive Member Events</span>
+                            </div>
                         </div>
-                        <button className='text-base sm:text-lg md:text-xl mt-[43px] font-semibold flex items-center py-2 md:py-4 px-4 sm:px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] overflow-hidden'>
-                            <span className="text-wrap-balance whitespace-normal">{t.bookNow}</span>
+                        <button
+                            onClick={() => window.location.href = '/pricing'}
+                            className='text-base sm:text-lg md:text-xl mt-[43px] font-semibold flex items-center py-2 md:py-4 px-4 sm:px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] overflow-hidden'>
+                            <span className="text-wrap-balance whitespace-normal">View More</span>
                             <img src="/icons/arrow.svg" alt="" className='h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] ml-2 sm:ml-[11px] flex-shrink-0 rounded-full' />
                         </button>
                     </div>

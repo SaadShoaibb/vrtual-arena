@@ -37,17 +37,18 @@ const EventsPage = () => {
   }, [t]);
 
   const handleRegisterClick = (event) => {
-    if (!isAuthenticated) {
-      setShowLogin(true);
-      return;
-    }
+    console.log('Register button clicked for event:', event);
+    console.log('Is authenticated:', isAuthenticated);
+    console.log('Current registrations:', registrations);
 
-    if (registrations?.includes(event?.event_id)) {
+    // Check if already registered (only for authenticated users)
+    if (isAuthenticated && registrations?.includes(event?.event_id)) {
       toast.error(t.alreadyRegistered || "You have already registered for this event");
       return;
     }
 
-    // Show payment options instead of directly registering
+    // Show payment options modal (supports both guest and user registration)
+    console.log('Setting selected tournament and showing payment options');
     setSelectedTournament(event);
     setShowPaymentOptions(true);
   };
