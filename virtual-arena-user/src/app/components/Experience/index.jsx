@@ -51,7 +51,7 @@ const Experience = ({ locale = 'en' }) => {
                             <span className="text-wrap-balance whitespace-normal">{t.exploreExperiences}</span>
                             <img
                                 src="/icons/arrow.svg"
-                                alt=""
+                                alt="Arrow icon"
                                 className="h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] ml-2 sm:ml-[11px] flex-shrink-0 rounded-full"
                             />
                         </button>
@@ -62,7 +62,7 @@ const Experience = ({ locale = 'en' }) => {
                     <div className='flex flex-col gap-4 w-full'>
                         <div className='grid grid-flow-col grid-rows-2 gap-4 w-full'>
                             <div className='bg-[#23A1FF] w-full max-w-[240px] rounded-xl flex justify-center items-center h-[200px]'>
-                                <img src="/icons/exp1.png" alt="" />
+                                <img src="/icons/exp1.png" alt="VR headset icon representing virtual reality experiences" />
                             </div>
                             <div className='bg-[#DB1FEB] w-full max-w-[240px] rounded-xl flex justify-center items-center h-[200px]'>
                                 <div>
@@ -70,10 +70,10 @@ const Experience = ({ locale = 'en' }) => {
                                     <h1 className='text-white text-[20px] sm:text-[26px] md:text-[30px] font-semibold leading-none text-wrap-balance'>{t.happyClients}</h1>
                                 </div>
                             </div>
-                            <img src="/assets/experience1.png" alt="" className='row-span-2 object-cover w-full max-w-[240px] h-full' />
+                            <img src="/assets/experience1.png" alt="VR gaming experience - Player immersed in virtual reality" className='row-span-2 object-cover w-full max-w-[240px] h-full' />
                         </div>
                         <div className='flex justify-center items-center gap-4 bg-[#23A1FF] rounded-xl h-[200px]'>
-                            <img src="/icons/exp2.png" alt="" />
+                            <img src="/icons/exp2.png" alt="Gaming controller icon representing VR gaming products" />
                             <div>
                                 <h1 className='text-white text-[40px] md:text-[50px] font-bold leading-none'>150k</h1>
                                 <h1 className='text-white text-[20px] sm:text-[24px] md:text-[30px] font-semibold leading-none text-wrap-balance'>{t.productsSold}</h1>
@@ -81,18 +81,18 @@ const Experience = ({ locale = 'en' }) => {
                         </div>
                     </div>
 
-                    <img src="/assets/experience2.png" className='rounded-xl object-cover h-full' alt="" />
+                    <img src="/assets/experience2.png" className='rounded-xl object-cover h-full' alt="VR gaming arena - Players enjoying immersive virtual reality experiences" />
 
                     <div className='flex flex-col gap-4 w-full'>
                         <div className='flex justify-center items-center gap-4 bg-[#23A1FF] rounded-xl h-[200px]'>
-                            <img src="/icons/exp2.png" alt="" />
+                            <img src="/icons/exp2.png" alt="Gaming controller icon representing popular VR features" />
                             <div>
                                 <h1 className='text-white text-[40px] md:text-[50px] font-bold leading-none'>56k</h1>
                                 <h1 className='text-white text-[20px] sm:text-[24px] md:text-[30px] font-semibold leading-none text-wrap-balance'>{t.popularFeatures}</h1>
                             </div>
                         </div>
                         <div className='grid grid-flow-col grid-rows-2 gap-4 w-full'>
-                            <img src="/assets/experience3.png" alt="" className='row-span-2 object-cover h-full w-full max-w-[240px]' />
+                            <img src="/assets/experience3.png" alt="VR technology showcase - Advanced virtual reality equipment and setup" className='row-span-2 object-cover h-full w-full max-w-[240px]' />
                             <div className='bg-[#DB1FEB] w-full max-w-[240px] rounded-xl flex justify-center items-center h-[200px]'>
                                 <div>
                                     <h1 className='text-white text-[45px] md:text-[60px] font-bold leading-none'>45k</h1>
@@ -100,7 +100,7 @@ const Experience = ({ locale = 'en' }) => {
                                 </div>
                             </div>
                             <div className='bg-[#23A1FF] w-full max-w-[240px] rounded-xl flex justify-center items-center h-[200px]'>
-                                <img src="/icons/exp1.png" alt="" />
+                                <img src="/icons/exp1.png" alt="VR headset icon representing virtual reality technology" />
                             </div>
                         </div>
                     </div>

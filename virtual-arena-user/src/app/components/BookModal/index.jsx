@@ -2,12 +2,14 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { closeBookModal } from '@/Store/ReduxSlice/bookModalSlice';
-import BookingForm from '../BookingForm';
+import EnhancedBookingForm from '../EnhancedBookingForm';
 import { FaArrowLeft, FaMinus } from 'react-icons/fa';
+import { translations } from '@/app/translations';
 
-const BookModal = () => {
+const BookModal = ({ locale = 'en' }) => {
   const dispatch = useDispatch();
   const { showBookModal, bookingPrefill } = useSelector((state) => state.bookModal);
+  const t = translations[locale] || translations.en;
 
   const handleClose = () => {
     dispatch(closeBookModal());
@@ -39,7 +41,7 @@ const BookModal = () => {
           <FaMinus />
         </div>
 
-        <BookingForm prefill={bookingPrefill} onClose={handleClose} />
+        <EnhancedBookingForm onClose={handleClose} locale={locale} translations={t} />
       </div>
     </div>
   );

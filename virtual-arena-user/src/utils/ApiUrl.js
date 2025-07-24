@@ -68,15 +68,15 @@ export const getAuthHeaders = () => {
 export const validateToken = async () => {
   try {
     const authToken = localStorage.getItem('token');
-    
+
     if (!authToken) {
       console.error('No token found to validate');
       return false;
     }
-    
+
     // Format token with Bearer prefix if needed
     const formattedToken = authToken.startsWith('Bearer ') ? authToken : `Bearer ${authToken}`;
-    
+
     // Make a test request to an endpoint that requires authentication
     const response = await fetch(`${API_URL}/auth/`, {
       method: 'GET',
@@ -84,7 +84,7 @@ export const validateToken = async () => {
         Authorization: formattedToken
       }
     });
-    
+
     if (response.ok) {
       console.log('Token is valid');
       return true;
@@ -96,4 +96,48 @@ export const validateToken = async () => {
     console.error('Error validating token:', error);
     return false;
   }
+};
+
+// Helper function to get full media URL
+export const getFullMediaUrl = (relativePath) => {
+  if (!relativePath) return '';
+
+  // If already a full URL, return as is
+  if (relativePath.startsWith('http://') || relativePath.startsWith('https://')) {
+    return relativePath;
+  }
+
+  const baseUrl = getMediaBaseUrl();
+  const cleanPath = relativePath.startsWith('/') ? relativePath : `/${relativePath}`;
+
+  return baseUrl ? `${baseUrl}${cleanPath}` : cleanPath;
+};
+
+// Helper function to check if media file exists
+export const checkMediaExists = async (url) => {
+  try {
+    const response = await fetch(url, { method: 'HEAD' });
+    return response.ok;
+  } catch {
+    return false;
+  }
+};
+
+// Helper function to get optimized image URL
+export const getOptimizedImageUrl = (src, width = 800, quality = 75) => {
+  if (!src) return '';
+
+  // If it's already optimized or external, return as is
+  if (src.includes('/_next/image') || src.startsWith('http')) {
+    return src;
+  }
+
+  const baseUrl = getMediaBaseUrl();
+  const params = new URLSearchParams({
+    url: src.startsWith('/') ? src : `/${src}`,
+    w: width.toString(),
+    q: quality.toString()
+  });
+
+  return `${baseUrl}/_next/image?${params.toString()}`;
 };

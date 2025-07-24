@@ -1,78 +1,30 @@
 'use client'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { IoMdPeople, IoMdTime } from 'react-icons/io';
 import { MdOutlineEventSeat } from 'react-icons/md';
+import { useSearchParams } from 'next/navigation';
+import { useDispatch } from 'react-redux';
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
+import LazyMedia from '@/app/components/LazyMedia';
+import BookModal from '@/app/components/BookModal';
+import { openBookModal } from '@/Store/ReduxSlice/bookModalSlice';
+import { translations } from '@/app/translations';
 
-const LazyMedia = ({ type, src, index, poster }) => {
-  const ref = useRef(null)
-  const [isVisible, setIsVisible] = useState(false)
-  const [error, setError] = useState(false)
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.1 }
-    )
-
-    if (ref.current) observer.observe(ref.current)
-    return () => observer.disconnect()
-  }, [])
-
-  const handleImageError = () => {
-    console.error(`Failed to load image: ${src}`);
-    setError(true);
-  }
-
-  return (
-    <div
-      ref={ref}
-      className="relative aspect-video overflow-hidden rounded-2xl shadow-lg bg-gray-900 hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-shadow duration-300"
-    >
-      {isVisible ? (
-        type === 'image' ? (
-          error ? (
-            <div className="w-full h-full flex items-center justify-center text-white">
-              Failed to load image
-            </div>
-          ) : (
-            <img
-              src={src}
-              alt={`Gallery Image ${index + 1}`}
-              loading="lazy"
-              onError={handleImageError}
-              className="w-full h-full object-cover transition-transform duration-300 hover:scale-105 rounded-2xl"
-            />
-          )
-        ) : (
-          <div className="relative w-full h-full">
-            <video
-              controls
-              playsInline
-              preload="metadata"
-              poster={poster || '/gallery/video-thumb.jpg'}
-              className="w-full h-full object-cover rounded-2xl outline-none transition-all duration-300 hover:brightness-110"
-              onError={handleImageError}
-            >
-              <source src={src} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-        )
-      ) : (
-        <div className="w-full h-full animate-pulse bg-gray-700 rounded-2xl" />
-      )}
-    </div>
-  )
-}
 
 const PhotoBoothPage = () => {
+  const searchParams = useSearchParams();
+  const locale = searchParams.get('locale') || 'en';
+  const t = translations[locale] || translations.en;
+  const dispatch = useDispatch();
+
+  const handleBookNow = () => {
+    dispatch(openBookModal({
+      experienceType: 'Photo Booth',
+      sessionName: 'Photo Booth Experience'
+    }));
+  };
   const [mediaItems, setMediaItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -93,18 +45,28 @@ const PhotoBoothPage = () => {
           throw new Error(data.error)
         }
 
-        const imageFiles = (data.images || []).map((file, index) => ({
+        const imageFiles = (data.images || []).map((item, index) => ({
           type: 'image',
-          src: file,
+          src: typeof item === 'string' ? item : item.url || item,
+          filename: typeof item === 'object' ? item.filename : `image-${index}`,
           index
         }))
 
-        const videoFiles = (data.videos || []).map((file, index) => ({
-          type: 'video',
-          src: file,
-          poster: file.replace(/\.mp4$/, '.webp'),
-          index
-        }))
+        const videoFiles = (data.videos || []).map((item, index) => {
+          const src = typeof item === 'string' ? item : item.url || item;
+          const filename = typeof item === 'object' ? item.filename : `video-${index}`;
+          const poster = typeof item === 'object' && item.poster
+            ? item.poster
+            : (typeof src === 'string' ? src.replace(/\.(mp4|webm|ogg)$/i, '.jpg') : null);
+
+          return {
+            type: 'video',
+            src,
+            poster,
+            filename,
+            index
+          };
+        })
 
         setMediaItems([...imageFiles, ...videoFiles])
         setError(null)
@@ -122,7 +84,7 @@ const PhotoBoothPage = () => {
   return (
     <>
     <div className="bg-black text-white">
-      <Navbar />
+      <Navbar locale={locale} />
       
       {/* Hero Section */}
       <div className="relative h-[60vh] overflow-hidden">
@@ -134,9 +96,9 @@ const PhotoBoothPage = () => {
         />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
           <div className="max-w-[1600px] mx-auto">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white">Photo Booth Experience</h1>
-            <p className="text-xl md:text-2xl text-gray-200 max-w-3xl">
-              Capture fun memories with friends and family in our interactive VR photo booth.
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white text-wrap-balance">{t.photoBoothTitle}</h1>
+            <p className="text-xl md:text-2xl text-gray-200 max-w-3xl text-wrap-balance">
+              {t.photoBoothDescription}
             </p>
           </div>
         </div>
@@ -147,32 +109,24 @@ const PhotoBoothPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Left Column - Description and Features */}
           <div className="lg:col-span-2">
-            <h2 className="text-3xl font-bold mb-6 text-white">Experience Overview</h2>
+            <h2 className="text-3xl font-bold mb-6 text-white">{t.experienceOverview}</h2>
             <p className="text-lg text-gray-200 mb-8">
-              Our interactive Photo Booth Experience combines the fun of traditional photo booths with cutting-edge 
-              virtual reality technology. Choose from dozens of virtual backgrounds and fun digital props to create 
-              memorable photos with friends and family. From fantastical landscapes to famous landmarks, the 
-              possibilities are endless!
+              {t.photoBoothOverviewText}
             </p>
 
             <div className="mb-12">
-              <h3 className="text-2xl font-bold mb-4 text-white">Experience Highlights</h3>
+              <h3 className="text-2xl font-bold mb-4 text-white">{t.experienceHighlights}</h3>
               <ul className="list-disc list-inside space-y-3 text-gray-200">
-                <li>Group photos for up to 6 people at once</li>
-                <li>Dozens of virtual backgrounds to choose from</li>
-                <li>Digital props and effects</li>
-                <li>Instant printing and digital sharing options</li>
-                <li>Perfect for parties, events, and special occasions</li>
-                <li>Suitable for all ages</li>
+                {t.photoBoothHighlights.map((highlight, index) => (
+                  <li key={index}>{highlight}</li>
+                ))}
               </ul>
             </div>
 
             <div className="mb-12">
-              <h3 className="text-2xl font-bold mb-4 text-white">The Experience</h3>
+              <h3 className="text-2xl font-bold mb-4 text-white">{t.theExperience}</h3>
               <p className="text-lg text-gray-200 mb-4">
-                Step into our state-of-the-art photo booth and choose from an extensive library of virtual backgrounds.
-                From exotic beaches to outer space, famous landmarks to fantasy worlds, we have something for everyone.
-                Add digital props, filters, and effects to make your photos truly unique.
+                {t.photoBoothExperienceText}
               </p>
               <p className="text-lg text-gray-200 mb-8">
                 Our system uses green screen technology combined with high-resolution cameras to create
@@ -201,8 +155,17 @@ const PhotoBoothPage = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                  {mediaItems.map(({ type, src, index, poster }) => (
-                    <LazyMedia key={`${type}-${index}`} type={type} src={src} index={index} poster={poster} />
+                  {mediaItems.map(({ type, src, index, poster, filename }) => (
+                    <LazyMedia
+                      key={`${type}-${index}-${filename || src}`}
+                      type={type}
+                      src={src}
+                      index={index}
+                      poster={poster}
+                      alt={`Photo Booth ${type} ${index + 1}`}
+                      className="aspect-video rounded-2xl shadow-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-shadow duration-300"
+                      priority={index < 2} // Prioritize first 2 items
+                    />
                   ))}
                 </div>
               )}
@@ -259,12 +222,15 @@ const PhotoBoothPage = () => {
                 </p>
               </div>
               
-              <button className="w-full bg-gradient-to-r from-[#DB1FEB] to-[#24CBFF] hover:opacity-90 transition-opacity text-white text-lg font-bold py-3 px-6 rounded-full mb-4">
-                Book Now
+              <button
+                onClick={handleBookNow}
+                className="w-full bg-gradient-to-r from-[#DB1FEB] to-[#24CBFF] hover:opacity-90 transition-opacity text-white text-lg font-bold py-3 px-6 rounded-full mb-4"
+              >
+                {t.bookNow}
               </button>
-              
+
               <button className="w-full border border-white text-white hover:bg-white hover:text-black transition-colors font-bold py-3 px-6 rounded-full">
-                View Available Packages
+                {t.viewAvailablePackages}
               </button>
             </div>
           </div>
@@ -336,7 +302,10 @@ const PhotoBoothPage = () => {
         </div>
       </div>
 
-      <Footer />
+      <Footer locale={locale} />
+
+      {/* Booking Modal */}
+      <BookModal locale={locale} />
     </div>
     </>
   );

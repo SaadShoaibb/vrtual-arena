@@ -9,13 +9,15 @@ import Link from 'next/link'
 import AuthModel from '../AuthModal'
 import BookingForm from '../BookingForm'
 import { motion } from 'framer-motion'
+import { useDispatch } from 'react-redux'
+import { openBookModal } from '@/Store/ReduxSlice/bookModalSlice'
 
 const HeroSection = ({ locale = 'en' }) => {
   const t = locale === 'fr' ? translations.fr : translations.en;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const slideInterval = useRef(null);
-  const [isBookModalOpen, setIsBookModalOpen] = useState(false);
+  const dispatch = useDispatch();
 
   // Slides data with different content for each language
   const slides = [
@@ -63,14 +65,9 @@ const HeroSection = ({ locale = 'en' }) => {
     setIsPlaying(!isPlaying);
   };
 
-  // Open booking modal
+  // Open booking modal using Redux
   const handleOpenBookModal = () => {
-    setIsBookModalOpen(true);
-  };
-
-  // Close booking modal
-  const handleCloseBookModal = () => {
-    setIsBookModalOpen(false);
+    dispatch(openBookModal());
   };
 
   // Description text with proper translation
@@ -112,7 +109,7 @@ const HeroSection = ({ locale = 'en' }) => {
             >
               <span className="block">Explore the</span>
               <span className="block">Future</span>
-              <span className="block">With <img src="/assets/logo.png" alt="Virtual Arena" className="h-12 sm:h-14 md:h-16 inline-block" /></span>
+              <span className="block">With <img src="/assets/logo.png" alt="VRtual Arena" className="h-12 sm:h-14 md:h-16 inline-block" /></span>
             </motion.h1>
             <motion.p
               key={`desc-${currentIndex}`}
@@ -180,11 +177,7 @@ const HeroSection = ({ locale = 'en' }) => {
       </div>
 
       {/* Booking Modal */}
-      {isBookModalOpen && (
-        <AuthModel onClose={handleCloseBookModal}>
-          <BookingForm />
-        </AuthModel>
-      )}
+
 
       {/* Add text shadow style */}
       <style jsx global>{`

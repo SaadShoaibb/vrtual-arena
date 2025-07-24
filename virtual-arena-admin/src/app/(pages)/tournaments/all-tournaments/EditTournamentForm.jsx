@@ -3,6 +3,7 @@ import Checkbox from '@/components/common/Checkbox';
 import FieldContainer from '@/components/common/FieldContainer';
 import Input from '@/components/common/Input';
 import Select from '@/components/common/Select';
+import TextArea from '@/components/common/TextArea';
 import React, { useState } from 'react';
 
 const EditTournamentForm = ({ data, onSave }) => {
@@ -87,12 +88,77 @@ const paymentOptions = [
                             />
                         </FieldContainer>
 
-                        
+                        <FieldContainer label="Game Type" htmlFor="game_type">
+                            <Input
+                                type="text"
+                                name="game_type"
+                                value={formData.game_type || ''}
+                                onChange={handleChange}
+                            />
+                        </FieldContainer>
 
-                        
+                        <FieldContainer label="Ticket Price" htmlFor="ticket_price">
+                            <Input
+                                type="number"
+                                step="0.01"
+                                name="ticket_price"
+                                value={formData.ticket_price || ''}
+                                onChange={handleChange}
+                                required
+                            />
+                        </FieldContainer>
+
+                        <FieldContainer label="Prize Pool" htmlFor="prize_pool">
+                            <Input
+                                type="number"
+                                step="0.01"
+                                name="prize_pool"
+                                value={formData.prize_pool || ''}
+                                onChange={handleChange}
+                            />
+                        </FieldContainer>
+
+                        <FieldContainer label="Max Participants" htmlFor="max_participants">
+                            <Input
+                                type="number"
+                                name="max_participants"
+                                value={formData.max_participants || ''}
+                                onChange={handleChange}
+                            />
+                        </FieldContainer>
+                </div>
+
+                <div className="mt-4">
+                    <FieldContainer label="Description" htmlFor="description">
+                        <TextArea
+                            name="description"
+                            value={formData.description || ''}
+                            onChange={handleChange}
+                            rows={3}
+                        />
+                    </FieldContainer>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+                    <FieldContainer label="Rules" htmlFor="rules">
+                        <TextArea
+                            name="rules"
+                            value={formData.rules || ''}
+                            onChange={handleChange}
+                            rows={4}
+                        />
+                    </FieldContainer>
+
+                    <FieldContainer label="Requirements" htmlFor="requirements">
+                        <TextArea
+                            name="requirements"
+                            value={formData.requirements || ''}
+                            onChange={handleChange}
+                            rows={4}
+                        />
+                    </FieldContainer>
+                </div>
             </div>
-            </div>
-            {/* Add other fields here */}
             <button
                  type="submit"
                  className="bg-grad w-full text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"

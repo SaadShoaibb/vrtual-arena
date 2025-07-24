@@ -19,6 +19,7 @@ import WhyChoose from "./components/WhyChoose";
 import { addLocaleToUrl, validateLocale } from './utils/languageUtils';
 import { useDispatch } from 'react-redux';
 import { setLanguage } from '@/Store/ReduxSlice/languageSlice';
+import SEOHead from './components/SEOHead';
 
 export default function HomePage() {
   const router = useRouter();
@@ -45,6 +46,7 @@ export default function HomePage() {
 
   return (
     <>
+      <SEOHead page="home" locale={locale} />
       <div className="relative">
         <Navbar locale={locale} />
         <HeroSection locale={locale} />

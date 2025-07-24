@@ -7,18 +7,20 @@ import React from 'react'
 import Deals from './Deals'
 import GiftCards from './giftCards'
 import { useSearchParams } from 'next/navigation'
+import { translations } from '@/app/translations'
 
 const DealsPage = () => {
   const searchParams = useSearchParams();
   const locale = searchParams.get('locale') || 'en';
+  const t = translations[locale] || translations.en;
 
   return (
     <>
       <div className="relative">
         <Navbar locale={locale} />
         <HeroHeader
-          btn='Deals & Membership'
-          title='Deals & Membership'
+          btn={t.dealsMembership}
+          title={t.dealsMembership}
           bg='bg-dealbg'
           locale={locale}
         />

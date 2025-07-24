@@ -54,6 +54,9 @@ const Bookings = () => {
     status: booking.payment_status,
     session_status: booking.session_status,
     payment_status: booking.payment_status,
+    payment_method: booking.payment_method,
+    is_guest_booking: booking.is_guest_booking,
+    booking_reference: booking.booking_reference,
   }));
 
   const handleFetchBookings = async () => {
@@ -196,7 +199,10 @@ const Bookings = () => {
         const price = selectedBooking.price ?? selectedBooking.total_price ?? selectedBooking.final_price ?? selectedBooking.amount;
         return price !== undefined ? `$${price}` : 'N/A';
       })() },
-    { label: 'Payment Status', value: selectedBooking.payment_status }
+    { label: 'Payment Status', value: selectedBooking.payment_status },
+    { label: 'Payment Method', value: selectedBooking.payment_method || 'N/A' },
+    { label: 'Booking Type', value: selectedBooking.is_guest_booking ? 'Guest Booking' : 'Registered User' },
+    { label: 'Reference', value: selectedBooking.booking_reference || 'N/A' }
   ] : [];
 
   return (

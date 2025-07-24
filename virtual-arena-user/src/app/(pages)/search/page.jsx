@@ -6,20 +6,23 @@ import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
 import Link from 'next/link';
 import { API_URL } from '@/utils/ApiUrl';
+import { translations } from '@/app/translations';
 
-const predefinedPages = [
-  { title: 'Home', path: '/' },
-  { title: 'Experiences', path: '/experiences' },
-  { title: 'Gallery', path: '/gallery' },
-  { title: 'Shop', path: '/merchandise' },
-  { title: 'Tournaments', path: '/tournaments' },
-  { title: 'Contact', path: '/contact' },
+const getPredefinedPages = (t) => [
+  { title: t.home, path: '/' },
+  { title: t.experiences, path: '/experiences' },
+  { title: t.gallery, path: '/gallery' },
+  { title: t.shop, path: '/merchandise' },
+  { title: t.tournaments, path: '/tournaments' },
+  { title: t.contactUs, path: '/contact' },
 ];
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
   const query = (searchParams.get('q') || '').toLowerCase();
   const locale = searchParams.get('locale') || 'en';
+  const t = translations[locale] || translations.en;
+  const predefinedPages = getPredefinedPages(t);
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);

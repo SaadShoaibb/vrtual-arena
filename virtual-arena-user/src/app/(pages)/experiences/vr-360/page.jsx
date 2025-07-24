@@ -2,14 +2,30 @@
 import React from 'react';
 import { IoMdPeople, IoMdTime } from 'react-icons/io';
 import { MdOutlineEventSeat } from 'react-icons/md';
+import { useSearchParams } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
+import BookModal from '@/app/components/BookModal';
+import { openBookModal } from '@/Store/ReduxSlice/bookModalSlice';
+import { translations } from '@/app/translations';
 
 const VR360Page = () => {
+  const searchParams = useSearchParams();
+  const locale = searchParams.get('locale') || 'en';
+  const t = translations[locale] || translations.en;
+  const dispatch = useDispatch();
+
+  const handleBookNow = () => {
+    dispatch(openBookModal({
+      experienceType: 'VR 360',
+      sessionName: 'VR 360° Motion Chair'
+    }));
+  };
   return (
     <>
     <div className="bg-black text-white">
-      <Navbar />
+      <Navbar locale={locale} />
       
       {/* Hero Section */}
       <div className="relative h-[60vh] overflow-hidden">
@@ -21,9 +37,9 @@ const VR360Page = () => {
         />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
           <div className="max-w-[1600px] mx-auto">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white">VR 360</h1>
-            <p className="text-xl md:text-2xl text-gray-200 max-w-3xl">
-              Experience full 360° immersion with our rotating VR chairs for the ultimate virtual reality adventure.
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white text-wrap-balance">{t.vr360Title}</h1>
+            <p className="text-xl md:text-2xl text-gray-200 max-w-3xl text-wrap-balance">
+              {t.vr360Description}
             </p>
           </div>
         </div>
@@ -34,22 +50,17 @@ const VR360Page = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Left Column - Description and Features */}
           <div className="lg:col-span-2">
-            <h2 className="text-3xl font-bold mb-6 text-white">Experience Overview</h2>
-            <p className="text-lg text-gray-200 mb-8">
-              Our VR 360 experience takes immersion to the next level with specially designed rotating chairs that allow 
-              for a full 360-degree range of motion. Feel completely absorbed in virtual worlds as you twist, turn, and 
-              look in any direction with perfect freedom of movement.
+            <h2 className="text-3xl font-bold mb-6 text-white text-wrap-balance">{t.experienceOverview}</h2>
+            <p className="text-lg text-gray-200 mb-8 text-wrap-balance">
+              {t.vr360FullDescription}
             </p>
 
             <div className="mb-12">
-              <h3 className="text-2xl font-bold mb-4 text-white">Experience Highlights</h3>
+              <h3 className="text-2xl font-bold mb-4 text-white text-wrap-balance">{t.experienceHighlights}</h3>
               <ul className="list-disc list-inside space-y-3 text-gray-200">
-                <li>Two fully rotating VR chairs for unparalleled freedom of movement</li>
-                <li>High-definition VR headsets with premium audio</li>
-                <li>Wide selection of immersive experiences and games</li>
-                <li>Smooth motion synchronization for comfort</li>
-                <li>Perfect for exploration and atmospheric experiences</li>
-                <li>Suitable for ages 10 and up</li>
+                {t.vr360Highlights.map((highlight, index) => (
+                  <li key={index} className="text-wrap-balance">{highlight}</li>
+                ))}
               </ul>
             </div>
 
@@ -117,12 +128,15 @@ const VR360Page = () => {
                 </p>
               </div>
               
-              <button className="w-full bg-gradient-to-r from-[#DB1FEB] to-[#24CBFF] hover:opacity-90 transition-opacity text-white text-lg font-bold py-3 px-6 rounded-full mb-4">
-                Book Now
+              <button
+                onClick={handleBookNow}
+                className="w-full bg-gradient-to-r from-[#DB1FEB] to-[#24CBFF] hover:opacity-90 transition-opacity text-white text-lg font-bold py-3 px-6 rounded-full mb-4"
+              >
+                {t.bookNow}
               </button>
-              
+
               <button className="w-full border border-white text-white hover:bg-white hover:text-black transition-colors font-bold py-3 px-6 rounded-full">
-                View Available Packages
+                {t.viewAvailablePackages}
               </button>
             </div>
           </div>
@@ -132,7 +146,7 @@ const VR360Page = () => {
       {/* Related Experiences Section */}
       <div className="bg-gray-900">
         <div className="max-w-[1600px] mx-auto px-4 md:px-10 lg:px-16 xl:px-20 2xl:px-6 py-16">
-          <h2 className="text-3xl font-bold mb-8 text-white">You Might Also Like</h2>
+          <h2 className="text-3xl font-bold mb-8 text-white">{t.youMightAlsoLike}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* UFO Spaceship Card */}
             <div className="bg-black rounded-xl overflow-hidden group">
@@ -144,11 +158,11 @@ const VR360Page = () => {
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-2 text-white">UFO Spaceship</h3>
                 <p className="text-gray-300 mb-4">Pilot a UFO through immersive virtual worlds with our 5-seat simulator.</p>
-                <a 
-                  href="/experiences/ufo-spaceship"
+                <a
+                  href={`/experiences/ufo-spaceship?locale=${locale}`}
                   className="inline-block text-[#DB1FEB] font-semibold hover:underline"
                 >
-                  Learn More →
+                  {t.learnMore} →
                 </a>
               </div>
             </div>
@@ -161,13 +175,13 @@ const VR360Page = () => {
                 </div>
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold mb-2 text-white">VR Battle</h3>
-                <p className="text-gray-300 mb-4">Challenge your friends in our two-player VR battle arena.</p>
-                <a 
-                  href="/experiences/vr-battle"
+                <h3 className="text-xl font-bold mb-2 text-white">{t.vrBattle}</h3>
+                <p className="text-gray-300 mb-4">{t.vrBattleDescription || 'Challenge your friends in our two-player VR battle arena.'}</p>
+                <a
+                  href={`/experiences/vr-battle?locale=${locale}`}
                   className="inline-block text-[#DB1FEB] font-semibold hover:underline"
                 >
-                  Learn More →
+                  {t.learnMore} →
                 </a>
               </div>
             </div>
@@ -180,13 +194,13 @@ const VR360Page = () => {
                 </div>
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold mb-2 text-white">VR WARRIOR (Kids)</h3>
-                <p className="text-gray-300 mb-4">A child-friendly battle experience designed specifically for younger players.</p>
-                <a 
-                  href="/experiences/vr-warrior"
+                <h3 className="text-xl font-bold mb-2 text-white">{t.vrWarrior} ({t.kids || 'Kids'})</h3>
+                <p className="text-gray-300 mb-4">{t.vrWarriorDescription || 'A child-friendly battle experience designed specifically for younger players.'}</p>
+                <a
+                  href={`/experiences/vr-warrior?locale=${locale}`}
                   className="inline-block text-[#DB1FEB] font-semibold hover:underline"
                 >
-                  Learn More →
+                  {t.learnMore} →
                 </a>
               </div>
             </div>
@@ -194,7 +208,10 @@ const VR360Page = () => {
         </div>
       </div>
 
-      <Footer />
+      <Footer locale={locale} />
+
+      {/* Booking Modal */}
+      <BookModal locale={locale} />
     </div>
     </>
   );

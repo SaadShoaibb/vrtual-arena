@@ -20,7 +20,7 @@ const About = ({ locale = 'en' }) => {
                         </p>
 
                         <h1 className='text-[30px] flex items-center gap-2 font-semibold text-white mt-[37px]'>
-                            <span><img src="/icons/cursor.svg" alt="" /></span>
+                            <span><img src="/icons/cursor.svg" alt="Cursor icon" /></span>
                             <span>{t.ourStory}</span>
                         </h1>
                         <p className='text-xl text-white font-light'>
@@ -28,7 +28,7 @@ const About = ({ locale = 'en' }) => {
                         </p>
 
                         <h1 className='text-[30px] flex items-center gap-2 font-semibold text-white mt-[37px]'>
-                            <span><img src="/icons/cursor.svg" alt="" /></span>
+                            <span><img src="/icons/cursor.svg" alt="Cursor icon" /></span>
                             <span>{t.ourMission}</span>
                         </h1>
                         <p className='text-xl text-white font-light'>
@@ -42,7 +42,7 @@ const About = ({ locale = 'en' }) => {
 
                             <div className='flex flex-col'>
                                 <div className='flex items-center gap-2'>
-                                    <img src="/icons/star.svg" alt="" />
+                                    <img src="/icons/star.svg" alt="Star rating icon" />
                                     <h1 className='text-xl text-white font-semibold'>{t.ratings || "4.8 Ratings"}</h1>
                                 </div>
                                 <p className='text-[12px] text-white font-light'>{t.trustedCustomers || "Trusted by over 11,000 customers"}</p>
@@ -51,8 +51,8 @@ const About = ({ locale = 'en' }) => {
                     </div>
 
                     <div className='relative min-h-full'>
-                        <img src="/assets/about.png" alt="" className='object-center xl:absolute bottom-0 right-0' />
-                        <img src="/assets/aboutmask.png" alt="" className='absolute bottom-0 right-0' />
+                        <img src="/assets/about.png" alt="VRtual Arena team and facility - Modern VR gaming center in Edmonton" className='object-center xl:absolute bottom-0 right-0' />
+                        <img src="/assets/aboutmask.png" alt="Decorative overlay for about section" className='absolute bottom-0 right-0' />
                     </div>
                 </div>
             </div>

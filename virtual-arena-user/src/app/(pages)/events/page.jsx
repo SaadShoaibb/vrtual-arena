@@ -7,8 +7,10 @@ import { useTranslation } from '@/app/hooks/useTranslation';
 import { useSelector, useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
-import { addToCart, fetchCart } from '@/Store/ReduxSlice/addToCartSlice';
-import { fetchUserData } from '@/Store/Actions/userActions';
+import PaymentOptionsModal from '@/app/components/PaymentOptionsModal';
+import AuthModal from '@/app/components/AuthModal';
+import SEOHead from '@/app/components/SEOHead';
+
 
 const EventsPage = () => {
   const { t, locale } = useTranslation();
@@ -18,38 +20,35 @@ const EventsPage = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
   const [selectedTournament, setSelectedTournament] = useState(null);
-  const [paymentChoice, setPaymentChoice] = useState('online'); // 'online' or 'at_event'
-  const { userData, isAuthenticated, registrations } = useSelector((state) => state.userData);
-  const dispatch = useDispatch();
-  const router = useRouter();
+  const { isAuthenticated, registrations } = useSelector((state) => state.userData);
 
   useEffect(() => {
-    const fetchTournaments = async () => {
+    const fetchEvents = async () => {
       try {
-        const response = await axios.get(`${API_URL}/user/get-tournaments`);
-        setTournaments(response.data.tournaments || []);
+        const response = await axios.get(`${API_URL}/user/get-events`);
+        setTournaments(response.data.events || []);
       } catch (err) {
         setError(t.common?.error || 'Error fetching events');
       } finally {
         setLoading(false);
       }
     };
-    fetchTournaments();
+    fetchEvents();
   }, [t]);
 
-  const handleRegisterClick = (tournament) => {
+  const handleRegisterClick = (event) => {
     if (!isAuthenticated) {
       setShowLogin(true);
       return;
     }
-    
-    if (registrations?.includes(tournament?.tournament_id)) {
-      toast.error(t.alreadyRegistered || "You have already registered for this tournament");
+
+    if (registrations?.includes(event?.event_id)) {
+      toast.error(t.alreadyRegistered || "You have already registered for this event");
       return;
     }
-    
+
     // Show payment options instead of directly registering
-    setSelectedTournament(tournament);
+    setSelectedTournament(event);
     setShowPaymentOptions(true);
   };
 
@@ -132,6 +131,7 @@ const EventsPage = () => {
 
   return (
     <MainLayout title={t.eventsParties || 'Events & Parties'}>
+      <SEOHead page="events" locale={locale} />
       <div className="w-full px-2 md:px-8 py-8 min-h-[60vh] bg-blackish">
         <h1 className="text-3xl md:text-4xl font-bold text-center text-white mb-8">{t.eventsParties || 'Events & Parties'}</h1>
         {loading ? (
@@ -142,35 +142,52 @@ const EventsPage = () => {
           <div className="text-center text-white">{t.common?.noEvents || 'No events found.'}</div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {tournaments.map((tournament) => (
-              <div key={tournament.tournament_id} className="bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] rounded-xl p-6 flex flex-col justify-between shadow-lg">
-                <h2 className="text-xl font-bold mb-2 text-white truncate">{tournament.name}</h2>
+            {tournaments.map((event) => (
+              <div key={event.event_id} className="bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] rounded-xl p-6 flex flex-col justify-between shadow-lg">
+                <h2 className="text-xl font-bold mb-2 text-white truncate">{event.name}</h2>
+                {event.description && (
+                  <div className="text-white text-sm mb-2">
+                    <span className="font-semibold">{t['description'] || 'Description'}:</span> {event.description}
+                  </div>
+                )}
                 <div className="text-white text-sm mb-2">
-                  <span className="font-semibold">{t['startDate'] || 'Start Date'}:</span> {tournament.start_date?.slice(0, 10)}
+                  <span className="font-semibold">{t['eventType'] || 'Event Type'}:</span> {event.event_type}
                 </div>
                 <div className="text-white text-sm mb-2">
-                  <span className="font-semibold">{t['endDate'] || 'End Date'}:</span> {tournament.end_date?.slice(0, 10)}
+                  <span className="font-semibold">{t['startDate'] || 'Start Date'}:</span> {event.start_date?.slice(0, 10)}
                 </div>
                 <div className="text-white text-sm mb-2">
-                  <span className="font-semibold">{t['city'] || 'City'}:</span> {tournament.city}
+                  <span className="font-semibold">{t['endDate'] || 'End Date'}:</span> {event.end_date?.slice(0, 10)}
                 </div>
                 <div className="text-white text-sm mb-2">
-                  <span className="font-semibold">{t['country'] || 'Country'}:</span> {tournament.country}
+                  <span className="font-semibold">{t['city'] || 'City'}:</span> {event.city}
                 </div>
                 <div className="text-white text-sm mb-2">
-                  <span className="font-semibold">{t['state'] || 'State'}:</span> {tournament.state}
+                  <span className="font-semibold">{t['country'] || 'Country'}:</span> {event.country}
                 </div>
                 <div className="text-white text-sm mb-2">
-                  <span className="font-semibold">{t['ticketPrice'] || 'Ticket Price'}:</span> ${tournament.ticket_price}
+                  <span className="font-semibold">{t['state'] || 'State'}:</span> {event.state}
                 </div>
                 <div className="text-white text-sm mb-2">
-                  <span className="font-semibold">{t['status'] || 'Status'}:</span> {tournament.status}
+                  <span className="font-semibold">{t['ticketPrice'] || 'Ticket Price'}:</span> ${event.ticket_price}
+                </div>
+                {event.max_participants && (
+                  <div className="text-white text-sm mb-2">
+                    <span className="font-semibold">{t['participants'] || 'Participants'}:</span> {event.registered_count || 0} / {event.max_participants}
+                  </div>
+                )}
+                <div className="text-white text-sm mb-2">
+                  <span className="font-semibold">{t['status'] || 'Status'}:</span> {event.status}
                 </div>
                 <button
                   className="mt-4 bg-white text-black font-semibold py-2 px-4 rounded hover:bg-gray-200 transition"
-                  onClick={() => handleRegisterClick(tournament)}
+                  onClick={() => handleRegisterClick(event)}
+                  disabled={event.max_participants && event.registered_count >= event.max_participants}
                 >
-                  {t.register || 'Register'}
+                  {event.max_participants && event.registered_count >= event.max_participants
+                    ? t.eventFull || 'Event Full'
+                    : t.register || 'Register'
+                  }
                 </button>
               </div>
             ))}
@@ -178,65 +195,19 @@ const EventsPage = () => {
         )}
         {/* Payment Options Modal */}
         {showPaymentOptions && selectedTournament && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-            <div className="bg-[#1E1E1E] p-6 rounded-lg max-w-md w-full shadow-lg">
-              <h2 className="text-white text-2xl font-bold mb-4">{t.paymentOptions || 'Payment Options'}</h2>
-              <p className="text-white mb-6">{t.paymentOptionsMsg || 'How would you like to pay for this tournament?'}</p>
-              
-              <div className="flex flex-col gap-4 mb-6">
-                <div 
-                  className={`flex items-center gap-3 p-4 rounded-lg cursor-pointer ${paymentChoice === 'online' ? 'bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7]' : 'bg-[#2A2A2A]'}`}
-                  onClick={() => handlePaymentChoiceChange('online')}
-                >
-                  <div className={`w-5 h-5 rounded-full border-2 ${paymentChoice === 'online' ? 'border-white bg-white' : 'border-white'} flex items-center justify-center`}>
-                    {paymentChoice === 'online' && <div className="w-3 h-3 rounded-full bg-[#5A79FB]"></div>}
-                  </div>
-                  <span className="text-white font-medium">{t.payOnlineNow || 'Pay Online Now'} (${selectedTournament.ticket_price})</span>
-                </div>
-                
-                <div 
-                  className={`flex items-center gap-3 p-4 rounded-lg cursor-pointer ${paymentChoice === 'at_event' ? 'bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7]' : 'bg-[#2A2A2A]'}`}
-                  onClick={() => handlePaymentChoiceChange('at_event')}
-                >
-                  <div className={`w-5 h-5 rounded-full border-2 ${paymentChoice === 'at_event' ? 'border-white bg-white' : 'border-white'} flex items-center justify-center`}>
-                    {paymentChoice === 'at_event' && <div className="w-3 h-3 rounded-full bg-[#5A79FB]"></div>}
-                  </div>
-                  <span className="text-white font-medium">{t.payAtEvent || 'Pay at the Event'} (${selectedTournament.ticket_price})</span>
-                </div>
-              </div>
-              
-              <div className="flex justify-between">
-                <button 
-                  onClick={() => setShowPaymentOptions(false)}
-                  className="px-6 py-2 bg-[#2A2A2A] text-white rounded-full"
-                >
-                  {t.cancel || 'Cancel'}
-                </button>
-                <button 
-                  onClick={handlePaymentOptionSelect}
-                  className="px-6 py-2 bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] text-white rounded-full"
-                >
-                  {t.continue || 'Continue'}
-                </button>
-              </div>
-            </div>
-          </div>
+          <PaymentOptionsModal
+            isOpen={showPaymentOptions}
+            onClose={() => setShowPaymentOptions(false)}
+            tournament={selectedTournament}
+            type="event"
+          />
         )}
-        {/* Login Modal */}
+        {/* Auth Modal */}
         {showLogin && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-            <div className="bg-white rounded-lg p-8 max-w-md w-full text-center shadow-lg">
-              <h2 className="text-2xl font-bold mb-4 text-black">{t.login || 'Login'}</h2>
-              <p className="mb-6 text-black">{t.loginPrompt || 'Please log in to register for events.'}</p>
-              <button
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                onClick={() => setShowLogin(false)}
-              >
-                Ok
-              </button>
-            
-            </div>
-          </div>
+          <AuthModal
+            isOpen={showLogin}
+            onClose={() => setShowLogin(false)}
+          />
         )}
       </div>
     </MainLayout>

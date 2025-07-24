@@ -9,8 +9,9 @@ import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { FaHeart, FaRegHeart } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux'
+import { formatDisplayPrice } from '@/app/utils/currency'
 
-const Deals = () => {
+const Deals = ({ locale = 'en' }) => {
     const data = [
         {
             id: 1,
@@ -126,8 +127,8 @@ const Deals = () => {
                                     <div className='bg-white h-11 w-[72px] rounded-md flex justify-center items-center'>
                                         <h1 className='text-black text-xl font-bold'>-{Math.round(item.discount || 40)}%</h1>
                                     </div>
-                                    <h1 className='text-xl text-white line-through'>${item.original_price || 69.99}</h1>
-                                    <span className='text-xl text-white font-bold'>${item.discount_price || 41.99}</span>
+                                    <h1 className='text-xl text-white line-through'>{formatDisplayPrice(item.original_price || 69.99, locale)}</h1>
+                                    <span className='text-xl text-white font-bold'>{formatDisplayPrice(item.discount_price || 41.99, locale)}</span>
                                 </div>
                                 <div className='flex items-center justify-between bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7]'>
                                     <button

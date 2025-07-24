@@ -18,27 +18,38 @@ export const fetchCart = createAsyncThunk(
 // Async Thunk: Add Item to Cart
 export const addToCart = createAsyncThunk(
   'cart/addToCart',
-  async ({ product_id, tournament_id, quantity, item_type = 'product', payment_option }, { rejectWithValue }) => {
+  async ({ product_id, tournament_id, event_id, quantity, item_type = 'product', payment_option }, { rejectWithValue }) => {
     try {
       // Check for authentication token first
       const authToken = localStorage.getItem('token');
       if (!authToken) {
         return rejectWithValue({ message: 'Authentication required. Please login.' });
       }
-      
+
       let payload;
-      
+
       if (item_type === 'tournament') {
         // For tournament items, explicitly omit product_id to avoid sending undefined
-        payload = { 
-          tournament_id, 
-          quantity, 
+        payload = {
+          tournament_id,
+          quantity,
           item_type,
           payment_option: payment_option || 'online' // Default to online payment if not specified
         };
-        
+
         // Log the payload for debugging
         console.log('Tournament cart payload:', payload);
+      } else if (item_type === 'event') {
+        // For event items, explicitly omit product_id to avoid sending undefined
+        payload = {
+          event_id,
+          quantity,
+          item_type,
+          payment_option: payment_option || 'online' // Default to online payment if not specified
+        };
+
+        // Log the payload for debugging
+        console.log('Event cart payload:', payload);
       } else {
         payload = { product_id, quantity, item_type };
       }

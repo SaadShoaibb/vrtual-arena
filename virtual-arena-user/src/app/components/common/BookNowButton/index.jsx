@@ -11,11 +11,8 @@ const BookNowButton = ({margin, locale = 'en', size = 'default'}) => {
     const t = translations[locale] || translations.en;
     
     const handleShowBookModal= ()=>{
-        if(isAuthenticated){
-            dispatch(openBookModal())
-        }else{
-            dispatch(openModal('LOGIN'))
-        }
+        // Always open the booking modal - it handles guest vs registered user internally
+        dispatch(openBookModal())
     }
     
     // Determine size-specific classes

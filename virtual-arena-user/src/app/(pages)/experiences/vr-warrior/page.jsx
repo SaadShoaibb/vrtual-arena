@@ -2,14 +2,30 @@
 import React from 'react';
 import { IoMdPeople, IoMdTime } from 'react-icons/io';
 import { MdOutlineEventSeat } from 'react-icons/md';
+import { useSearchParams } from 'next/navigation';
+import { useDispatch } from 'react-redux';
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
+import BookModal from '@/app/components/BookModal';
+import { openBookModal } from '@/Store/ReduxSlice/bookModalSlice';
+import { translations } from '@/app/translations';
 
 const VRWarriorPage = () => {
+  const searchParams = useSearchParams();
+  const locale = searchParams.get('locale') || 'en';
+  const t = translations[locale] || translations.en;
+  const dispatch = useDispatch();
+
+  const handleBookNow = () => {
+    dispatch(openBookModal({
+      experienceType: 'VR Warrior',
+      sessionName: 'VR Warrior Kids Experience'
+    }));
+  };
   return (
     <>
     <div className="bg-black text-white">
-      <Navbar />
+      <Navbar locale={locale} />
       
       {/* Hero Section */}
       <div className="relative h-[60vh] overflow-hidden">
@@ -21,9 +37,9 @@ const VRWarriorPage = () => {
         />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
           <div className="max-w-[1600px] mx-auto">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white">VR WARRIOR (Kids)</h1>
-            <p className="text-xl md:text-2xl text-gray-200 max-w-3xl">
-              A specially designed battle experience for our younger adventurers with kid-friendly content and easy controls.
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white text-wrap-balance">{t.vrWarriorTitle}</h1>
+            <p className="text-xl md:text-2xl text-gray-200 max-w-3xl text-wrap-balance">
+              {t.vrWarriorDescription}
             </p>
           </div>
         </div>
@@ -34,32 +50,24 @@ const VRWarriorPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Left Column - Description and Features */}
           <div className="lg:col-span-2">
-            <h2 className="text-3xl font-bold mb-6 text-white">Experience Overview</h2>
+            <h2 className="text-3xl font-bold mb-6 text-white">{t.experienceOverview}</h2>
             <p className="text-lg text-gray-200 mb-8">
-              VR WARRIOR is our special VR battle experience designed specifically for children. With age-appropriate 
-              content, simplified controls, and special equipment sized for smaller users, this experience introduces 
-              kids to the excitement of virtual reality in a safe, controlled environment. Two players can compete 
-              or cooperate in colorful, engaging worlds built just for them.
+              {t.vrWarriorOverviewText}
             </p>
 
             <div className="mb-12">
-              <h3 className="text-2xl font-bold mb-4 text-white">Experience Highlights</h3>
+              <h3 className="text-2xl font-bold mb-4 text-white">{t.experienceHighlights}</h3>
               <ul className="list-disc list-inside space-y-3 text-gray-200">
-                <li>Two kid-sized VR stations with adjusted equipment</li>
-                <li>Child-friendly content with no scary or inappropriate material</li>
-                <li>Simplified controls that are easy for children to master</li>
-                <li>Shorter game sessions designed for younger attention spans</li>
-                <li>Parental viewing screen to watch what your child is experiencing</li>
-                <li>Perfect for ages 6-12</li>
+                {t.vrWarriorHighlights.map((highlight, index) => (
+                  <li key={index}>{highlight}</li>
+                ))}
               </ul>
             </div>
 
             <div>
-              <h3 className="text-2xl font-bold mb-4 text-white">The Experience</h3>
+              <h3 className="text-2xl font-bold mb-4 text-white">{t.theExperience}</h3>
               <p className="text-lg text-gray-200 mb-4">
-                When your child arrives for their VR WARRIOR session, our trained staff will help them get 
-                comfortable with their kid-sized VR gear. We'll explain the controls in easy-to-understand terms 
-                and make sure they're completely comfortable before starting.
+                {t.vrWarriorExperienceText}
               </p>
               <p className="text-lg text-gray-200 mb-8">
                 Children can choose from a variety of fun games - from gentle tag games with colorful characters, 
@@ -119,12 +127,15 @@ const VRWarriorPage = () => {
                 </p>
               </div>
               
-              <button className="w-full bg-gradient-to-r from-[#DB1FEB] to-[#24CBFF] hover:opacity-90 transition-opacity text-white text-lg font-bold py-3 px-6 rounded-full mb-4">
-                Book Now
+              <button
+                onClick={handleBookNow}
+                className="w-full bg-gradient-to-r from-[#DB1FEB] to-[#24CBFF] hover:opacity-90 transition-opacity text-white text-lg font-bold py-3 px-6 rounded-full mb-4"
+              >
+                {t.bookNow}
               </button>
-              
+
               <button className="w-full border border-white text-white hover:bg-white hover:text-black transition-colors font-bold py-3 px-6 rounded-full">
-                View Available Packages
+                {t.viewAvailablePackages}
               </button>
             </div>
           </div>
@@ -196,7 +207,10 @@ const VRWarriorPage = () => {
         </div>
       </div>
 
-      <Footer />
+      <Footer locale={locale} />
+
+      {/* Booking Modal */}
+      <BookModal locale={locale} />
     </div>
     </>
   );

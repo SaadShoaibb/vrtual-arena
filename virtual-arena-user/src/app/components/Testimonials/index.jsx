@@ -1,22 +1,24 @@
 'use client'
 import React from 'react'
 import { FaStar } from 'react-icons/fa'
+import { translations } from '@/app/translations'
 
-const Testimonials = () => {
+const Testimonials = ({ locale = 'en' }) => {
+    const t = translations[locale] || translations.en;
     return (
         <>
             <div id='tesimonials' className='w-full h-full bg-blackish'>
                 <div className='w-full mx-auto max-w-[1600px] border-y py-[100px] flex-col flex px-4 md:px-10 lg:px-16 xl:px-20 2xl:px-6'>
                     <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 xl:gap-12 items-center'>
                         <div className='w-full border-r-2 border-[#926BB9]'>
-                            <h1 className='text-gradiant text-[26px] font-semibold'>Testimonial</h1>
-                            <h1 className='text-white text-[40px] md:text-[50px] font-bold leading-none'>
-                                What Our Awesome Customers Say
+                            <h1 className='text-gradiant text-[26px] font-semibold text-wrap-balance'>{t.testimonial}</h1>
+                            <h1 className='text-white text-[40px] md:text-[50px] font-bold leading-none text-wrap-balance'>
+                                {t.whatCustomersSay}
                             </h1>
                         </div>
                         <div>
-                            <p className='text-xl text-white font-light'>
-                                Our players love the thrill of the Virtual Arena! From immersive VR battles to unforgettable group sessions, the feedback speaks for itself. Discover what keeps them coming back for more.
+                            <p className='text-xl text-white font-light text-wrap-balance'>
+                                {t.testimonialsDescription}
                             </p>
                         </div>
                     </div>

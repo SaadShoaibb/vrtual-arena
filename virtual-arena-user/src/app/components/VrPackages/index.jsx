@@ -1,10 +1,17 @@
 'use client'
 import Link from 'next/link'
 import React from 'react'
+import { useDispatch } from 'react-redux'
+import { openBookModal } from '@/Store/ReduxSlice/bookModalSlice'
 import { translations } from '@/app/translations'
 
 const VRPackage = ({ locale = 'en' }) => {
   const t = translations[locale] || translations.en;
+  const dispatch = useDispatch();
+
+  const handleBookNow = () => {
+    dispatch(openBookModal());
+  };
   
   return (
     <div id='package' className={`w-full h-full bg-blackish overflow-hidden`}>
@@ -18,12 +25,13 @@ const VRPackage = ({ locale = 'en' }) => {
               <p className='text-[16px] sm:text-[18px] text-white mt-3 text-center text-wrap-balance'>
                 {t.vrPackageDescription || 'Dive into the action with our immersive VR gaming packages. Whether you\'re here for intense competition, team battles, or just pure fun—Virtual Arena offers experiences designed for every skill level and every thrill seeker.'}
               </p>
-              <Link href={`/deals?locale=${locale}`}>
-                <button className='text-base sm:text-lg md:text-xl mt-3 font-semibold flex items-center py-2 md:py-4 px-4 sm:px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] overflow-hidden'>
-                  <span className="text-wrap-balance whitespace-normal">{t.exploreVRPackages || 'Explore VR Packages'}</span>
-                  <img src="/icons/arrow.svg" alt="" className='h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] ml-2 sm:ml-[11px] flex-shrink-0 rounded-full' />
-                </button>
-              </Link>
+              <button
+                onClick={handleBookNow}
+                className='text-base sm:text-lg md:text-xl mt-3 font-semibold flex items-center py-2 md:py-4 px-4 sm:px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] overflow-hidden hover:scale-105 transition-transform'
+              >
+                <span className="text-wrap-balance whitespace-normal">{t.bookNow || 'Book Now'}</span>
+                <img src="/icons/arrow.svg" alt="" className='h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] ml-2 sm:ml-[11px] flex-shrink-0 rounded-full' />
+              </button>
             </div>
           </div>
         </div>

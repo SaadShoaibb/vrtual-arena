@@ -2,6 +2,7 @@
 import React from 'react'
 import { translations } from '@/app/translations'
 import PricingCalculator from './PricingCalculator'
+import { formatDisplayPrice } from '@/app/utils/currency'
 
 const Plans = ({ locale = 'en' }) => {
     const t = translations[locale] || translations.en;
@@ -266,11 +267,11 @@ const Plans = ({ locale = 'en' }) => {
                             <h3 className='text-white text-xl font-bold mb-4'>{t.vrWarrior}</h3>
                             <div className='flex justify-between items-center border-b border-gray-700 pb-2 mb-2'>
                                 <span className='text-gray-300'>{t.singleSession}</span>
-                                <span className='font-bold text-white'>$7</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(7, locale)}</span>
                             </div>
                             <div className='flex justify-between items-center'>
                                 <span className='text-gray-300'>{t.twoSessions}</span>
-                                <span className='font-bold text-white'>$12</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(12, locale)}</span>
                             </div>
                         </div>
                         

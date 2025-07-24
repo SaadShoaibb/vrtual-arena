@@ -63,17 +63,34 @@ const NotificationDropdown = () => {
 
     const handleMarkAsRead = async (notificationId) => {
         try {
+            console.log('Attempting to mark notification as read:', notificationId);
+
+            // Debug: Check if token exists
+            const token = localStorage.getItem('token');
+            console.log('Token exists:', !!token);
+            console.log('Token length:', token ? token.length : 0);
+
             await dispatch(markNotificationAsRead(notificationId)).unwrap();
+            console.log('Successfully marked notification as read');
         } catch (error) {
             console.error("Error marking notification as read:", error);
+            console.error("Error type:", typeof error);
+            console.error("Error message:", error.message || error);
+
+            // Show user-friendly error message
+            alert('Failed to mark notification as read. Please try again.');
         }
     };
 
     const handleMarkAllAsRead = async () => {
         try {
+            console.log('Attempting to mark all notifications as read');
             await dispatch(markAllNotificationsAsRead()).unwrap();
+            console.log('Successfully marked all notifications as read');
         } catch (error) {
             console.error("Error marking all notifications as read:", error);
+            // Show user-friendly error message
+            alert('Failed to mark all notifications as read. Please try again.');
         }
     };
 

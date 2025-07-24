@@ -7,18 +7,23 @@ import Information from './Information'
 import Connected from '@/app/components/Connected'
 import Footer from '@/app/components/Footer'
 import { useSearchParams } from 'next/navigation'
+import { translations } from '@/app/translations'
+import SEOHead from '@/app/components/SEOHead'
+
 
 const ContactPage = () => {
   const searchParams = useSearchParams();
   const locale = searchParams.get('locale') || 'en';
+  const t = translations[locale] || translations.en;
  
   return (
     <Suspense fallback={"loading"}>
       <div className="relative">
+        <SEOHead page="contact" locale={locale} />
         <Navbar locale={locale} />
         <HeroHeader
-          btn='Contact Us'
-          title='Contact Us'
+          btn={t.contactUs}
+          title={t.contactUs}
           bg='bg-contactbg'
           locale={locale}
         />

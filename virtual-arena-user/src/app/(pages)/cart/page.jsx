@@ -6,17 +6,22 @@ import { useDispatch, useSelector } from 'react-redux'
 import { fetchCart } from '@/Store/ReduxSlice/addToCartSlice'
 import Connected from '@/app/components/Connected'
 import Footer from '@/app/components/Footer'
+import { useSearchParams } from 'next/navigation'
+import { translations } from '@/app/translations'
 
 const CartPage = () => {
     const dispatch = useDispatch()
     const { cart } = useSelector((state) => state.cart)
+    const searchParams = useSearchParams()
+    const locale = searchParams.get('locale') || 'en'
+    const t = translations[locale] || translations.en
     useEffect(() => {
         dispatch(fetchCart());
     }, [])
     return (
         <Suspense fallback={"loading..."}>
             <div className="relative">
-                <Navbar />
+                <Navbar locale={locale} />
                 <div className="h-[400px] overflow-x-hidden relative -mt-[90px] md:-mt-[110px]">
 
                     <div className="absolute inset-0 z-0 bg-black bg-gradient-to-tr from-[#00000000] to-[#00000080] bg-opacity-50 "></div>
@@ -46,9 +51,9 @@ const CartPage = () => {
 
                 </div>
 
-                <Cart cart={cart} />
-                <Connected />
-                <Footer />
+                <Cart cart={cart} locale={locale} />
+                <Connected locale={locale} />
+                <Footer locale={locale} />
             </div>
         </Suspense>
     )

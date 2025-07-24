@@ -13,27 +13,47 @@ const Sessions = () => {
         { header: 'Session Name', accessor: 'name' },
         { header: 'Duration', accessor: 'duration' },
         { header: 'Max Players', accessor: 'maxPlayers' },
-        { header: 'Price', accessor: 'session_price' },
+        { header: 'Pricing (1 / 2 sessions)', accessor: 'session_price' },
         { header: 'Status', accessor: 'status' },
         // { header: 'Slots', accessor: 'slots' },
         // { header: 'Bookings', accessor: 'bookings' },
     ];
     const [sessions, setSessions] = useState([])
-    const data = sessions?.map((session) => ({
-        name: session.name,
-        session_id: session.session_id,
-        duration_minutes: session.duration_minutes,
-        duration: `${session.duration_minutes} mins`,
-        maxPlayers: session.max_players,
-        max_players: session.max_players,
-        session_price: `$${session.price}`,
-        price: session.price,
-        status: session.is_active ? 'Active' : 'Inactive',
-        is_active: session.is_active,
-        slots: session?.available_slots,
-        bookings: session?.booking_count,
-        description: session?.description,
-    }));
+    // Pricing calculator pricing map
+    const getPricingInfo = (sessionName) => {
+        const pricingMap = {
+            'Free Roaming Arena': { price1: 12, price2: 20 },
+            'UFO Spaceship Cinema': { price1: 9, price2: 15 },
+            'VR 360': { price1: 9, price2: 15 },
+            'VR Battle': { price1: 9, price2: 15 },
+            'VR Warrior': { price1: 7, price2: 12 },
+            'VR Cat': { price1: 6, price2: 10 },
+            'Photo Booth': { price1: 6, price2: 6 }
+        };
+        return pricingMap[sessionName] || { price1: 0, price2: 0 };
+    };
+
+    const data = sessions?.map((session) => {
+        const pricing = getPricingInfo(session.name);
+        return {
+            name: session.name,
+            session_id: session.session_id,
+            duration_minutes: session.duration_minutes,
+            duration: `${session.duration_minutes} mins`,
+            maxPlayers: session.max_players,
+            max_players: session.max_players,
+            session_price: session.name === 'Photo Booth'
+                ? `$${pricing.price1}`
+                : `$${pricing.price1} / $${pricing.price2}`,
+            price: session.price,
+            pricing_info: `1 session: $${pricing.price1}${session.name !== 'Photo Booth' ? `, 2 sessions: $${pricing.price2}` : ''}`,
+            status: session.is_active ? 'Active' : 'Inactive',
+            is_active: session.is_active,
+            slots: session?.available_slots,
+            bookings: session?.booking_count,
+            description: session?.description,
+        };
+    });
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [selectedSession, setSelectedSession] = useState(null);
     const [sidebarMode, setSidebarMode] = useState('view'); // 'view' or 'edit'
@@ -142,19 +162,25 @@ const Sessions = () => {
 
     return (
         <div className="p-6">
-            <h1 className="text-2xl font-bold mb-6 text-gradiant">Sessions</h1>
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl font-bold text-gradiant">VR Sessions</h1>
+                <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-2 rounded-lg">
+                    <span className="text-sm">ℹ️ Sessions are automatically managed from pricing calculator</span>
+                </div>
+            </div>
             <DynamicTable
                 headers={columns}
                 data={data}
                 onEdit={handleEdit}
                 onDetail={handleDetail}
-                onDelete={handleDelete}
-                onConfirm={confirmDelete}
+                onDelete={null} // Disable delete functionality
+                onConfirm={null}
                 sidebarMode={sidebarMode}
                 dropdownOpen={dropdownOpen}
                 setDropdownOpen={setDropdownOpen}
-                deleteModalOpen={deleteModalOpen}
-                setDeleteModalOpen={setDeleteModalOpen}
+                deleteModalOpen={false}
+                setDeleteModalOpen={() => {}} // Disable delete modal
+                hideDeleteButton={true} // Hide delete button
             />
            {sidebarOpen && (
                            <div className='fixed right-0 top-0 min-h-screen w-1/2'>

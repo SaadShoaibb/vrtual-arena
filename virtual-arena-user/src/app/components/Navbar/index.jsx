@@ -13,6 +13,7 @@ import { fetchUserData } from '@/Store/Actions/userActions';
 import toast from 'react-hot-toast';
 import { closeBookModal } from '@/Store/ReduxSlice/bookModalSlice';
 import BookingForm from '../BookingForm';
+import EnhancedBookingForm from '../EnhancedBookingForm';
 import BookNowButton from '../common/BookNowButton';
 import { fetchCart } from '@/Store/ReduxSlice/addToCartSlice';
 import { fetchProducts } from '@/Store/ReduxSlice/productSlice';
@@ -35,18 +36,19 @@ const Navbar = ({ locale = 'en' }) => {
             path: `/experiences?locale=${locale}`,
             hasDropdown: true,
             dropdownItems: [
-                { title: t.ufoSpaceship, path: `/experiences/ufo-spaceship?locale=${locale}`, description: '5 seats' },
-                { title: t.vr360, path: `/experiences/vr-360?locale=${locale}`, description: '2 seats' },
-                { title: t.vrBattle, path: `/experiences/vr-battle?locale=${locale}`, description: '2 players' },
-                { title: t.vrWarrior, path: `/experiences/vr-warrior?locale=${locale}`, description: 'Kids - 2 players' },
-                { title: t.vrCat, path: `/experiences/vr-cat?locale=${locale}`, description: 'Kids - 2 machines' },
-                { title: t.freeRoaming, path: `/experiences/free-roaming-arena?locale=${locale}`, description: '34x49 feet, up to 10 players' },
-                { title: t.photoBooth, path: `/gallery?locale=${locale}`, description: 'Photo experiences' },
+                { title: t.ufoSpaceship, path: `/experiences/ufo-spaceship?locale=${locale}`, description: t.ufoSpaceshipDesc },
+                { title: t.vr360, path: `/experiences/vr-360?locale=${locale}`, description: t.vr360Desc },
+                { title: t.vrBattle, path: `/experiences/vr-battle?locale=${locale}`, description: t.vrBattleDesc },
+                { title: t.vrWarrior, path: `/experiences/vr-warrior?locale=${locale}`, description: t.vrWarriorDesc },
+                { title: t.vrCat, path: `/experiences/vr-cat?locale=${locale}`, description: t.vrCatDesc },
+                { title: t.freeRoaming, path: `/experiences/free-roaming-arena?locale=${locale}`, description: t.freeRoamingDesc },
+                { title: t.photoBooth, path: `/gallery?locale=${locale}`, description: t.photoBoothDesc },
             ]
         },
         { title: t.pricing, path: `/pricing?locale=${locale}` },
-        { title: "Events & Parties", path: `/events?locale=${locale}` },
-        { title: "Shop", path: `/merchandise?locale=${locale}` },
+        { title: t.eventsParties, path: `/events?locale=${locale}` },
+        { title: t.tournaments, path: `/tournaments?locale=${locale}` },
+        { title: t.shop, path: `/merchandise?locale=${locale}` },
         { title: t.aboutUs, path: `/about?locale=${locale}` },
         { title: t.contactUs, path: `/contact?locale=${locale}` },
     ];
@@ -74,8 +76,8 @@ const Navbar = ({ locale = 'en' }) => {
         { title: t.home, path: `/?locale=${locale}` },
         { title: t.experiences, path: `/experiences?locale=${locale}` },
         { title: t.pricing, path: `/pricing?locale=${locale}` },
-        { title: 'Gallery', path: `/gallery?locale=${locale}` },
-        { title: 'Shop', path: `/merchandise?locale=${locale}` },
+        { title: t.gallery, path: `/gallery?locale=${locale}` },
+        { title: t.shop, path: `/merchandise?locale=${locale}` },
     ];
     const router = useRouter()
 
@@ -261,7 +263,7 @@ const Navbar = ({ locale = 'en' }) => {
                             </div>
                             <div className="flex items-center">
                                 <FaClock className="mr-1 text-[#DB1FEB]" />
-                                <span className="text-white">Mon-Sun: 10AM-10PM</span>
+                                <span className="text-white">{t.mondayToFriday}: {t.mondayToFridayHours}</span>
                             </div>
                         </div>
                         
@@ -388,8 +390,14 @@ const Navbar = ({ locale = 'en' }) => {
                                                     <Link href={`/tournaments?locale=${locale}`}>
                                                         <div className="px-4 py-2 text-white hover:text-[#DB1FEB] transition-colors">{t.tournaments}</div>
                                                     </Link>
-                                                    <button 
-                                                        onClick={handleLogout} 
+                                                    <Link href={`/tournaments/registrations?locale=${locale}`}>
+                                                        <div className="px-4 py-2 text-white hover:text-[#DB1FEB] transition-colors">{t.tournamentRegistrations || 'Tournament Registrations'}</div>
+                                                    </Link>
+                                                    <Link href={`/events/registrations?locale=${locale}`}>
+                                                        <div className="px-4 py-2 text-white hover:text-[#DB1FEB] transition-colors">{t.eventRegistrations || 'Event Registrations'}</div>
+                                                    </Link>
+                                                    <button
+                                                        onClick={handleLogout}
                                                         className="w-full text-left px-4 py-2 text-white hover:text-[#DB1FEB] transition-colors"
                                                     >
                                                         {t.logout}
@@ -412,10 +420,10 @@ const Navbar = ({ locale = 'en' }) => {
                     <div className="py-3 flex justify-between items-center">
                         {/* Logo */}
                         <Link href={`/?locale=${locale}`} className="flex-shrink-0">
-                            <img 
-                                src="/assets/logo.png" 
-                                alt="Virtual Arena" 
-                                className="h-10 md:h-12 w-auto object-contain" 
+                            <img
+                                src="/assets/logo.png"
+                                alt="VRtual Arena"
+                                className="h-10 md:h-12 w-auto object-contain"
                             />
                         </Link>
 
@@ -530,7 +538,7 @@ const Navbar = ({ locale = 'en' }) => {
             <div className={`fixed top-0 right-0 transition-transform duration-300 z-30 h-screen w-full max-w-[300px] bg-[#121212] px-6 py-8 overflow-y-auto ${showSidebar ? "translate-x-0" : "translate-x-full"}`}>
                 <div className="flex justify-between items-center mb-8">
                     <Link href={`/?locale=${locale}`} onClick={() => setShowSidebar(false)}>
-                        <img src="/assets/logo.png" alt="Logo" className="w-[140px] object-contain" />
+                        <img src="/assets/logo.png" alt="VRtual Arena" className="w-[140px] object-contain" />
                     </Link>
                     <button onClick={toggleSidebar} className="text-white">
                         <IoCloseCircleSharp size={24} />
@@ -629,7 +637,13 @@ const Navbar = ({ locale = 'en' }) => {
                             <Link href={`/tournaments?locale=${locale}`} onClick={() => setShowSidebar(false)}>
                                 <div className="text-white hover:text-[#DB1FEB]">{t.tournaments}</div>
                             </Link>
-                            <button 
+                            <Link href={`/tournaments/registrations?locale=${locale}`} onClick={() => setShowSidebar(false)}>
+                                <div className="text-white hover:text-[#DB1FEB]">{t.tournamentRegistrations || 'Tournament Registrations'}</div>
+                            </Link>
+                            <Link href={`/events/registrations?locale=${locale}`} onClick={() => setShowSidebar(false)}>
+                                <div className="text-white hover:text-[#DB1FEB]">{t.eventRegistrations || 'Event Registrations'}</div>
+                            </Link>
+                            <button
                                 onClick={() => {
                                     handleLogout();
                                     setShowSidebar(false);
@@ -671,7 +685,7 @@ const Navbar = ({ locale = 'en' }) => {
                     </div>
                     <div className="flex items-center">
                         <FaClock className="mr-2 text-[#DB1FEB]" />
-                        <span>Mon-Sun: 10AM-10PM</span>
+                        <span>{t.mondayToFriday}: {t.mondayToFridayHours}</span>
                     </div>
                 </div>
             </div>
@@ -692,7 +706,7 @@ const Navbar = ({ locale = 'en' }) => {
             )}
             {showBookModal && (
                 <AuthModel onClose={handleCloseBookModal}>
-                    <BookingForm />
+                    <EnhancedBookingForm onClose={handleCloseBookModal} locale={locale} translations={t} />
                 </AuthModel>
             )}
         </>

@@ -2,20 +2,11 @@ import './globals.css';
 import { Inter } from 'next/font/google';
 import ClientLayout from './components/ClientLayout';
 import { locales } from './translations';
+import { generatePageMetadata, generateLocalBusinessSchema } from './utils/seoMetadata';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export const metadata = {
-  title: 'Virtual Arena',
-  description: 'Virtual Reality Experience',
-  alternates: {
-    canonical: 'https://vrtualarena.com',
-    languages: {
-      'en-US': 'https://vrtualarena.com/?locale=en',
-      'fr-CA': 'https://vrtualarena.com/?locale=fr',
-    },
-  },
-};
+export const metadata = generatePageMetadata('home', 'en');
 
 export default function RootLayout({ children }) {
   return (
@@ -29,13 +20,14 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description" content="Virtual Arena - Immersive VR Experiences" />
-        <meta property="og:title" content="Virtual Arena" />
-        <meta property="og:description" content="Discover the future of entertainment with our immersive virtual reality experiences." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://virtualarena.com" />
-        <meta property="og:image" content="/assets/og-image.jpg" />
-        <meta name="twitter:card" content="summary_large_image" />
+
+        {/* Structured Data for Local Business */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(generateLocalBusinessSchema('en')),
+          }}
+        />
 
         {/* Language alternates */}
         {locales.map((locale) => (
@@ -43,10 +35,10 @@ export default function RootLayout({ children }) {
             key={locale}
             rel="alternate"
             hrefLang={locale === 'en' ? 'en-us' : 'fr-ca'}
-            href={`https://vrtualarena.com/?locale=${locale}`}
+            href={`https://vrtualarena.ca/?locale=${locale}`}
           />
         ))}
-        <link rel="alternate" hrefLang="x-default" href="https://vrtualarena.com" />
+        <link rel="alternate" hrefLang="x-default" href="https://vrtualarena.ca" />
       </head>
       <body
         className={inter.className}

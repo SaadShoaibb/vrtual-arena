@@ -42,10 +42,11 @@ const Registrations = () => {
     const handleFetchRegistrations = async () => {
         try {
             const response = await axios.get(`${API_URL}/admin/tournament-registrations/`, getAuthHeaders());
-            console.log(response);
-            setRegistrations(response?.data?.registrations);
+            console.log('Tournament registrations response:', response);
+            setRegistrations(response?.data?.registrations || []);
         } catch (error) {
-            console.log(error);
+            console.error('Error fetching tournament registrations:', error);
+            toast.error('Error fetching tournament registrations');
         }
     };
 

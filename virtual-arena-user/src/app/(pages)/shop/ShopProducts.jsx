@@ -9,8 +9,12 @@ import { openModal } from '@/Store/ReduxSlice/ModalSlice'
 import { FaHeart, FaRegHeart } from 'react-icons/fa'
 import CardSidebar from '@/app/components/CartSidebar'
 import Link from 'next/link'
+import { formatDisplayPrice } from '@/app/utils/currency'
+import { translations } from '@/app/translations'
+import { getProductImageUrl } from '@/app/utils/imageUtils'
 
-const ShopProducts = ({ category }) => {
+const ShopProducts = ({ category, locale = 'en' }) => {
+    const t = translations[locale] || translations.en;
     const dispatch = useDispatch()
     const { products, status, error } = useSelector(state => state.products)
     const { isAuthenticated } = useSelector(state => state.userData)
@@ -45,7 +49,7 @@ const ShopProducts = ({ category }) => {
             dispatch(openModal("LOGIN"))
             return
         }
-        
+
         const isInWishlist = localWishlist.map(item => item.product_id).includes(productId)
         if (isInWishlist) {
             setLocalWishlist(localWishlist.filter(item => item.product_id !== productId))
@@ -58,6 +62,8 @@ const ShopProducts = ({ category }) => {
             dispatch(fetchWishlist())
         }, 500)
     }
+
+
 
     // Filter products based on selected category
     const filteredProducts = category === 'all' 
@@ -101,8 +107,8 @@ const ShopProducts = ({ category }) => {
         return (
             <div className="w-full h-full bg-blackish flex justify-center items-center py-20">
                 <div className="text-white text-center">
-                    <h2 className="text-xl font-bold">Failed to load products</h2>
-                    <p>{error || "Something went wrong"}</p>
+                    <h2 className="text-xl font-bold text-wrap-balance">{t.failedToLoadProducts}</h2>
+                    <p className="text-wrap-balance">{error || t.somethingWentWrong}</p>
                 </div>
             </div>
         )
@@ -117,10 +123,10 @@ const ShopProducts = ({ category }) => {
                             <div key={product.product_id} className='rounded-xl overflow-hidden bg-gray-900 hover:shadow-xl hover:shadow-purple-900/20 transition-all transform hover:-translate-y-1'>
                                 <Link href={`/shop/${product.product_id}`} className="block relative group">
                                     <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-0 group-hover:opacity-70 transition-opacity"></div>
-                                    <img 
-                                        src={'/assets/d1.png'} 
-                                        alt={product.name} 
-                                        className='h-[300px] w-full object-cover' 
+                                    <img
+                                        src={getProductImageUrl(product)}
+                                        alt={product.name}
+                                        className='h-[300px] w-full object-cover'
                                     />
                                     <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform">
                                         <p className="text-white text-sm">Click for details</p>
@@ -129,30 +135,32 @@ const ShopProducts = ({ category }) => {
                                         <h3 className="text-white text-lg font-medium truncate">{product.name}</h3>
                                     </div>
                                 </Link>
-                                <div className='bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] p-4 flex justify-between items-center'>
-                                    <div className="flex items-center gap-2">
-                                        {product.discount > 0 && (
-                                            <div className='bg-white h-8 w-[60px] rounded-md flex justify-center items-center'>
-                                                <h1 className='text-black text-sm font-bold'>-{Math.round(product?.discount)}%</h1>
-                                            </div>
-                                        )}
-                                        <div>
-                                            {product.discount > 0 ? (
-                                                <div className="flex flex-col">
-                                                    <span className='text-sm text-white line-through'>${product?.original_price}</span>
-                                                    <span className='text-xl text-white font-bold'>${product?.discount_price}</span>
+                                <div className='bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] p-4'>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center gap-2 flex-1">
+                                            {product.discount > 0 && (
+                                                <div className='bg-white h-8 w-[60px] rounded-md flex justify-center items-center flex-shrink-0'>
+                                                    <h1 className='text-black text-sm font-bold'>-{Math.round(product?.discount)}%</h1>
                                                 </div>
+                                            )}
+                                            <div className="flex flex-col min-w-0 flex-1">
+                                                {product.discount > 0 ? (
+                                                    <>
+                                                        <span className='text-sm text-white line-through opacity-80 leading-tight'>{formatDisplayPrice(product?.original_price, locale)}</span>
+                                                        <span className='text-lg text-white font-bold leading-tight'>{formatDisplayPrice(product?.discount_price, locale)}</span>
+                                                    </>
+                                                ) : (
+                                                    <span className='text-lg text-white font-bold'>{formatDisplayPrice(product?.original_price, locale)}</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2 flex-shrink-0">
+                                            {product.stock > 0 ? (
+                                                <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">{t.inStock}</span>
                                             ) : (
-                                                <span className='text-xl text-white font-bold'>${product?.original_price}</span>
+                                                <span className="text-xs bg-red-500 text-white px-2 py-1 rounded">{t.outOfStock}</span>
                                             )}
                                         </div>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        {product.stock > 0 ? (
-                                            <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">In Stock</span>
-                                        ) : (
-                                            <span className="text-xs bg-red-500 text-white px-2 py-1 rounded">Out of Stock</span>
-                                        )}
                                     </div>
                                 </div>
                                 <div className='flex items-center justify-between bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7]'>
@@ -163,7 +171,7 @@ const ShopProducts = ({ category }) => {
                                     >
                                         <img src="/icons/cart.png" alt="cart" />
                                         <h1 className={`text-lg font-semibold ${product.stock <= 0 ? 'text-gray-500' : ''}`}>
-                                            {product.stock > 0 ? 'Add To Cart' : 'Out of Stock'}
+                                            {product.stock > 0 ? t.addToCart : t.outOfStock}
                                         </h1>
                                     </button>
                                     <div
@@ -182,8 +190,8 @@ const ShopProducts = ({ category }) => {
                     </div>
                 ) : (
                     <div className="text-white text-center py-10">
-                        <h2 className="text-xl font-bold">No products available in this category</h2>
-                        <p className="mt-4">Check back later for new additions to our shop</p>
+                        <h2 className="text-xl font-bold text-wrap-balance">{t.noProductsAvailable}</h2>
+                        <p className="mt-4 text-wrap-balance">{t.checkBackLater}</p>
                     </div>
                 )}
             </div>

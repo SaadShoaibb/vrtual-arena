@@ -1,6 +1,8 @@
 'use client'
 import Link from 'next/link'
 import React from 'react'
+import { useDispatch } from 'react-redux'
+import { openBookModal } from '@/Store/ReduxSlice/bookModalSlice'
 
 // Translations
 const translations = {
@@ -28,6 +30,11 @@ const translations = {
 
 const Offers = ({ locale = 'en' }) => {
     const t = translations[locale] || translations.en;
+    const dispatch = useDispatch();
+
+    const handleBookNow = () => {
+        dispatch(openBookModal());
+    };
     
     return (
         <div id='offers' className={`w-full h-full bg-blackish overflow-hidden`}>
@@ -39,12 +46,13 @@ const Offers = ({ locale = 'en' }) => {
                                 <h1 className='text-white font-bold text-[30px] sm:text-[40px] md:text-[50px] leading-none text-wrap-balance'>{t.visaCardOffer}</h1>
                                 <p className='text-[18px] sm:text-[22px] md:text-[26px] text-white font-semibold mt-0.5 leading-tight text-wrap-balance'>{t.offOnOrder}</p>
                             </div>
-                            <Link href={`/deals?locale=${locale}`}>
-                                <button className='text-base sm:text-lg md:text-xl font-semibold w-fit flex items-center py-2 md:py-4 px-4 sm:px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] overflow-hidden'>
-                                    <span className="text-wrap-balance whitespace-normal">{t.bookNow}</span>
-                                    <img src="/icons/arrow.svg" alt="" className='h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] ml-2 sm:ml-[11px] flex-shrink-0 rounded-full' />
-                                </button>
-                            </Link>
+                            <button
+                                onClick={handleBookNow}
+                                className='text-base sm:text-lg md:text-xl font-semibold w-fit flex items-center py-2 md:py-4 px-4 sm:px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] overflow-hidden hover:scale-105 transition-transform'
+                            >
+                                <span className="text-wrap-balance whitespace-normal">{t.bookNow}</span>
+                                <img src="/icons/arrow.svg" alt="" className='h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] ml-2 sm:ml-[11px] flex-shrink-0 rounded-full' />
+                            </button>
                         </div>
                         <div className='relative w-full h-[260px] overflow-hidden rounded-xl px-4 sm:px-[30px] py-[27px] flex flex-col justify-between items-end'>
                             <img src="/assets/offer.png" alt="" className='absolute top-0 -translate-x-1/2 xl:-translate-x-1/3 h-[260px] opacity-50 z-0' />
@@ -54,12 +62,13 @@ const Offers = ({ locale = 'en' }) => {
                                     <h1 className='text-white font-bold text-[30px] sm:text-[40px] md:text-[50px] leading-none text-wrap-balance'>{t.getFlatOff}</h1>
                                     <p className='text-[18px] sm:text-[22px] md:text-[26px] text-white font-semibold mt-0.5 leading-tight text-wrap-balance'>{t.bestOfBest}</p>
                                 </div>
-                                <Link href={`/deals?locale=${locale}`} className="self-end">
-                                    <button className='text-base sm:text-lg md:text-xl z-30 font-semibold w-fit flex items-center py-2 md:py-4 px-4 sm:px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] overflow-hidden'>
-                                        <span className="text-wrap-balance whitespace-normal">{t.bookNow}</span>
-                                        <img src="/icons/arrow.svg" alt="" className='h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] ml-2 sm:ml-[11px] flex-shrink-0 rounded-full' />
-                                    </button>
-                                </Link>
+                                <button
+                                    onClick={handleBookNow}
+                                    className='text-base sm:text-lg md:text-xl z-30 font-semibold w-fit flex items-center py-2 md:py-4 px-4 sm:px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] overflow-hidden hover:scale-105 transition-transform self-end'
+                                >
+                                    <span className="text-wrap-balance whitespace-normal">{t.bookNow}</span>
+                                    <img src="/icons/arrow.svg" alt="" className='h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] ml-2 sm:ml-[11px] flex-shrink-0 rounded-full' />
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -74,12 +83,13 @@ const Offers = ({ locale = 'en' }) => {
                                 <span className='text-[14px] italic font-semibold block text-wrap-balance text-white'>{t.freeShipping}</span>
                                 <p className='text-[18px] sm:text-[22px] md:text-[26px] text-white font-semibold mt-0.5 leading-tight text-wrap-balance'>{t.orderOrMore}</p>
                             </div>
-                            <Link href={`/deals?locale=${locale}`}>
-                                <button className='text-base sm:text-lg md:text-xl mt-[34px] font-semibold w-fit flex items-center py-2 md:py-4 px-4 sm:px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] overflow-hidden'>
-                                    <span className="text-wrap-balance whitespace-normal">{t.bookNow}</span>
-                                    <img src="/icons/arrow.svg" alt="" className='h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] ml-2 sm:ml-[11px] flex-shrink-0 rounded-full hidden md:block' />
-                                </button>
-                            </Link>
+                            <button
+                                onClick={handleBookNow}
+                                className='text-base sm:text-lg md:text-xl mt-[34px] font-semibold w-fit flex items-center py-2 md:py-4 px-4 sm:px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] overflow-hidden hover:scale-105 transition-transform'
+                            >
+                                <span className="text-wrap-balance whitespace-normal">{t.bookNow}</span>
+                                <img src="/icons/arrow.svg" alt="" className='h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] ml-2 sm:ml-[11px] flex-shrink-0 rounded-full hidden md:block' />
+                            </button>
                         </div>
                         <div className='bg-offer3 bg-no-repeat bg-cover w-1/2 h-full rounded-xl px-3 md:px-[30px] py-6 md:py-[27px] flex flex-col justify-start'>
                             <div>
@@ -90,12 +100,13 @@ const Offers = ({ locale = 'en' }) => {
                                 <span className='text-[14px] italic font-semibold block text-wrap-balance text-white'>{t.freeShipping}</span>
                                 <p className='text-[18px] sm:text-[22px] md:text-[26px] text-white font-semibold mt-0.5 leading-tight text-wrap-balance'>{t.orderOrMore}</p>
                             </div>
-                            <Link href={`/deals?locale=${locale}`}>
-                                <button className='text-base sm:text-lg md:text-xl mt-[34px] font-semibold w-fit flex items-center py-2 md:py-4 px-4 sm:px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] overflow-hidden'>
-                                    <span className="text-wrap-balance whitespace-normal">{t.bookNow}</span>
-                                    <img src="/icons/arrow.svg" alt="" className='h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] ml-2 sm:ml-[11px] flex-shrink-0 rounded-full hidden md:block' />
-                                </button>
-                            </Link>
+                            <button
+                                onClick={handleBookNow}
+                                className='text-base sm:text-lg md:text-xl mt-[34px] font-semibold w-fit flex items-center py-2 md:py-4 px-4 sm:px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] overflow-hidden hover:scale-105 transition-transform'
+                            >
+                                <span className="text-wrap-balance whitespace-normal">{t.bookNow}</span>
+                                <img src="/icons/arrow.svg" alt="" className='h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] ml-2 sm:ml-[11px] flex-shrink-0 rounded-full hidden md:block' />
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -38,7 +38,7 @@ const DetailView = ({ data, title, type,id }) => {
               y = 20;
             }
         });
-        doc.save(`booking-receipt-${id || Date.now()}.pdf`);
+        doc.save(`booking-receipt-${id || 'download'}.pdf`);
     };
 
     return (

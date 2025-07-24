@@ -11,7 +11,7 @@ import AuthModel from '@/app/components/AuthModal';
 import { submitReview } from '@/Store/ReduxSlice/reviewSlice';
 import { FaStar } from 'react-icons/fa';
 
-const Tournaments = () => {
+const TournamentRegistrations = () => {
     const [registrations, setRegistrations] = useState([]);
     const [selectedRegistration, setSelectedRegistration] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -62,13 +62,13 @@ const Tournaments = () => {
     const handleRowClick = (registration) => {
         setSelectedRegistration(registration);
         setIsSidebarOpen(true);
-        router.push(`/tournaments?tournament_id=${registration.registration_id}`);
+        router.push(`/tournaments/registrations?tournament_id=${registration.registration_id}`);
     };
 
     const closeSidebar = () => {
         setIsSidebarOpen(false);
         setSelectedRegistration(null);
-        router.push('/tournaments');
+        router.push('/tournaments/registrations');
     };
 
     useEffect(() => {
@@ -329,4 +329,4 @@ const Tournaments = () => {
     );
 };
 
-export default Tournaments;
+export default TournamentRegistrations;

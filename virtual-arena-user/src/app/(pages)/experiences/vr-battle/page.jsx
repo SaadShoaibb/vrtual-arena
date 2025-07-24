@@ -2,14 +2,30 @@
 import React from 'react';
 import { IoMdPeople, IoMdTime } from 'react-icons/io';
 import { MdOutlineEventSeat } from 'react-icons/md';
+import { useSearchParams } from 'next/navigation';
+import { useDispatch } from 'react-redux';
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
+import BookModal from '@/app/components/BookModal';
+import { openBookModal } from '@/Store/ReduxSlice/bookModalSlice';
+import { translations } from '@/app/translations';
 
 const VRBattlePage = () => {
+  const searchParams = useSearchParams();
+  const locale = searchParams.get('locale') || 'en';
+  const t = translations[locale] || translations.en;
+  const dispatch = useDispatch();
+
+  const handleBookNow = () => {
+    dispatch(openBookModal({
+      experienceType: 'VR Battle',
+      sessionName: 'VR Battle Arena'
+    }));
+  };
   return (
     <>
     <div className="bg-black text-white">
-      <Navbar />
+      <Navbar locale={locale} />
       
       {/* Hero Section */}
       <div className="relative h-[60vh] overflow-hidden">
@@ -21,9 +37,9 @@ const VRBattlePage = () => {
         />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
           <div className="max-w-[1600px] mx-auto">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white">VR Battle</h1>
-            <p className="text-xl md:text-2xl text-gray-200 max-w-3xl">
-              Challenge your friends in our adrenaline-pumping two-player VR battle arena.
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white text-wrap-balance">{t.vrBattleTitle}</h1>
+            <p className="text-xl md:text-2xl text-gray-200 max-w-3xl text-wrap-balance">
+              {t.vrBattleDescription}
             </p>
           </div>
         </div>
@@ -34,32 +50,24 @@ const VRBattlePage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Left Column - Description and Features */}
           <div className="lg:col-span-2">
-            <h2 className="text-3xl font-bold mb-6 text-white">Experience Overview</h2>
+            <h2 className="text-3xl font-bold mb-6 text-white">{t.experienceOverview}</h2>
             <p className="text-lg text-gray-200 mb-8">
-              Our VR Battle arena pits you directly against a friend or opponent in high-intensity virtual 
-              combat. With two fully equipped battle stations, you'll enter the same virtual world to cooperate 
-              or compete, depending on the game you choose. Perfect for gamers seeking the ultimate competitive 
-              experience or teammates looking to take on challenges together.
+              {t.vrBattleOverviewText}
             </p>
 
             <div className="mb-12">
-              <h3 className="text-2xl font-bold mb-4 text-white">Experience Highlights</h3>
+              <h3 className="text-2xl font-bold mb-4 text-white">{t.experienceHighlights}</h3>
               <ul className="list-disc list-inside space-y-3 text-gray-200">
-                <li>Two dedicated VR battle stations with full-body tracking</li>
-                <li>Advanced multiplayer technology for seamless interaction</li>
-                <li>Professional gaming-grade hardware for responsive controls</li>
-                <li>Multiple game genres including shooters, sports, and puzzles</li>
-                <li>Real-time voice communication between players</li>
-                <li>Suitable for ages 12 and up</li>
+                {t.vrBattleHighlights.map((highlight, index) => (
+                  <li key={index}>{highlight}</li>
+                ))}
               </ul>
             </div>
 
             <div>
-              <h3 className="text-2xl font-bold mb-4 text-white">The Experience</h3>
+              <h3 className="text-2xl font-bold mb-4 text-white">{t.theExperience}</h3>
               <p className="text-lg text-gray-200 mb-4">
-                When you book a VR Battle session, you and your partner will each be equipped with a high-end VR 
-                headset, haptic controllers, and motion sensors. Our staff will guide you through setting up your 
-                equipment and explain the controls for your chosen game.
+                {t.vrBattleExperienceText}
               </p>
               <p className="text-lg text-gray-200 mb-8">
                 You can choose from a variety of games - from intense first-person shooters where you take cover 
@@ -118,12 +126,15 @@ const VRBattlePage = () => {
                 </p>
               </div>
               
-              <button className="w-full bg-gradient-to-r from-[#DB1FEB] to-[#24CBFF] hover:opacity-90 transition-opacity text-white text-lg font-bold py-3 px-6 rounded-full mb-4">
-                Book Now
+              <button
+                onClick={handleBookNow}
+                className="w-full bg-gradient-to-r from-[#DB1FEB] to-[#24CBFF] hover:opacity-90 transition-opacity text-white text-lg font-bold py-3 px-6 rounded-full mb-4"
+              >
+                {t.bookNow}
               </button>
-              
+
               <button className="w-full border border-white text-white hover:bg-white hover:text-black transition-colors font-bold py-3 px-6 rounded-full">
-                View Available Packages
+                {t.viewAvailablePackages}
               </button>
             </div>
           </div>
@@ -195,7 +206,10 @@ const VRBattlePage = () => {
         </div>
       </div>
 
-      <Footer />
+      <Footer locale={locale} />
+
+      {/* Booking Modal */}
+      <BookModal locale={locale} />
     </div>
     </>
   );

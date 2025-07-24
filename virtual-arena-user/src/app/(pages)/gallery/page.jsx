@@ -1,92 +1,13 @@
 'use client'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
+import LazyMedia from '@/app/components/LazyMedia';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import { translations } from '@/app/translations';
 
-const LazyMedia = ({ type, src, index, poster }) => {
-  const ref = useRef(null)
-  const [isVisible, setIsVisible] = useState(false)
-  const [error, setError] = useState(false)
-  const [isLoaded, setIsLoaded] = useState(false)
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-          observer.disconnect()
-        }
-      },
-      { 
-        rootMargin: '200px', // Load images 200px before they come into view
-        threshold: 0.01 
-      }
-    )
-
-    if (ref.current) observer.observe(ref.current)
-    return () => observer.disconnect()
-  }, [])
-
-  const handleImageError = () => {
-    console.error(`Failed to load image: ${src}`);
-    setError(true);
-  }
-
-  const handleImageLoad = () => {
-    setIsLoaded(true);
-  }
-
-  return (
-    <div
-      ref={ref}
-      className="relative aspect-video overflow-hidden rounded-2xl shadow-lg bg-gray-900 hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-shadow duration-300"
-    >
-      {isVisible ? (
-        type === 'image' ? (
-          error ? (
-            <div className="w-full h-full flex items-center justify-center text-white">
-              Failed to load image
-            </div>
-          ) : (
-            <>
-              <div className={`absolute inset-0 bg-gray-800 animate-pulse ${isLoaded ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}></div>
-              <Image
-                src={src}
-                alt={`Gallery Image ${index + 1}`}
-                loading="lazy"
-                width={640}
-                height={360}
-                quality={75}
-                onError={handleImageError}
-                onLoad={handleImageLoad}
-                className={`w-full h-full object-cover transition-transform duration-300 hover:scale-105 rounded-2xl ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              />
-            </>
-          )
-        ) : (
-          <div className="relative w-full h-full">
-            <video
-              controls
-              playsInline
-              preload="metadata"
-              poster={poster || '/gallery/video-thumb.jpg'}
-              className="w-full h-full object-cover rounded-2xl outline-none transition-all duration-300 hover:brightness-110"
-              onError={handleImageError}
-            >
-              <source src={src} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-        )
-      ) : (
-        <div className="w-full h-full animate-pulse bg-gray-700 rounded-2xl" />
-      )}
-    </div>
-  )
-}
 
 const GalleryPage = () => {
   const [mediaItems, setMediaItems] = useState([])
@@ -95,6 +16,7 @@ const GalleryPage = () => {
   const [error, setError] = useState(null)
   const searchParams = useSearchParams();
   const locale = searchParams.get('locale') || 'en';
+  const t = translations[locale] || translations.en;
 
   // Demo images for development - optimized with smaller file sizes
   const demoImages = [
@@ -106,58 +28,65 @@ const GalleryPage = () => {
     '/gallery/gal6.png',
   ]
 
-  useEffect(() => {
-    const fetchMedia = async () => {
-      try {
-        setLoading(true)
-        const res = await fetch('/api/gallery')
-        
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`)
-        }
-        
-        const data = await res.json()
+  const fetchMedia = useCallback(async () => {
+    try {
+      setLoading(true)
+      const res = await fetch('/api/gallery', {
+        cache: 'force-cache', // Cache the response for better performance
+        next: { revalidate: 3600 } // Revalidate every hour
+      })
 
-        if (data.error) {
-          throw new Error(data.error)
-        }
-
-        const imageFiles = (data.images || []).map((file, index) => ({
-          type: 'image',
-          src: file,
-          index
-        }))
-
-        const videoFiles = (data.videos || []).map((file, index) => ({
-          type: 'video',
-          src: file,
-          poster: file.replace(/\.mp4$/, '.webp'),
-          index
-        }))
-
-        const allMedia = [...imageFiles, ...videoFiles]
-        setMediaItems(allMedia)
-        
-        // Initially show only the first 6 items for faster page load
-        setVisibleItems(allMedia.slice(0, 6))
-        
-        setError(null)
-      } catch (error) {
-        console.error('Failed to fetch gallery:', error)
-        setError(error.message)
-        // Use demo images if API fails
-        setVisibleItems(demoImages.map((src, index) => ({
-          type: 'image',
-          src,
-          index
-        })))
-      } finally {
-        setLoading(false)
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`)
       }
-    }
 
-    fetchMedia()
+      const data = await res.json()
+
+      if (data.error) {
+        throw new Error(data.error)
+      }
+
+      // Process images with proper URLs
+      const imageFiles = (data.images || []).map((item, index) => ({
+        type: 'image',
+        src: item.url || item,
+        filename: item.filename || `image-${index}`,
+        index
+      }))
+
+      // Process videos with proper URLs and posters
+      const videoFiles = (data.videos || []).map((item, index) => ({
+        type: 'video',
+        src: item.url || item,
+        poster: item.poster || item.url?.replace(/\.(mp4|webm|ogg)$/i, '.jpg'),
+        filename: item.filename || `video-${index}`,
+        index
+      }))
+
+      const allMedia = [...imageFiles, ...videoFiles]
+      setMediaItems(allMedia)
+
+      // Initially show only the first 6 items for faster page load
+      setVisibleItems(allMedia.slice(0, 6))
+
+      setError(null)
+    } catch (error) {
+      console.error('Failed to fetch gallery:', error)
+      setError(error.message)
+      // Use demo images if API fails
+      setVisibleItems(demoImages.map((src, index) => ({
+        type: 'image',
+        src,
+        index
+      })))
+    } finally {
+      setLoading(false)
+    }
   }, [])
+
+  useEffect(() => {
+    fetchMedia()
+  }, [fetchMedia])
 
   // Load more items as user scrolls
   useEffect(() => {
@@ -197,7 +126,7 @@ const GalleryPage = () => {
         />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
           <div className="max-w-[1600px] mx-auto">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white">Photo Booth Experience</h1>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white text-wrap-balance">{t.photoBoothTitle}</h1>
             <p className="text-xl md:text-2xl text-gray-200 max-w-3xl">
               Capture fun memories with friends and family in our interactive VR photo booth.
             </p>
@@ -262,8 +191,17 @@ const GalleryPage = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-              {visibleItems.map(({ type, src, index, poster }) => (
-                <LazyMedia key={`${type}-${index}`} type={type} src={src} index={index} poster={poster} />
+              {visibleItems.map(({ type, src, index, poster, filename }) => (
+                <LazyMedia
+                  key={`${type}-${index}-${filename}`}
+                  type={type}
+                  src={src}
+                  index={index}
+                  poster={poster}
+                  alt={`Gallery ${type} ${index + 1}`}
+                  className="aspect-video rounded-2xl shadow-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-shadow duration-300"
+                  priority={index < 3} // Prioritize first 3 items
+                />
               ))}
             </div>
           )}

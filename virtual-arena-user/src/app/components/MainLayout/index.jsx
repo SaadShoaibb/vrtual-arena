@@ -3,13 +3,16 @@ import Connected from '@/app/components/Connected';
 import Footer from '@/app/components/Footer';
 import Navbar from '@/app/components/Navbar';
 import React from 'react';
+import { useSearchParams } from 'next/navigation';
 
 const MainLayout = ({children,btnTitle,title}) => {
+  const searchParams = useSearchParams();
+  const locale = searchParams.get('locale') || 'en';
   return (
     <>
       <div className="relative">
         {/* Navbar */}
-        <Navbar />
+        <Navbar locale={locale} />
 
         {/* Hero Section */}
         <div className="h-[400px] overflow-x-hidden relative -mt-[90px] md:-mt-[110px]">
@@ -47,10 +50,10 @@ const MainLayout = ({children,btnTitle,title}) => {
         {children}
 
         {/* Connected Section */}
-        <Connected />
+        <Connected locale={locale} />
 
         {/* Footer */}
-        <Footer />
+        <Footer locale={locale} />
       </div>
     </>
   );

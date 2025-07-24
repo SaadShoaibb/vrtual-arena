@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
+import VirtualTour from '@/app/components/VirtualTour';
 import { motion } from 'framer-motion';
 import { FaPlus, FaMinus, FaShieldAlt, FaCertificate, FaUsers, FaBuilding } from 'react-icons/fa';
 import { useSearchParams } from 'next/navigation';
@@ -191,26 +192,14 @@ export default function AboutPage() {
                 </div>
               ))}
             </div>
-            
-            <div className="mt-16 bg-gray-900 rounded-xl overflow-hidden">
-              <div className="p-8">
-                <h3 className="text-2xl font-bold mb-4 text-white">{t.virtualTour}</h3>
-                <p className="text-gray-300 mb-6">
-                  {t.virtualTourDesc}
-                </p>
-                <div className="aspect-video rounded-lg overflow-hidden bg-gray-800 flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <p className="text-xl font-bold text-white mb-4">{t.comingSoon}</p>
-                    <p className="text-gray-300">
-                      {t.tourUpdateMessage}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+
+
           </div>
         </section>
-        
+
+        {/* Virtual Tour Section */}
+        <VirtualTour locale={locale} />
+
         {/* Meet Our Team */}
         <section className="py-16 bg-gray-900">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

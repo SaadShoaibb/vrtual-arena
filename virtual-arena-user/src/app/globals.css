@@ -71,6 +71,60 @@ html, body {
   html[lang="fr"] #plans .text-wrap-balance {
     font-size: 0.9em;
   }
+
+  /* Gallery, Events, and Testimonials sections for French */
+  html[lang="fr"] #gallery .text-wrap-balance,
+  html[lang="fr"] #events .text-wrap-balance,
+  html[lang="fr"] #testimonials .text-wrap-balance {
+    font-size: 0.9em;
+    line-height: 1.4;
+  }
+
+  /* Ensure buttons don't overflow on mobile */
+  .btn-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* French button text adjustments */
+  html[lang="fr"] .btn-text {
+    font-size: 0.75rem;
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+/* Additional mobile responsiveness for very small screens */
+@media (max-width: 480px) {
+  /* Ensure headings don't overflow */
+  h1, h2, h3 {
+    word-break: break-word;
+    hyphens: auto;
+  }
+
+  /* French text specific adjustments for very small screens */
+  html[lang="fr"] h1 {
+    font-size: 0.9em;
+    line-height: 1.2;
+  }
+
+  html[lang="fr"] h2 {
+    font-size: 0.95em;
+    line-height: 1.3;
+  }
+
+  /* Ensure contact information doesn't overflow */
+  .contact-info {
+    word-break: break-all;
+    overflow-wrap: break-word;
+  }
+
+  /* Navigation adjustments for French */
+  html[lang="fr"] .navbar-button {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
 }
 
 .text-gradiant {

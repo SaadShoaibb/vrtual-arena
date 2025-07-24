@@ -1,13 +1,17 @@
 
-import { API_URL, getAuthHeaders, getMediaBaseUrl } from '@/utils/ApiUrl';
+import { API_URL, getAuthHeaders } from '@/utils/ApiUrl';
+import { getCartItemImageUrl } from '@/app/utils/imageUtils';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { FaMinus, FaPlus } from 'react-icons/fa';
 import { IoMdCloseCircle } from 'react-icons/io';
 import { IoClose } from 'react-icons/io5';
+import { translations } from '@/app/translations';
+import { formatDisplayPrice } from '@/app/utils/currency';
 
-const Cart = ({ cart }) => {
+const Cart = ({ cart, locale = 'en' }) => {
+  const t = translations[locale] || translations.en;
   const [cartItems, setCartItems] = useState(cart || []);
   const router = useRouter();
 
@@ -22,25 +26,7 @@ const Cart = ({ cart }) => {
   const getPrice = (val) => Number(val) || 0;
   const subtotal = cartItems.reduce((total, item) => total + getPrice(item.discount_price) * (Number(item.quantity) || 0), 0);
 
-  // Helper: return correct image URL or null
-  const getImageSrc = (cartItem) => {
-    if (cartItem.item_type === 'tournament') return '/assets/tournament.png';
 
-    if (cartItem.images) {
-      // images can be an array or comma-separated string
-      if (Array.isArray(cartItem.images) && cartItem.images.length) {
-        let img = cartItem.images[0];
-        if (img.startsWith('/')) img = `${getMediaBaseUrl()}${img}`;
-        return img;
-      }
-      if (typeof cartItem.images === 'string' && cartItem.images.length) {
-        let img = cartItem.images.split(',')[0];
-        if (img.startsWith('/')) img = `${getMediaBaseUrl()}${img}`;
-        return img;
-      }
-    }
-    return null; // no image available
-  };
 
   const incrementQuantity = async (cart_id) => {
     try {
@@ -90,10 +76,10 @@ const Cart = ({ cart }) => {
               <table className=' min-w-full '>
                 <thead>
                   <tr className='border-y'>
-                    <th className='p-2'>Product</th>
-                    <th className='p-2'>Price</th>
-                    <th className='p-2'>quantity</th>
-                    <th className='p-2'>Total</th>
+                    <th className='p-2'>{t.product}</th>
+                    <th className='p-2'>{t.price}</th>
+                    <th className='p-2'>{t.quantity}</th>
+                    <th className='p-2'>{t.total}</th>
 
                   </tr>
                 </thead>
@@ -104,21 +90,65 @@ const Cart = ({ cart }) => {
                         <button onClick={() => removeItem(item.cart_id)} >
                           <IoClose size={24} />
                         </button>
-                        {getImageSrc(item) && (
-                            <img src={getImageSrc(item)} className="h-20 w-20 object-cover" alt={item.name} />
-                          )}
+                        <img src={getCartItemImageUrl(item)} className="h-20 w-20 object-cover" alt={item.name} />
                         <div>
                           <h2 className="text-lg font-semibold">{item.name}</h2>
-                          {item.item_type === 'tournament' && 
-                            <span className="ml-2 text-xs bg-purple-700 text-white px-2 py-1 rounded">Tournament</span>
-                          }
+                          {item.item_type === 'tournament' && (
+                            <>
+                              <span className="ml-2 text-xs bg-purple-700 text-white px-2 py-1 rounded">Tournament</span>
+                              {(item.rules || item.requirements) && (
+                                <div className="mt-2 text-sm text-gray-300">
+                                  {item.rules && (
+                                    <div className="mb-2">
+                                      <strong>Rules:</strong>
+                                      <ul className="list-disc list-inside ml-2 text-xs">
+                                        {(typeof item.rules === 'string' ?
+                                          item.rules.split('\n').filter(rule => rule.trim()) :
+                                          Array.isArray(item.rules) ? item.rules :
+                                          [
+                                            'All participants must be 13 years or older',
+                                            'Valid government-issued ID required for registration',
+                                            'Players must use provided VR equipment only',
+                                            'Unsportsmanlike conduct will result in disqualification',
+                                            'Tournament organizers\' decisions are final'
+                                          ]
+                                        ).map((rule, index) => (
+                                          <li key={index}>{rule.trim()}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                  {item.requirements && (
+                                    <div>
+                                      <strong>Requirements:</strong>
+                                      <ul className="list-disc list-inside ml-2 text-xs">
+                                        {(typeof item.requirements === 'string' ?
+                                          item.requirements.split('\n').filter(req => req.trim()) :
+                                          Array.isArray(item.requirements) ? item.requirements :
+                                          [
+                                            'Signed waiver form mandatory',
+                                            'Comfortable clothing recommended',
+                                            'No loose jewelry or accessories',
+                                            'Arrive 30 minutes before scheduled match time',
+                                            'Motion sickness tolerance recommended'
+                                          ]
+                                        ).map((req, index) => (
+                                          <li key={index}>{req.trim()}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </>
+                          )}
                         </div>
                       </td>
-                      <td className='p-2 text-center'>${item.discount_price}</td>
+                      <td className='p-2 text-center'>{formatDisplayPrice(item.discount_price, locale)}</td>
                       <td className='p-2 flex justify-center'>
                         <div className='flex items-center mt-2 border w-fit'>
-                          {/* For tournament tickets, we typically don't allow quantity changes */}
-                          {item.item_type === 'tournament' ? (
+                          {/* For tournament and event tickets, we typically don't allow quantity changes */}
+                          {(item.item_type === 'tournament' || item.item_type === 'event') ? (
                             <span className="px-4">{item.quantity}</span>
                           ) : (
                             <>
@@ -130,7 +160,7 @@ const Cart = ({ cart }) => {
                         </div>
                       </td>
                       <td className='p-2 text-center'>
-                        ${(Number(item.discount_price) || 0) * item.quantity}
+                        {formatDisplayPrice((Number(item.discount_price) || 0) * item.quantity, locale)}
                       </td>
                     </tr>
                   ))}
@@ -145,23 +175,70 @@ const Cart = ({ cart }) => {
                   <button onClick={() => removeItem(item.cart_id)} >
                     <IoClose size={24} />
                   </button>
-                  {getImageSrc(item) && (
-                            <img src={getImageSrc(item)} className="h-20 w-20 object-cover" alt={item.name} />
-                          )}
+                  <img src={getCartItemImageUrl(item)} className="h-20 w-20 object-cover" alt={item.name} />
                   <div>
                     <h2 className="text-lg font-semibold text-nowrap">{item.name}</h2>
-                    {item.item_type === 'tournament' && 
-                      <span className="ml-2 text-xs bg-purple-700 text-white px-2 py-1 rounded">Tournament</span>
+                    {item.item_type === 'tournament' && (
+                      <>
+                        <span className="ml-2 text-xs bg-purple-700 text-white px-2 py-1 rounded">Tournament</span>
+                        {(item.rules || item.requirements) && (
+                          <div className="mt-2 text-sm text-gray-300">
+                            {item.rules && (
+                              <div className="mb-2">
+                                <strong>Rules:</strong>
+                                <ul className="list-disc list-inside ml-2 text-xs">
+                                  {(typeof item.rules === 'string' ?
+                                    item.rules.split('\n').filter(rule => rule.trim()) :
+                                    Array.isArray(item.rules) ? item.rules :
+                                    [
+                                      'All participants must be 13 years or older',
+                                      'Valid government-issued ID required for registration',
+                                      'Players must use provided VR equipment only',
+                                      'Unsportsmanlike conduct will result in disqualification',
+                                      'Tournament organizers\' decisions are final'
+                                    ]
+                                  ).map((rule, index) => (
+                                    <li key={index}>{rule.trim()}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                            {item.requirements && (
+                              <div>
+                                <strong>Requirements:</strong>
+                                <ul className="list-disc list-inside ml-2 text-xs">
+                                  {(typeof item.requirements === 'string' ?
+                                    item.requirements.split('\n').filter(req => req.trim()) :
+                                    Array.isArray(item.requirements) ? item.requirements :
+                                    [
+                                      'Signed waiver form mandatory',
+                                      'Comfortable clothing recommended',
+                                      'No loose jewelry or accessories',
+                                      'Arrive 30 minutes before scheduled match time',
+                                      'Motion sickness tolerance recommended'
+                                    ]
+                                  ).map((req, index) => (
+                                    <li key={index}>{req.trim()}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </>
+                    )}
+                    {item.item_type === 'event' &&
+                      <span className="ml-2 text-xs bg-blue-700 text-white px-2 py-1 rounded">Event</span>
                     }
                   </div>
                 </div>
                 <div className='flex flex-row sm:flex-row items-center'>
 
-                  <div className='p-2 text-center'>${item.discount_price}</div>
+                  <div className='p-2 text-center'>{formatDisplayPrice(item.discount_price, locale)}</div>
                   <div className='p-2 flex justify-center'>
                     <div className='flex items-center mt-2 border w-fit h-fit'>
-                      {/* For tournament tickets, we typically don't allow quantity changes */}
-                      {item.item_type === 'tournament' ? (
+                      {/* For tournament and event tickets, we typically don't allow quantity changes */}
+                      {(item.item_type === 'tournament' || item.item_type === 'event') ? (
                         <span className="px-4">{item.quantity}</span>
                       ) : (
                         <>
@@ -173,7 +250,7 @@ const Cart = ({ cart }) => {
                     </div>
                   </div>
                   <div className='p-2 text-center'>
-                    ${(Number(item.discount_price) || 0) * item.quantity}
+                    {formatDisplayPrice((Number(item.discount_price) || 0) * item.quantity, locale)}
                   </div>
                 </div>
               </div>
@@ -181,28 +258,28 @@ const Cart = ({ cart }) => {
 
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mt-10'>
               <div className='p-4 bg-gray-900'>
-                <h1 class="text-2xl font-bold mb-4 uppercase my-4 text-center">Special instruction for seller</h1>
-                <textarea class="w-full h-40 p-2 border border-gray-300 rounded bg-transparent" placeholder="Write you message here.."></textarea>
+                <h1 className="text-2xl font-bold mb-4 uppercase my-4 text-center text-wrap-balance">{t.specialInstructionForSeller}</h1>
+                <textarea className="w-full h-40 p-2 border border-gray-300 rounded bg-transparent" placeholder={t.writeYourMessageHere}></textarea>
               </div>
               <div className='p-4 bg-gray-900'>
-                <h1 class="text-2xl font-bold mb-4 uppercase my-4 text-center">Carts Total</h1>
-                <div class="flex justify-between px-2 border-b-2 pb-2"><h1 class="font-bold ">Subtotal</h1><h1>${subtotal.toFixed(2)}</h1></div>
+                <h1 className="text-2xl font-bold mb-4 uppercase my-4 text-center text-wrap-balance">{t.cartsTotal}</h1>
+                <div className="flex justify-between px-2 border-b-2 pb-2"><h1 className="font-bold">{t.subtotal}</h1><h1>{formatDisplayPrice(subtotal, locale)}</h1></div>
                 {hasPhysicalProducts && (
-                  <div class="flex justify-between px-2 mt-4 border-b-2 pb-2">
-                    <h1 class="font-bold ">Shipping</h1>
-                    <h1>Shipping &amp; taxes calculated at checkout</h1>
+                  <div className="flex justify-between px-2 mt-4 border-b-2 pb-2">
+                    <h1 className="font-bold">{t.shipping}</h1>
+                    <h1 className="text-wrap-balance">{t.shippingTaxesCalculated}</h1>
                   </div>
                 )}
 
 
-                <button onClick={() => router.push('/checkout')} class="bg-grad w-full py-2 text-white  mt-4 font-bold transition-colors duration-500">PROOCEED TO CHECKOUT</button>
+                <button onClick={() => router.push(`/checkout?locale=${locale}`)} className="bg-grad w-full py-2 text-white mt-4 font-bold transition-colors duration-500">{t.proceedToCheckout}</button>
               </div>
 
             </div>
 
           </div>
         ) : (
-          <p className="text-center text-gray-500">Your cart is empty.</p>
+          <p className="text-center text-gray-500 text-wrap-balance">{t.yourCartIsEmpty}</p>
         )}
 
       </div>

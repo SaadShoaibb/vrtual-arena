@@ -2,14 +2,30 @@
 import React from 'react';
 import { IoMdPeople, IoMdTime } from 'react-icons/io';
 import { MdOutlineEventSeat } from 'react-icons/md';
+import { useSearchParams } from 'next/navigation';
+import { useDispatch } from 'react-redux';
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
+import BookModal from '@/app/components/BookModal';
+import { openBookModal } from '@/Store/ReduxSlice/bookModalSlice';
+import { translations } from '@/app/translations';
 
 const VRCatPage = () => {
+  const searchParams = useSearchParams();
+  const locale = searchParams.get('locale') || 'en';
+  const t = translations[locale] || translations.en;
+  const dispatch = useDispatch();
+
+  const handleBookNow = () => {
+    dispatch(openBookModal({
+      experienceType: 'VR Cat',
+      sessionName: 'VR Cat Kids Experience'
+    }));
+  };
   return (
     <>
     <div className="bg-black text-white">
-      <Navbar />
+      <Navbar locale={locale} />
       
       {/* Hero Section */}
       <div className="relative h-[60vh] overflow-hidden">
@@ -21,9 +37,9 @@ const VRCatPage = () => {
         />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
           <div className="max-w-[1600px] mx-auto">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white">VR CAT (Kids)</h1>
-            <p className="text-xl md:text-2xl text-gray-200 max-w-3xl">
-              Creative, artistic, and educational VR experiences designed especially for children.
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white text-wrap-balance">{t.vrCatTitle}</h1>
+            <p className="text-xl md:text-2xl text-gray-200 max-w-3xl text-wrap-balance">
+              {t.vrCatDescription}
             </p>
           </div>
         </div>
@@ -34,32 +50,24 @@ const VRCatPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Left Column - Description and Features */}
           <div className="lg:col-span-2">
-            <h2 className="text-3xl font-bold mb-6 text-white">Experience Overview</h2>
+            <h2 className="text-3xl font-bold mb-6 text-white">{t.experienceOverview}</h2>
             <p className="text-lg text-gray-200 mb-8">
-              VR CAT (Creative, Artistic, and Teaching) is our educational VR experience designed specifically 
-              for children. With content that focuses on creativity, learning, and exploration, VR CAT provides 
-              an enriching experience that's both fun and educational. Two machines allow kids to explore 
-              together in virtual worlds that spark imagination and teach valuable skills.
+              {t.vrCatOverviewText}
             </p>
 
             <div className="mb-12">
-              <h3 className="text-2xl font-bold mb-4 text-white">Experience Highlights</h3>
+              <h3 className="text-2xl font-bold mb-4 text-white">{t.experienceHighlights}</h3>
               <ul className="list-disc list-inside space-y-3 text-gray-200">
-                <li>Two kid-friendly VR stations with simplified equipment</li>
-                <li>Educational content spanning art, science, history, and more</li>
-                <li>Interactive drawing and creation tools in VR</li>
-                <li>Virtual field trips to museums, historical sites, and natural wonders</li>
-                <li>Guided experiences with voiceover narration</li>
-                <li>Perfect for ages 5-12</li>
+                {t.vrCatHighlights.map((highlight, index) => (
+                  <li key={index}>{highlight}</li>
+                ))}
               </ul>
             </div>
 
             <div>
-              <h3 className="text-2xl font-bold mb-4 text-white">The Experience</h3>
+              <h3 className="text-2xl font-bold mb-4 text-white">{t.theExperience}</h3>
               <p className="text-lg text-gray-200 mb-4">
-                When your child arrives for their VR CAT session, our friendly staff will introduce them to the 
-                equipment and how it works. The controllers are specially designed for smaller hands, and the 
-                headsets are adjusted for comfort and proper fit for children.
+                {t.vrCatExperienceText}
               </p>
               <p className="text-lg text-gray-200 mb-8">
                 Children can choose from a variety of educational experiences - from painting in 3D space and 
@@ -119,12 +127,15 @@ const VRCatPage = () => {
                 </p>
               </div>
               
-              <button className="w-full bg-gradient-to-r from-[#DB1FEB] to-[#24CBFF] hover:opacity-90 transition-opacity text-white text-lg font-bold py-3 px-6 rounded-full mb-4">
-                Book Now
+              <button
+                onClick={handleBookNow}
+                className="w-full bg-gradient-to-r from-[#DB1FEB] to-[#24CBFF] hover:opacity-90 transition-opacity text-white text-lg font-bold py-3 px-6 rounded-full mb-4"
+              >
+                {t.bookNow}
               </button>
-              
+
               <button className="w-full border border-white text-white hover:bg-white hover:text-black transition-colors font-bold py-3 px-6 rounded-full">
-                View Available Packages
+                {t.viewAvailablePackages}
               </button>
             </div>
           </div>
@@ -196,7 +207,10 @@ const VRCatPage = () => {
         </div>
       </div>
 
-      <Footer />
+      <Footer locale={locale} />
+
+      {/* Booking Modal */}
+      <BookModal locale={locale} />
     </div>
     </>
   );

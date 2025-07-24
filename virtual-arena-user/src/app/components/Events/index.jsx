@@ -13,9 +13,11 @@ import toast from 'react-hot-toast';
 import PaymentModal from '../PaymentForm';
 import { useRouter } from 'next/navigation';
 import { fetchUserData } from '@/Store/Actions/userActions';
+import { translations } from '@/app/translations';
 import { addToCart, fetchCart } from '@/Store/ReduxSlice/addToCartSlice';
 
-const Calender = () => {
+const Calender = ({ locale = 'en' }) => {
+    const t = translations[locale] || translations.en;
     const [tournament, setTournament] = useState({})
     const [tournamentModel, setTournamentModel] = useState(false)
     const [paymentModel, setPaymentModel] = useState(false)
@@ -138,14 +140,14 @@ const Calender = () => {
                 <div className='w-full mx-auto max-w-[1600px] border-y pt-[100px] pb-[51px] flex-col flex px-4 md:px-10 lg:px-16 xl:px-20 2xl:px-6'>
                     <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 xl:gap-4'>
                         <div>
-                            <h1 className='text-gradiant text-[26px] font-semibold'>Calender</h1>
-                            <h1 className='text-white text-[40px] md:text-[50px] font-bold leading-none'>Our events</h1>
+                            <h1 className='text-gradiant text-[26px] font-semibold text-wrap-balance'>{t.calendar}</h1>
+                            <h1 className='text-white text-[40px] md:text-[50px] font-bold leading-none text-wrap-balance'>{t.ourEvents}</h1>
                         </div>
                         <div>
-                            <p className='text-xl text-white font-light'>
-                                Discover the latest esports tournaments and virtual competitions happening on Virtual Arena. Whether you're a casual gamer or a competitive pro, our events are designed to challenge, entertain, and connect you with the gaming community across the globe.
+                            <p className='text-xl text-white font-light text-wrap-balance'>
+                                {t.eventsDescription}
                             </p>
-                            <BookNowButton margin='mt-[36px]' />
+                            <BookNowButton margin='mt-[36px]' locale={locale} />
                         </div>
                     </div>
                 </div>

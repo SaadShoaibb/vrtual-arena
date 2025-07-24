@@ -5,8 +5,11 @@ import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
+import { translations } from '@/app/translations';
+import { getProductImageUrl } from '@/app/utils/imageUtils';
 
-const Wishlish = ({ wishlist }) => {
+const Wishlish = ({ wishlist, locale = 'en' }) => {
+    const t = translations[locale] || translations.en;
     const dispatch = useDispatch()
     const { isOpen } = useSelector((state) => state.cartSidebar); // Get the sidebar state
     const { isAuthenticated } = useSelector((state) => state.userData)
@@ -49,6 +52,8 @@ const Wishlish = ({ wishlist }) => {
             dispatch(fetchWishlist());
         }, 500);
     };
+
+
    
     return (
         <div id='deals' className={`w-full  h-full  bg-blackish `}>
@@ -56,17 +61,33 @@ const Wishlish = ({ wishlist }) => {
                {wishlist?.length >0 ?
               
                 <div className='grid grid-cols-1 md:grdc2 lg:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-10'>
-                    {wishlist?.map((data, i) => (
+                    {wishlist?.map((data) => (
 
 
                         <div key={data.product_id} className='rounded-xl overflow-hidden'>
-                            <Link href={`/deals/${data.product_id}`}><img src={'/assets/d1.png'} alt="" className='h-[300px] w-full' /></Link>
-                            <div className='bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] p-2.5 flex gap-2.5 items-center'>
-                                <div className='bg-white h-11 w-[72px] rounded-md flex justify-center items-center'>
-                                    <h1 className='text-black text-xl font-bold'>-{Math.round(data?.discount)}%</h1>
-
+                            <Link href={`/shop/${data.product_id}`}>
+                                <img
+                                    src={getProductImageUrl(data)}
+                                    alt={data?.name || "Product"}
+                                    className='h-[300px] w-full object-cover'
+                                />
+                                <div className="bg-blackish p-2 text-center">
+                                    <h3 className="text-white text-lg font-medium truncate">{data?.name || "Product"}</h3>
                                 </div>
-                                <h1 className='text-xl text-white line-through'>${data?.original_price} </h1><span className='text-xl text-white font-bold '>${data?.discount_price}</span>
+                            </Link>
+                            <div className='bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] p-2.5'>
+                                <div className="flex items-center gap-2.5 mb-2">
+                                    <div className='bg-white h-11 w-[72px] rounded-md flex justify-center items-center flex-shrink-0'>
+                                        <h1 className='text-black text-xl font-bold'>-{Math.round(data?.discount || 0)}%</h1>
+                                    </div>
+                                    <div className="flex flex-col min-w-0 flex-1">
+                                        <span className='text-sm text-white line-through opacity-80 leading-tight'>${data?.original_price}</span>
+                                        <span className='text-lg text-white font-bold leading-tight'>${data?.discount_price}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                        <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">In Stock</span>
+                                    </div>
+                                </div>
                             </div>
                             <div className=' flex items-center justify-between  bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7]'>
                                 <button
@@ -74,7 +95,7 @@ const Wishlish = ({ wishlist }) => {
                                     className="flex items-center justify-center gap-2 bg-white w-[78%] py-4"
                                 >
                                     <img src="/icons/cart.png" alt="" />
-                                    <h1 className="text-lg font-semibold">Add To Cart</h1>
+                                    <h1 className="text-lg font-semibold">{t.addToCart}</h1>
                                 </button>
                                 {/* Wishlist Button */}
                                 <div
@@ -93,7 +114,7 @@ const Wishlish = ({ wishlist }) => {
 
                 </div>
 :
-<p className='text-gray-300 text-xl text-center '>No wishlist available</p>
+<p className='text-gray-300 text-xl text-center text-wrap-balance'>{t.noWishlistAvailable}</p>
 }
 
             </div>

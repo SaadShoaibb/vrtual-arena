@@ -6,6 +6,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { openModal } from '@/Store/ReduxSlice/ModalSlice';
 import { fetchUserData } from '@/Store/Actions/userActions';
 import PaymentModal from '@/app/components/PaymentForm';
+import { formatDisplayPrice } from '@/app/utils/currency';
+import EnhancedBookingForm from '@/app/components/EnhancedBookingForm';
+import AuthModel from '@/app/components/AuthModal';
 
 const PricingCalculator = ({ locale = 'en' }) => {
   const dispatch = useDispatch();
@@ -48,6 +51,7 @@ const PricingCalculator = ({ locale = 'en' }) => {
   const [finalPrice, setFinalPrice] = useState(0);
   const [appliedDiscount, setAppliedDiscount] = useState(null);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
   
   // Handle experience selection
   const handleExperienceSelect = (experienceId) => {
@@ -145,6 +149,13 @@ const PricingCalculator = ({ locale = 'en' }) => {
   
   // Handle booking
   const handleBookNow = () => {
+    // For individual experiences, open the enhanced booking form
+    if (selectedExperiences.length > 0) {
+      setIsBookingOpen(true);
+      return;
+    }
+
+    // For passes, use the existing payment modal
     if (!isAuthenticated) {
       dispatch(openModal('LOGIN'));
       return;
@@ -269,7 +280,7 @@ const PricingCalculator = ({ locale = 'en' }) => {
                 <div className="flex flex-col">
                   <h4 className="text-white font-medium">{pass.name}</h4>
                   <p className="text-gray-300 text-sm">{pass.description}</p>
-                  <p className="text-white font-bold mt-2">${pass.price}</p>
+                  <p className="text-white font-bold mt-2">{formatDisplayPrice(pass.price, locale)}</p>
                 </div>
               </div>
             ))}
@@ -316,19 +327,19 @@ const PricingCalculator = ({ locale = 'en' }) => {
         
         <div className="flex justify-between mb-2">
           <span className="text-gray-300">{t.subtotal}:</span>
-          <span className="text-white">${totalPrice.toFixed(2)}</span>
+          <span className="text-white">{formatDisplayPrice(totalPrice, locale)}</span>
         </div>
-        
+
         {discount > 0 && (
           <div className="flex justify-between mb-2">
             <span className="text-gray-300">{t.groupDiscount} ({appliedDiscount.discount}%):</span>
-            <span className="text-green-400">-${discount.toFixed(2)}</span>
+            <span className="text-green-400">-{formatDisplayPrice(discount, locale)}</span>
           </div>
         )}
-        
+
         <div className="flex justify-between pt-4 border-t border-gray-700 mt-4">
           <span className="text-white font-bold">{t.totalTaxIncluded}:</span>
-          <span className="text-white font-bold text-xl">${finalPrice.toFixed(2)}</span>
+          <span className="text-white font-bold text-xl">{formatDisplayPrice(finalPrice, locale)}</span>
         </div>
         
         <div className="mt-2 text-center">
@@ -347,7 +358,7 @@ const PricingCalculator = ({ locale = 'en' }) => {
               : 'bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] hover:opacity-90'
           }`}
         >
-          {t.bookNow}
+          {selectedExperiences.length > 0 ? 'Book VR Sessions' : t.bookNow}
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
           </svg>
@@ -365,6 +376,12 @@ const PricingCalculator = ({ locale = 'en' }) => {
           onRedeemSuccess={() => { dispatch(fetchUserData()); setIsPaymentOpen(false); router.push('/bookings'); }}
           type="booking"
         />
+      )}
+
+      {isBookingOpen && (
+        <AuthModel onClose={() => setIsBookingOpen(false)}>
+          <EnhancedBookingForm onClose={() => setIsBookingOpen(false)} />
+        </AuthModel>
       )}
     </div>
   );

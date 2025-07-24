@@ -21,14 +21,29 @@ export const markNotificationAsRead = createAsyncThunk(
     'notifications/markNotificationAsRead',
     async (notificationId, { rejectWithValue }) => {
         try {
+            console.log('Marking notification as read:', notificationId);
+
+            // Get auth headers safely
+            let authHeaders;
+            try {
+                authHeaders = getAuthHeaders();
+                console.log('Auth headers obtained successfully');
+            } catch (authError) {
+                console.error('Error getting auth headers:', authError);
+                return rejectWithValue('Authentication required');
+            }
+
             const response = await axios.put(
                 `${API_URL}/admin/notification/${notificationId}/read`,
                 {},
-                getAuthHeaders()
+                authHeaders
             );
+
+            console.log('Notification marked as read successfully:', response.data);
             return response.data;
         } catch (error) {
             console.error('Error marking notification as read:', error);
+            console.error('Error details:', error.response?.data);
             return rejectWithValue(error.response?.data || 'Failed to mark notification as read');
         }
     }
@@ -39,14 +54,29 @@ export const markAllNotificationsAsRead = createAsyncThunk(
     'notifications/markAllNotificationsAsRead',
     async (_, { rejectWithValue }) => {
         try {
+            console.log('Marking all notifications as read');
+
+            // Get auth headers safely
+            let authHeaders;
+            try {
+                authHeaders = getAuthHeaders();
+                console.log('Auth headers obtained successfully');
+            } catch (authError) {
+                console.error('Error getting auth headers:', authError);
+                return rejectWithValue('Authentication required');
+            }
+
             const response = await axios.put(
-                `${API_URL}/admin/notifications/read-all`,
+                `${API_URL}/admin/notifications/mark-all-read`,
                 {},
-                getAuthHeaders()
+                authHeaders
             );
+
+            console.log('All notifications marked as read successfully:', response.data);
             return response.data;
         } catch (error) {
             console.error('Error marking all notifications as read:', error);
+            console.error('Error details:', error.response?.data);
             return rejectWithValue(error.response?.data || 'Failed to mark all notifications as read');
         }
     }

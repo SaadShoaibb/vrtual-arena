@@ -6,8 +6,11 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { translations } from '@/app/translations';
+import { formatDisplayPrice } from '@/app/utils/currency';
 
-const Checkout = ({ cart }) => {
+const Checkout = ({ cart, locale = 'en' }) => {
+    const t = translations[locale] || translations.en;
     const [cartItems, setCartItems] = useState(cart || []);
     const [shippingInfo, setShippingInfo] = useState({
         name: '',
@@ -29,14 +32,24 @@ const Checkout = ({ cart }) => {
     const [userAddress, setUserAddress] = useState(null); // Existing user address
     const router = useRouter();
     const [paymentModel, setPaymentModel] = useState(false)
+    const [orderId, setOrderId] = useState(null)
     useEffect(() => {
         setCartItems(cart);
         fetchUserAddress();
-        
-        // Set shipping price to 0 if cart only has tournament items
-        const onlyTournaments = cart.length > 0 && cart.every(item => item.item_type === 'tournament');
-        if (onlyTournaments) {
+
+        // Check if cart has tournaments or events
+        const hasDigitalItems = cart.length > 0 && cart.some(item =>
+            item.item_type === 'tournament' || item.item_type === 'event'
+        );
+
+        // Set shipping price to 0 if cart has tournament or event items
+        const onlyDigitalItems = cart.length > 0 && cart.every(item =>
+            item.item_type === 'tournament' || item.item_type === 'event'
+        );
+
+        if (onlyDigitalItems) {
             setShippingPrice(0);
+            setPaymentMethod('online'); // Force online payment for digital items
         } else {
             setShippingPrice(shippingInfo.shippingMethod === 'express' ? 10.0 : 5.0);
         }
@@ -108,13 +121,13 @@ const Checkout = ({ cart }) => {
         
         // If there are missing fields, show an alert and return
         if (missingFields.length > 0) {
-            alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
+            alert(`${t.pleaseFillRequiredFields} ${missingFields.join(', ')}`);
             return;
         }
-        
+
         // If cart is empty, show an alert and return
         if (cartItems.length === 0) {
-            alert('Your cart is empty. Please add items to your cart before placing an order.');
+            alert(t.cartIsEmpty);
             return;
         }
 
@@ -146,6 +159,13 @@ const Checkout = ({ cart }) => {
                                 price: item.discount_price,
                                 item_type: 'tournament'
                             };
+                        } else if (item.item_type === 'event') {
+                            return {
+                                event_id: item.event_id,
+                                quantity: item.quantity,
+                                price: item.discount_price,
+                                item_type: 'event'
+                            };
                         } else {
                             return {
                                 product_id: item.product_id,
@@ -173,7 +193,7 @@ const Checkout = ({ cart }) => {
                 );
 
                 if (response.data.success) {
-                    alert('Order placed successfully!');
+                    alert(t.orderPlacedSuccessfully);
                     // Delete each cart item in the order
                     for (const item of cartItems) {
                         await axios.delete(
@@ -182,127 +202,112 @@ const Checkout = ({ cart }) => {
                         );
                         console.log(`Cart item ${item.cart_id} deleted successfully.`);
                     }
-                    router.push('/orders');
+                    router.push(`/orders?locale=${locale}`);
                 } else {
-                    alert('Failed to place order. Please try again.');
+                    alert(t.failedToPlaceOrder);
                 }
             } catch (err) {
                 console.error('Error placing order:', err);
-                alert('Failed to place order. Please try again.');
+                alert(t.failedToPlaceOrder);
             }
-        }else{
-            setPaymentModel(true)
+        } else {
+            // For online payment, create order first then redirect to payment
+            try {
+                // Create order with pending status
+                const payload = {
+                    total_amount: total,
+                    status: 'pending',
+                    payment_status: 'pending',
+                    shipping_cost: shippingPrice,
+                    payment_method: 'online',
+                    items: cartItems.map((item) => {
+                        if (item.item_type === 'tournament') {
+                            return {
+                                tournament_id: item.tournament_id,
+                                quantity: item.quantity,
+                                price: item.discount_price,
+                                item_type: 'tournament'
+                            };
+                        } else if (item.item_type === 'event') {
+                            return {
+                                event_id: item.event_id,
+                                quantity: item.quantity,
+                                price: item.discount_price,
+                                item_type: 'event'
+                            };
+                        } else {
+                            return {
+                                product_id: item.product_id,
+                                quantity: item.quantity,
+                                price: item.discount_price,
+                                item_type: 'product'
+                            };
+                        }
+                    }),
+                    shipping_address: {
+                        full_name: shippingInfo.name,
+                        address: shippingInfo.address,
+                        city: shippingInfo.city,
+                        state: shippingInfo.state,
+                        zip_code: shippingInfo.zip,
+                        country: shippingInfo.country,
+                    },
+                };
+
+                const response = await axios.post(
+                    `${API_URL}/user/create-order`,
+                    payload,
+                    getAuthHeaders()
+                );
+
+                if (response.data.success) {
+                    // Store order ID for payment
+                    setOrderId(response.data.order_id);
+                    setPaymentModel(true);
+                } else {
+                    alert(t.failedToPlaceOrder);
+                }
+            } catch (err) {
+                console.error('Error creating order:', err);
+                alert(t.failedToPlaceOrder);
+            }
         }
     };
 
     const handlePaymentSuccess = async () => {
-        // Validate required fields
-        const requiredFields = ['name', 'address', 'city', 'state', 'zip', 'country'];
-        const missingFields = [];
-        
-        // Check if all required fields are filled
-        requiredFields.forEach(field => {
-            if (!shippingInfo[field] || shippingInfo[field].trim() === '') {
-                missingFields.push(field);
-            }
-        });
-        
-        // If there are missing fields, show an alert and return
-        if (missingFields.length > 0) {
-            alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
-            setPaymentModel(false);
-            return;
-        }
-        
-        // If cart is empty, show an alert and return
-        if (cartItems.length === 0) {
-            alert('Your cart is empty. Please add items to your cart before placing an order.');
-            setPaymentModel(false);
-            return;
-        }
-        
         try {
-            // Prepare the request payload for the merged controller
-            const payload = {
-                total_amount: total,
-                status: 'pending',
-                payment_status:"completed",
-                shipping_cost: shippingPrice,
-                payment_method: paymentMethod,
-                items: cartItems.map((item) => {
-                    if (item.item_type === 'tournament') {
-                        return {
-                            tournament_id: item.tournament_id,
-                            quantity: item.quantity,
-                            price: item.discount_price,
-                            item_type: 'tournament'
-                        };
-                    } else {
-                        return {
-                            product_id: item.product_id,
-                            quantity: item.quantity,
-                            price: item.discount_price,
-                            item_type: 'product'
-                        };
-                    }
-                }),
-                shipping_address: {
-                    full_name: shippingInfo.name,
-                    address: shippingInfo.address,
-                    city: shippingInfo.city,
-                    state: shippingInfo.state,
-                    zip_code: shippingInfo.zip,
-                    country: shippingInfo.country,
-                },
-            };
-
-            // Call the merged controller endpoint
-            const response = await axios.post(
-                `${API_URL}/user/create-order`,
-                payload,
-                getAuthHeaders()
-            );
-
-            if (response.data.success) {
-                alert('Order placed successfully!');
-                // Delete each cart item in the order
-                for (const item of cartItems) {
-                    await axios.delete(
-                        `${API_URL}/user/cart/${item.cart_id}`,
-                        getAuthHeaders()
-                    );
-                    console.log(`Cart item ${item.cart_id} deleted successfully.`);
-                }
-                router.push('/orders');
-            } else {
-                alert('Failed to place order. Please try again.');
-            }
+            // Payment was successful, cart will be cleared by webhook
+            // Just redirect to success page or orders page
+            alert('Payment successful! Your order has been placed.');
+            setPaymentModel(false);
+            router.push(`/orders?locale=${locale}`);
         } catch (err) {
-            console.error('Error placing order:', err);
-            alert('Failed to place order. Please try again.');
-        } finally {
-            setPaymentModel(false); // Close the payment modal
+            console.error('Error after payment success:', err);
+            setPaymentModel(false);
         }
     }
     return (
         <div className='bg-blackish text-white'>
             <div className="container mx-auto p-6">
-                <h1 className="text-3xl font-bold mb-6">Checkout</h1>
+                <h1 className="text-3xl font-bold mb-6 text-wrap-balance">{t.checkout}</h1>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <h2 className="text-2xl font-bold mb-4">Payment Method</h2>
+                        <h2 className="text-2xl font-bold mb-4 text-wrap-balance">{t.paymentMethod}</h2>
                         <div className="mb-6">
-                            <label className="block mb-2">
-                                <input
-                                    type="radio"
-                                    name="paymentMethod"
-                                    value="cod"
-                                    checked={paymentMethod === 'cod'}
-                                    onChange={handlePaymentMethodChange}
-                                    className="mr-2"
-                                />
-                                Cash on Delivery (COD)
-                            </label>
+                            {/* Only show COD if cart doesn't have tournaments or events */}
+                            {!cartItems.some(item => item.item_type === 'tournament' || item.item_type === 'event') && (
+                                <label className="block mb-2">
+                                    <input
+                                        type="radio"
+                                        name="paymentMethod"
+                                        value="cod"
+                                        checked={paymentMethod === 'cod'}
+                                        onChange={handlePaymentMethodChange}
+                                        className="mr-2"
+                                    />
+                                    {t.cashOnDelivery}
+                                </label>
+                            )}
                             <label className="block mb-2">
                                 <input
                                     type="radio"
@@ -312,16 +317,22 @@ const Checkout = ({ cart }) => {
                                     onChange={handlePaymentMethodChange}
                                     className="mr-2"
                                 />
-                                Online Payment
+                                {t.onlinePayment}
                             </label>
+                            {/* Show notice for digital items */}
+                            {cartItems.some(item => item.item_type === 'tournament' || item.item_type === 'event') && (
+                                <p className="text-sm text-yellow-400 mt-2">
+                                    {t.digitalItemsOnlineOnly || 'Tournament and event registrations require online payment.'}
+                                </p>
+                            )}
                         </div>
 
-                        <h2 className="text-2xl font-bold mb-4">{hasPhysicalProducts ? 'Shipping Information' : 'Contact Information'}</h2>
+                        <h2 className="text-2xl font-bold mb-4 text-wrap-balance">{hasPhysicalProducts ? t.shippingInformation : t.contactInformation}</h2>
                         <form className="space-y-4">
                             <input
                                 type="text"
                                 name="name"
-                                placeholder="Full Name"
+                                placeholder={t.fullName}
                                 required
                                 value={shippingInfo.name}
                                 onChange={handleInputChange}
@@ -330,7 +341,7 @@ const Checkout = ({ cart }) => {
                             <input
                                 type="text"
                                 name="address"
-                                placeholder="Address"
+                                placeholder={t.address}
                                 value={shippingInfo.address}
                                 onChange={handleInputChange}
                                 className="w-full p-2 border border-gray-300 rounded bg-transparent"
@@ -338,7 +349,7 @@ const Checkout = ({ cart }) => {
                             <input
                                 type="text"
                                 name="city"
-                                placeholder="City"
+                                placeholder={t.city}
                                 value={shippingInfo.city}
                                 onChange={handleInputChange}
                                 className="w-full p-2 border border-gray-300 rounded bg-transparent"
@@ -346,7 +357,7 @@ const Checkout = ({ cart }) => {
                             <input
                                 type="text"
                                 name="state"
-                                placeholder="State"
+                                placeholder={t.state}
                                 value={shippingInfo.state}
                                 onChange={handleInputChange}
                                 className="w-full p-2 border border-gray-300 rounded bg-transparent"
@@ -354,7 +365,7 @@ const Checkout = ({ cart }) => {
                             <input
                                 type="text"
                                 name="zip"
-                                placeholder="ZIP Code"
+                                placeholder={t.zipCode}
                                 value={shippingInfo.zip}
                                 onChange={handleInputChange}
                                 className="w-full p-2 border border-gray-300 rounded bg-transparent"
@@ -362,22 +373,22 @@ const Checkout = ({ cart }) => {
                             <input
                                 type="text"
                                 name="country"
-                                placeholder="Country"
+                                placeholder={t.country}
                                 value={shippingInfo.country}
                                 onChange={handleInputChange}
                                 className="w-full p-2 border border-gray-300 rounded bg-transparent"
                             />
                             {hasPhysicalProducts && (
                                 <div>
-                                    <label className="block mb-2">Shipping Method</label>
+                                    <label className="block mb-2">{t.shippingMethod}</label>
                                     <select
                                         name="shippingMethod"
                                         value={shippingInfo.shippingMethod}
                                         onChange={handleShippingMethodChange}
                                         className="w-full p-2 border border-gray-300 rounded bg-transparent"
                                     >
-                                        <option value="standard">Standard Shipping ($5.00)</option>
-                                        <option value="express">Express Shipping ($10.00)</option>
+                                        <option value="standard">{t.standardShipping}</option>
+                                        <option value="express">{t.expressShipping}</option>
                                     </select>
                                 </div>
                             )}
@@ -387,7 +398,7 @@ const Checkout = ({ cart }) => {
                     </div>
 
                     <div>
-                        <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
+                        <h2 className="text-2xl font-bold mb-4 text-wrap-balance">{t.orderSummary}</h2>
                         <div className="bg-gray-900 p-4 rounded">
                             <table className="w-full">
                                 <thead>
@@ -414,25 +425,25 @@ const Checkout = ({ cart }) => {
                             </table>
                             <div className="mt-4">
                                 <div className="flex justify-between p-2">
-                                    <span>Subtotal</span>
-                                    <span>${subtotal.toFixed(2)}</span>
+                                    <span>{t.subtotal}</span>
+                                    <span>{formatDisplayPrice(subtotal, locale)}</span>
                                 </div>
                                 {hasPhysicalProducts && (
                                     <div className="flex justify-between p-2">
-                                        <span>Shipping</span>
-                                        <span>${shippingPrice.toFixed(2)}</span>
+                                        <span>{t.shipping}</span>
+                                        <span>{formatDisplayPrice(shippingPrice, locale)}</span>
                                     </div>
                                 )}
                                 <div className="flex justify-between p-2 font-bold">
-                                    <span>Total</span>
-                                    <span>${total.toFixed(2)}</span>
+                                    <span>{t.total}</span>
+                                    <span>{formatDisplayPrice(total, locale)}</span>
                                 </div>
                             </div>
                             <button
                                 onClick={handleConfirmOrder}
                                 className="w-full bg-grad py-2 text-white mt-4 font-bold transition-colors duration-500"
                             >
-                                Confirm Order
+                                {t.confirmOrder}
                             </button>
                         </div>
                     </div>
@@ -448,9 +459,9 @@ const Checkout = ({ cart }) => {
                             <PaymentModal
                                 isOpen={paymentModel}
                                 onClose={() => setPaymentModel(false)}
-                                entity={1}
+                                entity={orderId}
                                 userId={userData?.user_id}
-                                amount={total} // Assuming the tournament has a ticket_price field
+                                amount={total}
                                 onSuccess={handlePaymentSuccess}
                                 onRedeemSuccess={handlePaymentSuccess}
                                 type="order"

@@ -6,10 +6,15 @@ import Wishlish from './Wishlish';
 import Navbar from '@/app/components/Navbar';
 import Connected from '@/app/components/Connected';
 import Footer from '@/app/components/Footer';
+import { useSearchParams } from 'next/navigation';
+import { translations } from '@/app/translations';
 
 const WishlistPage = () => {
     const dispatch = useDispatch();
     const { wishlist, loading, error } = useSelector(state => state.wishlist);
+    const searchParams = useSearchParams();
+    const locale = searchParams.get('locale') || 'en';
+    const t = translations[locale] || translations.en;
 
     useEffect(() => {
         dispatch(fetchWishlist()); // Load wishlist on mount
@@ -20,7 +25,7 @@ const WishlistPage = () => {
     return (
         <Suspense fallback={"loading..."}>
         <div className="relative">
-            <Navbar />
+            <Navbar locale={locale} />
             <div className="h-[400px] overflow-x-hidden relative -mt-[90px] md:-mt-[110px]">
 
                 <div className="absolute inset-0 z-0 bg-black bg-gradient-to-tr from-[#00000000] to-[#00000080] bg-opacity-50 "></div>
@@ -49,9 +54,9 @@ const WishlistPage = () => {
                 </div>
 
             </div>
-            <Wishlish wishlist={wishlist} />
-            <Connected />
-            <Footer />
+            <Wishlish wishlist={wishlist} locale={locale} />
+            <Connected locale={locale} />
+            <Footer locale={locale} />
         </div>
         </Suspense>
     )

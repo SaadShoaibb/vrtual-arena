@@ -8,33 +8,42 @@ import Footer from '@/app/components/Footer'
 import AuthModel from '@/app/components/AuthModal'
 import AuthComponents from '@/app/components/AuthComponents'
 import { useSelector } from 'react-redux'
+import { useSearchParams } from 'next/navigation'
+import { translations } from '@/app/translations'
+import SEOHead from '@/app/components/SEOHead'
+
 
 const Shop = () => {
   const { showModal } = useSelector(state => state.modal)
+  const searchParams = useSearchParams()
+  const locale = searchParams.get('locale') || 'en'
+  const t = translations[locale] || translations.en
   const [activeCategory, setActiveCategory] = useState('all')
   
   const categories = [
-    { id: 'all', name: 'All Products' },
-    { id: 'vr-essentials', name: 'VR Essentials', description: 'Eye masks, comfort accessories and more' },
-    { id: 'vr-hardware', name: 'VR Hardware', description: 'Guns, rifles, charging stations, and peripherals' },
-    { id: 'branded', name: 'Branded Merchandise', description: 'T-shirts, hats, caps with VRtual Arena logo' },
-    { id: 'gift-cards', name: 'Gift Cards & Experiences', description: 'Pre-paid sessions and gift options' }
+    { id: 'all', name: t.allProducts },
+    { id: 'vr-essentials', name: t.vrEssentials, description: t.vrEssentialsDesc },
+    { id: 'vr-hardware', name: t.vrHardware, description: t.vrHardwareDesc },
+    { id: 'branded', name: t.brandedMerchandise, description: t.brandedMerchandiseDesc },
+    { id: 'gift-cards', name: t.giftCards, description: t.giftCardsDesc }
   ]
   
   return (
     <>
+      <SEOHead page="shop" locale={locale} />
       <div className="relative">
-        <Navbar/>
+        <Navbar locale={locale} />
         <HeroHeader
-          btn='Shop'
-          title='Shop'
+          btn={t.shop}
+          title={t.shop}
           bg='bg-pricingbg'
+          locale={locale}
         />
         
         {/* Category Navigation */}
         <div className="bg-blackish py-8">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-white mb-6 text-center">Shop by Category</h2>
+            <h2 className="text-3xl font-bold text-white mb-6 text-center text-wrap-balance">{t.shopByCategory}</h2>
             
             <div className="flex flex-wrap justify-center gap-4 mb-8">
               {categories.map(category => (
@@ -58,16 +67,16 @@ const Shop = () => {
                   {categories.find(c => c.id === activeCategory)?.description}
                 </p>
                 {activeCategory === 'vr-essentials' && (
-                  <p className="text-green-400 font-bold mt-2">Eye masks starting at $11.99 - 50% less than Amazon price!</p>
+                  <p className="text-green-400 font-bold mt-2 text-wrap-balance">{t.eyeMasksOffer}</p>
                 )}
               </div>
             )}
           </div>
         </div>
         
-        <ShopProducts category={activeCategory} />
-        <Connected />
-        <Footer />
+        <ShopProducts category={activeCategory} locale={locale} />
+        <Connected locale={locale} />
+        <Footer locale={locale} />
       </div>
       {showModal && (
         <AuthModel>

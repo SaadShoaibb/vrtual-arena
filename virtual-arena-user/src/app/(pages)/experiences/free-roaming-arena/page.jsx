@@ -2,14 +2,30 @@
 import React from 'react';
 import { IoMdPeople, IoMdTime } from 'react-icons/io';
 import { MdOutlineEventSeat } from 'react-icons/md';
+import { useSearchParams } from 'next/navigation';
+import { useDispatch } from 'react-redux';
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
+import BookModal from '@/app/components/BookModal';
+import { openBookModal } from '@/Store/ReduxSlice/bookModalSlice';
+import { translations } from '@/app/translations';
 
 const FreeRoamingArenaPage = () => {
+  const searchParams = useSearchParams();
+  const locale = searchParams.get('locale') || 'en';
+  const t = translations[locale] || translations.en;
+  const dispatch = useDispatch();
+
+  const handleBookNow = () => {
+    dispatch(openBookModal({
+      experienceType: 'Free Roaming Arena',
+      sessionName: 'Free Roaming VR Experience'
+    }));
+  };
   return (
     <>
     <div className="bg-black text-white">
-      <Navbar />
+      <Navbar locale={locale} />
       
       {/* Hero Section */}
       <div className="relative h-[60vh] overflow-hidden">
@@ -21,9 +37,9 @@ const FreeRoamingArenaPage = () => {
         />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
           <div className="max-w-[1600px] mx-auto">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white">Free-roaming Arena</h1>
-            <p className="text-xl md:text-2xl text-gray-200 max-w-3xl">
-              Explore our massive 34x49 feet arena with full freedom of movement and up to 10 players simultaneously.
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white text-wrap-balance">{t.freeRoamingTitle}</h1>
+            <p className="text-xl md:text-2xl text-gray-200 max-w-3xl text-wrap-balance">
+              {t.freeRoamingDescription}
             </p>
           </div>
         </div>
@@ -34,24 +50,17 @@ const FreeRoamingArenaPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Left Column - Description and Features */}
           <div className="lg:col-span-2">
-            <h2 className="text-3xl font-bold mb-6 text-white">Experience Overview</h2>
-            <p className="text-lg text-gray-200 mb-8">
-              Our state-of-the-art Free-roaming Arena is the crown jewel of Virtual Arena, offering a massive 
-              34x49 feet space where up to 10 players can physically walk, run, and interact with the virtual 
-              world and each other. With advanced tracking technology, wireless equipment, and environmental 
-              effects, this is the most immersive VR experience available anywhere.
+            <h2 className="text-3xl font-bold mb-6 text-white text-wrap-balance">{t.experienceOverview}</h2>
+            <p className="text-lg text-gray-200 mb-8 text-wrap-balance">
+              {t.freeRoamingFullDescription}
             </p>
 
             <div className="mb-12">
-              <h3 className="text-2xl font-bold mb-4 text-white">Experience Highlights</h3>
+              <h3 className="text-2xl font-bold mb-4 text-white text-wrap-balance">{t.experienceHighlights}</h3>
               <ul className="list-disc list-inside space-y-3 text-gray-200">
-                <li>Massive 34x49 feet play space with obstacle mapping</li>
-                <li>Support for up to 10 simultaneous players</li>
-                <li>Wireless VR headsets and equipment for unrestricted movement</li>
-                <li>Physical props that match virtual objects for enhanced immersion</li>
-                <li>Environmental effects including wind, heat, and vibration</li>
-                <li>Multiple game scenarios available from zombie survival to space exploration</li>
-                <li>Suitable for ages 12 and up</li>
+                {t.freeRoamingHighlights.map((highlight, index) => (
+                  <li key={index} className="text-wrap-balance">{highlight}</li>
+                ))}
               </ul>
             </div>
 
@@ -125,12 +134,15 @@ const FreeRoamingArenaPage = () => {
                 </p>
               </div>
               
-              <button className="w-full bg-gradient-to-r from-[#DB1FEB] to-[#24CBFF] hover:opacity-90 transition-opacity text-white text-lg font-bold py-3 px-6 rounded-full mb-4">
-                Book Now
+              <button
+                onClick={handleBookNow}
+                className="w-full bg-gradient-to-r from-[#DB1FEB] to-[#24CBFF] hover:opacity-90 transition-opacity text-white text-lg font-bold py-3 px-6 rounded-full mb-4"
+              >
+                {t.bookNow}
               </button>
-              
+
               <button className="w-full border border-white text-white hover:bg-white hover:text-black transition-colors font-bold py-3 px-6 rounded-full">
-                View Available Packages
+                {t.viewAvailablePackages}
               </button>
             </div>
           </div>
@@ -202,7 +214,10 @@ const FreeRoamingArenaPage = () => {
         </div>
       </div>
 
-      <Footer />
+      <Footer locale={locale} />
+
+      {/* Booking Modal */}
+      <BookModal locale={locale} />
     </div>
     </>
   );

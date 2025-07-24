@@ -10,8 +10,9 @@ import { openModal } from '@/Store/ReduxSlice/ModalSlice'
 import { FaHeart, FaRegHeart } from 'react-icons/fa'
 import CardSidebar from '@/app/components/CartSidebar'
 import { getMediaBaseUrl } from '@/utils/ApiUrl';
+import { formatDisplayPrice } from '@/app/utils/currency';
 
-const Merchandises = () => {
+const Merchandises = ({ locale = 'en' }) => {
     const dispatch = useDispatch()
     const { products, status, error } = useSelector(state => state.products)
     const { isAuthenticated } = useSelector(state => state.userData)
@@ -192,11 +193,11 @@ const Merchandises = () => {
                                         <div>
                                             {product.discount > 0 ? (
                                                 <div className="flex flex-col">
-                                                    <span className='text-sm text-white line-through'>${product?.original_price}</span>
-                                                    <span className='text-xl text-white font-bold'>${product?.discount_price}</span>
+                                                    <span className='text-sm text-white line-through'>{formatDisplayPrice(product?.original_price, locale)}</span>
+                                                    <span className='text-xl text-white font-bold'>{formatDisplayPrice(product?.discount_price, locale)}</span>
                                                 </div>
                                             ) : (
-                                                <span className='text-xl text-white font-bold'>${product?.original_price}</span>
+                                                <span className='text-xl text-white font-bold'>{formatDisplayPrice(product?.original_price, locale)}</span>
                                             )}
                                         </div>
                                     </div>

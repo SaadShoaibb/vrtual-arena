@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import SidebarDropdown from '../SidebarDropdown';
-import { MdOutlineDashboard } from "react-icons/md";
+import { MdOutlineDashboard, MdEvent } from "react-icons/md";
 import { SiSession } from "react-icons/si";
 import { TbBrandBooking, TbTournament } from "react-icons/tb";
 import { IoMdClose } from "react-icons/io";
@@ -120,16 +120,14 @@ const DashboardLayout = ({ children, pageTitle }) => {
                             </Link>
                         </li>
 
-                        <SidebarDropdown
-                            isSidebarOpen={isSidebarOpen}
-                            title="Session"
-                            icon={<SiSession className='text-[#926BB9]' size={20} />}
-                            items={[
-                                { label: "Add Session", href: "/sessions/add-session" },
-                                { label: "All Sessions", href: "/sessions/all-sessions" },
-                            ]}
-                            dropdownId="session"
-                        />
+                        <li className="p-4">
+                            <Link href="/sessions/all-sessions" className={`flex items-center ${pathname === '/sessions/all-sessions' ? "text-gradiant font-bold" : ""}`}>
+                                <div className='flex items-center gap-2 leading-none'>
+                                    <SiSession className='text-[#926BB9]' size={20} />
+                                    {isSidebarOpen && "VR Sessions"}
+                                </div>
+                            </Link>
+                        </li>
 
                         <li className="p-4">
                             <Link href="/bookings/all-bookings" className={`flex items-center ${pathname === '/bookings/all-bookings' ? "text-gradiant font-bold" : ""}`}>
@@ -139,6 +137,18 @@ const DashboardLayout = ({ children, pageTitle }) => {
                                 </div>
                             </Link>
                         </li>
+
+                        <SidebarDropdown
+                            isSidebarOpen={isSidebarOpen}
+                            title="Events"
+                            icon={<MdEvent className='text-[#926BB9]' size={20} />}
+                            items={[
+                                { label: "Add Event", href: "/events/add-event" },
+                                { label: "All Events", href: "/events/all-events" },
+                                { label: "Registrations", href: "/events/registrations" },
+                            ]}
+                            dropdownId="events"
+                        />
 
                         <SidebarDropdown
                             isSidebarOpen={isSidebarOpen}

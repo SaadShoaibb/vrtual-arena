@@ -1,10 +1,17 @@
 'use client'
 import Link from 'next/link'
 import React from 'react'
+import { useDispatch } from 'react-redux'
+import { openBookModal } from '@/Store/ReduxSlice/bookModalSlice'
 import { translations } from '../../translations'
 
 const Package = ({ locale = 'en' }) => {
     const t = translations[locale] || translations.en;
+    const dispatch = useDispatch();
+
+    const handleBookNow = () => {
+        dispatch(openBookModal());
+    };
     
     return (
         <>
@@ -24,12 +31,13 @@ const Package = ({ locale = 'en' }) => {
                         <p className='text-[18px] text-white mt-4'>
                             {t.packageDescription}
                         </p>
-                        <Link href={`/deals?locale=${locale}`}>
-                            <button className='text-xl mt-5 font-semibold flex items-center py-2 md:py-4 px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7]'>
-                                {t.exploreVrPackages}
-                                <img src="/icons/arrow.svg" alt="" className='h-[22px] w-[22px] ml-[11px] rounded-full' />
-                            </button>
-                        </Link>
+                        <button
+                            onClick={handleBookNow}
+                            className='text-xl mt-5 font-semibold flex items-center py-2 md:py-4 px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] hover:scale-105 transition-transform'
+                        >
+                            {t.bookNow || 'Book Now'}
+                            <img src="/icons/arrow.svg" alt="" className='h-[22px] w-[22px] ml-[11px] rounded-full' />
+                        </button>
                     </div>
 
                     <img

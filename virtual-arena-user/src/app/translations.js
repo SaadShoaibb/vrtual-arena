@@ -7,11 +7,89 @@ export const translations = {
     home: 'Home',
     aboutUs: 'About Us',
     pricing: 'Pricing',
+    pricingPlan: 'Pricing Plan',
     deals: 'Deals',
     contactUs: 'Contact Us',
     merchandise: 'Shop',
+    shop: 'Shop',
+
+    // Shop Categories
+    allProducts: 'All Products',
+    vrEssentials: 'VR Essentials',
+    vrEssentialsDesc: 'Eye masks, comfort accessories and more',
+    vrHardware: 'VR Hardware',
+    vrHardwareDesc: 'Guns, rifles, charging stations, and peripherals',
+    brandedMerchandise: 'Branded Merchandise',
+    brandedMerchandiseDesc: 'T-shirts, hats, caps with VRtual Arena logo',
+    giftCards: 'Gift Cards & Experiences',
+    giftCardsDesc: 'Pre-paid sessions and gift options',
+    shopByCategory: 'Shop by Category',
+    dealsMembership: 'Deals & Membership',
+
+    // Shop Product Status and Actions
+    inStock: 'In Stock',
+    outOfStock: 'Out of Stock',
+    addToCart: 'Add To Cart',
+    failedToLoadProducts: 'Failed to load products',
+    somethingWentWrong: 'Something went wrong',
+    noProductsAvailable: 'No products available in this category',
+    checkBackLater: 'Check back later for new additions to our shop',
+
+    // Shop Special Offers
+    eyeMasksOffer: 'Eye masks starting at $11.99 - 50% less than Amazon price!',
+    eyeMaskPricing: 'VR Eye Mask Pricing',
+    disposableEyeMasks: 'Disposable VR Eye Masks',
+    disposableEyeMasksPrice: '$11.99 (Pack of 50)',
+    reusableEyeMasks: 'Reusable VR Eye Masks',
+    reusableEyeMasksPrice: '$24.99 (Pack of 10)',
+    premiumEyeMasks: 'Premium Comfort Eye Masks',
+    premiumEyeMasksPrice: '$39.99 (Pack of 5)',
+
+    // Cart
+    product: 'Product',
+    price: 'Price',
+    quantity: 'Quantity',
+    total: 'Total',
+    yourCartIsEmpty: 'Your cart is empty.',
+    specialInstructionForSeller: 'Special instruction for seller',
+    writeYourMessageHere: 'Write your message here...',
+    cartsTotal: 'Cart Total',
+    subtotal: 'Subtotal',
+    shipping: 'Shipping',
+    shippingTaxesCalculated: 'Shipping & taxes calculated at checkout',
+    proceedToCheckout: 'PROCEED TO CHECKOUT',
+
+    // Checkout
+    checkout: 'Checkout',
+    paymentMethod: 'Payment Method',
+    cashOnDelivery: 'Cash on Delivery',
+    onlinePayment: 'Online Payment',
+    shippingInformation: 'Shipping Information',
+    contactInformation: 'Contact Information',
+    fullName: 'Full Name',
+    address: 'Address',
+    city: 'City',
+    state: 'State',
+    zipCode: 'ZIP Code',
+    country: 'Country',
+    shippingMethod: 'Shipping Method',
+    standardShipping: 'Standard Shipping ($5.00)',
+    expressShipping: 'Express Shipping ($10.00)',
+    orderSummary: 'Order Summary',
+    confirmOrder: 'Confirm Order',
+    orderPlacedSuccessfully: 'Order placed successfully!',
+    failedToPlaceOrder: 'Failed to place order. Please try again.',
+    cartIsEmpty: 'Your cart is empty. Please add items to your cart before placing an order.',
+    pleaseFillRequiredFields: 'Please fill in all required fields:',
+
+    // Wishlist
+    noWishlistAvailable: 'No wishlist available',
+    wishlist: 'Wishlist',
     experiences: 'Experiences',
     tournaments: 'Tournaments',
+    tournamentRegistrations: 'Tournament Registrations',
+    eventRegistrations: 'Event Registrations',
+    digitalItemsOnlineOnly: 'Tournament and event registrations require online payment.',
     wishlist: 'Wishlist',
     bookings: 'Bookings',
     orders: 'Orders',
@@ -77,7 +155,172 @@ export const translations = {
     vrCat: 'VR Cat',
     freeRoaming: 'Free Roaming Arena',
     photoBooth: 'Photo Booth',
-    
+
+    // Experience Descriptions for Navigation
+    ufoSpaceshipDesc: '5 seats',
+    vr360Desc: '2 seats',
+    vrBattleDesc: '2 players',
+    vrWarriorDesc: 'Kids - 2 players',
+    vrCatDesc: 'Kids - 2 machines',
+    freeRoamingDesc: '34x49 feet, up to 10 players',
+    photoBoothDesc: 'Photo experiences',
+
+    // Common UI Text
+    learnMore: 'Learn More',
+    bookNow: 'Book Now',
+    viewAvailablePackages: 'View Available Packages',
+    youMightAlsoLike: 'You Might Also Like',
+    kids: 'Kids',
+
+    // Experience Detailed Descriptions
+    vrBattleDescription: 'Challenge your friends in our two-player VR battle arena.',
+    vrWarriorDescription: 'A child-friendly battle experience designed specifically for younger players.',
+    vrCatDescription: 'Educational VR experience designed for younger visitors.',
+    ufoSpaceshipDescription: 'Pilot a UFO through immersive virtual worlds with our 5-seat simulator.',
+
+    // Experience Page Content
+    experienceOverview: 'Experience Overview',
+    theExperience: 'The Experience',
+    whatToExpect: 'What to Expect',
+    safetyFirst: 'Safety First',
+    perfectFor: 'Perfect For',
+
+    // UFO Spaceship specific
+    ufoOverviewText: 'Step into our cutting-edge UFO Spaceship simulator and prepare for an out-of-this-world virtual reality adventure. With seating for up to 5 people, this immersive experience combines state-of-the-art VR technology with motion simulation to create the sensation of piloting an actual UFO through stunning cosmic environments.',
+    ufoExperienceText: 'As you enter the UFO Spaceship, you\'ll be seated in one of five specially designed motion seats. Each seat is equipped with its own VR headset and interactive controls. Once everyone is ready, our staff will help you put on your headset and brief you on how to use the controls.',
+    ufoAdventureText: 'Choose from multiple adventure scenarios including space exploration, alien encounters, or intergalactic battles. Each experience lasts approximately 10-15 minutes and features stunning 360-degree visuals, spatial audio, and synchronized motion effects.',
+
+    // VR Battle specific
+    vrBattleOverviewText: 'Enter the ultimate VR combat arena where strategy meets action. Our two-player battle system puts you and a friend in direct competition across multiple game modes and environments.',
+    vrBattleExperienceText: 'Each player gets their own dedicated VR setup with wireless headsets and motion controllers. Choose your weapons, select your battlefield, and prepare for intense head-to-head combat.',
+
+    // VR Warrior specific
+    vrWarriorOverviewText: 'A specially designed VR experience for young adventurers aged 6-12. VR Warrior offers age-appropriate challenges and adventures in a safe, supervised environment.',
+    vrWarriorExperienceText: 'Kids will embark on exciting quests, solve puzzles, and explore magical worlds designed specifically for their age group. All content is carefully curated to be both fun and educational.',
+
+    // VR Cat specific
+    vrCatOverviewText: 'An educational and entertaining VR experience designed for children. Explore the world through the eyes of a curious cat in this delightful adventure.',
+    vrCatExperienceText: 'Children will learn about different environments, animals, and problem-solving while having fun in a completely safe virtual world.',
+
+    // Photo Booth specific
+    photoBoothOverviewText: 'Capture memories like never before with our state-of-the-art VR photo booth experiences. Create stunning photos and videos in virtual environments.',
+    photoBoothExperienceText: 'Choose from dozens of virtual backgrounds and scenarios. Our professional-grade cameras and lighting ensure you get the perfect shot every time.',
+
+    // Experience Page Details
+    freeRoamingTitle: 'Free-roaming Arena',
+    freeRoamingDescription: 'Explore our massive 34x49 feet arena with full freedom of movement and up to 10 players simultaneously.',
+    freeRoamingFullDescription: 'Step into our state-of-the-art free-roaming VR arena, where you can move freely in a 34x49 feet space without any cables or restrictions. Perfect for team building, birthday parties, or competitive gaming with friends.',
+
+    vr360Title: 'VR 360',
+    vr360Description: 'Experience full 360° immersion with our rotating VR chairs.',
+    vr360FullDescription: 'Immerse yourself in breathtaking 360-degree virtual worlds with our premium VR 360 experience. Our specially designed rotating chairs provide the ultimate comfort while you explore stunning virtual environments.',
+
+    vrBattleTitle: 'VR Battle',
+    vrBattleDescription: 'Challenge your friends in our two-player VR battle arena.',
+    vrBattleFullDescription: 'Engage in epic virtual battles with friends in our dedicated VR Battle arena. Test your skills, strategy, and reflexes in intense multiplayer combat scenarios.',
+
+    vrWarriorTitle: 'VR Warrior (Kids)',
+    vrWarriorDescription: 'A child-friendly battle experience designed specifically for younger players.',
+    vrWarriorFullDescription: 'A safe and exciting VR experience designed specifically for children. Our VR Warrior experience provides age-appropriate adventures that are both fun and educational.',
+
+    vrCatTitle: 'VR Cat',
+    vrCatDescription: 'Fun and engaging VR experience perfect for kids.',
+    vrCatFullDescription: 'A delightful VR experience featuring cute virtual cats and interactive gameplay designed for children. Safe, fun, and educational entertainment for young VR enthusiasts.',
+
+    ufoSpaceshipTitle: 'UFO Spaceship',
+    ufoSpaceshipDescription: 'A family-friendly experience for up to 5 people in our UFO simulator.',
+    ufoSpaceshipFullDescription: 'Embark on an intergalactic adventure in our UFO Spaceship simulator. Perfect for families, this experience accommodates up to 5 people for a shared journey through space.',
+
+    photoBoothTitle: 'Photo Booth',
+    photoBoothDescription: 'Capture memorable moments with our VR photo experiences.',
+    photoBoothFullDescription: 'Create unique and memorable photos with our VR Photo Booth. Step into virtual worlds and capture amazing moments that you can share with friends and family.',
+
+    // Experience Page Common
+    experienceOverview: 'Experience Overview',
+    experienceHighlights: 'Experience Highlights',
+    experienceSpecs: 'Experience Specifications',
+    capacity: 'Capacity',
+    duration: 'Duration',
+    ageRecommendation: 'Age Recommendation',
+    difficulty: 'Difficulty',
+    pricing: 'Pricing',
+    singleSession: 'Single Session',
+    twoSessions: 'Two Sessions',
+    bookExperience: 'Book This Experience',
+    learnMore: 'Learn More',
+    relatedExperiences: 'Related Experiences',
+
+    // Free Roaming Arena Specific
+    freeRoamingHighlights: [
+      'Massive 34x49 feet play space with obstacle mapping',
+      'Support for up to 10 simultaneous players',
+      'Wireless VR headsets and equipment for unrestricted movement',
+      'Physical props that match virtual objects for enhanced immersion',
+      'Environmental effects including wind, heat, and vibration',
+      'Multiple game scenarios available from zombie survival to space exploration',
+      'Suitable for ages 12 and up'
+    ],
+
+    // VR 360 Specific
+    vr360Highlights: [
+      'Two fully rotating VR chairs for unparalleled freedom of movement',
+      'High-definition VR headsets with premium audio',
+      'Wide selection of immersive experiences and games',
+      'Smooth motion synchronization for comfort',
+      'Perfect for exploration and atmospheric experiences',
+      'Suitable for ages 10 and up'
+    ],
+
+    // VR Battle Specific
+    vrBattleHighlights: [
+      'Two dedicated VR battle stations with full-body tracking',
+      'Advanced multiplayer technology for seamless interaction',
+      'Professional gaming-grade hardware for responsive controls',
+      'Multiple game genres including shooters, sports, and puzzles',
+      'Real-time voice communication between players',
+      'Suitable for ages 12 and up'
+    ],
+
+    // VR Cat Specific
+    vrCatHighlights: [
+      'Two kid-friendly VR stations with simplified equipment',
+      'Educational content spanning art, science, history, and more',
+      'Interactive drawing and creation tools in VR',
+      'Virtual field trips to museums, historical sites, and natural wonders',
+      'Guided experiences with voiceover narration',
+      'Perfect for ages 5-12'
+    ],
+
+    // VR Warrior Specific
+    vrWarriorHighlights: [
+      'Two kid-sized VR stations with adjusted equipment',
+      'Child-friendly content with no scary or inappropriate material',
+      'Simplified controls that are easy for children to master',
+      'Shorter game sessions designed for younger attention spans',
+      'Parental viewing screen to watch what your child is experiencing',
+      'Perfect for ages 6-12'
+    ],
+
+    // UFO Spaceship Specific
+    ufoSpaceshipHighlights: [
+      'Multi-player experience for up to 5 people simultaneously',
+      'Motion-synchronized seats that respond to your virtual environment',
+      'Ultra-high resolution visuals with 360° viewing',
+      'Interactive controls that let you pilot your own UFO',
+      'Multiple adventure scenarios to choose from',
+      'Suitable for ages 8 and up'
+    ],
+
+    // Photo Booth Specific
+    photoBoothHighlights: [
+      'Group photos for up to 6 people at once',
+      'Dozens of virtual backgrounds to choose from',
+      'Digital props and effects',
+      'Instant printing and digital sharing options',
+      'Perfect for parties, events, and special occasions',
+      'Suitable for all ages'
+    ],
+
     // Plans
     plansTitle: 'Our Plans',
     plansDescription: 'Choose from our range of plans designed to suit your needs and budget.',
@@ -92,7 +335,27 @@ export const translations = {
     letsGetStarted: 'Let\'s Get Started',
     packageDescription: 'Whether you\'re a gamer, developer, or business innovator — our immersive VR packages are built to accelerate your experience. Choose the one that fits you best and get started today.',
     exploreVrPackages: 'Explore VR Packages',
-    
+
+    // Events/Calendar
+    calendar: 'Calendar',
+    ourEvents: 'Our Events',
+    eventsDescription: 'Join us for exciting VR tournaments, community events, and special celebrations. From competitive gaming sessions to family-friendly activities, there\'s always something happening at Virtual Arena.',
+
+    // Gallery
+    gallery: 'Gallery',
+    discoverGallery: 'Discover Our Best VRA Gallery',
+    galleryDescription: 'Step inside the Virtual Arena and explore unforgettable moments captured from our top tournaments, community events, and behind-the-scenes action. From intense gameplay to epic celebrations, this is where champions and memories are made.',
+    viewAll: 'View All',
+
+    // Testimonials
+    testimonial: 'Testimonials',
+    whatCustomersSay: 'What Our Awesome Customers Say',
+    testimonialsDescription: 'Our players love the thrill of the Virtual Arena! From immersive VR battles to unforgettable group sessions, the feedback speaks for itself. Discover what keeps them coming back for more.',
+
+    // VR Package Section
+    readyToEnjoy: 'Ready to Enjoy?',
+    vrPackageDescription: 'Dive into the action with our immersive VR gaming packages. Whether you\'re here for intense competition, team battles, or just pure fun—Virtual Arena offers experiences designed for every skill level and every thrill seeker.',
+
     // Why Choose
     whyChooseTitle: 'Why Choose Us',
     whyChooseDescription: 'We offer the best virtual reality experience with cutting-edge technology and innovative content.',
@@ -117,22 +380,35 @@ export const translations = {
     submit: 'Send Message',
     
     // Contact Information
+    ourLocations: 'Our Locations',
     ourLocation: 'Our Location',
     locationAddress: '8109 102 St NW, Edmonton, AB T6E 4A4',
+    forestburgLocation: 'Forestburg Location',
+    forestburgAddress: '5619 46 Ave, Forestburg, AB T0B 1N0',
     corporation: 'Corporation: ABOUDA Enterprise Inc.',
     businessHours: 'Business Hours',
     mondayToFriday: 'Monday - Friday',
-    mondayToFridayHours: '7:00 AM - 5:00 PM',
+    mondayToFridayHours: '10:00 AM - 10:00 PM',
     saturday: 'Saturday',
-    saturdayHours: '9:00 AM - 5:00 PM',
+    saturdayHours: '10:00 AM - 10:00 PM',
     sunday: 'Sunday',
-    sundayHours: 'Closed',
+    sundayHours: '10:00 AM - 10:00 PM',
     phoneSupport: 'Phone support available during business hours',
     supportChannels: 'Support Channels',
     supportChannelsDesc: 'We offer multiple ways to get support:',
     phoneSupport: 'Phone Support',
     emailSupport: 'Email Support',
     liveChat: 'Live Chat (coming soon)',
+    virtualTour: 'Virtual Tour',
+    virtualTourDesc: 'Take a virtual tour of our facility',
+    virtualTourComingSoon: 'Virtual Tour (coming soon)',
+    virtualTourDescription: 'Get an immersive preview of our VR arena and facilities before your visit. See our state-of-the-art equipment and spacious gaming areas.',
+    exploreOurFacility: 'Explore Our Facility',
+    play: 'Play',
+    pause: 'Pause',
+    fullscreen: 'Fullscreen',
+    exitFullscreen: 'Exit Fullscreen',
+    bookYourVisit: 'Book Your Visit',
     onsiteAssistance: 'On-site Assistance',
     
     // Contact Info Cards
@@ -173,7 +449,7 @@ export const translations = {
     newsletter: "Newsletter",
     emailPlaceholder: "Your email address",
     copyright: "Copyright © 2024 Virtual Arena All Rights Reserved.",
-    phoneNumbers: "+1 780-901-0804  +1 780-901-0804",
+    phoneNumbers: "+1 780-901-0804",
     emailContact: "contact@vrtualarena.ca",
     physicalAddress: "8109 102 St NW, Edmonton, AB T6E 4A4",
     
@@ -187,11 +463,15 @@ export const translations = {
     ourFacility: 'Our Facility',
     facilityDescription: 'Designed for immersion, comfort, and safety at every turn',
     spaciousArena: 'Spacious Arena',
-    spaciousArenaDesc: 'Our 2,500 sq ft free-roaming arena offers plenty of space for immersive multiplayer adventures.',
+    spaciousArenaDesc: 'Our 34x49 feet (1,666 sq ft) free-roaming arena offers plenty of space for immersive multiplayer adventures.',
     premiumEquipment: 'Premium Equipment',
     premiumEquipmentDesc: 'We use only the latest high-end VR headsets and motion tracking technology for the best experience.',
     comfortZones: 'Comfort Zones',
     comfortZonesDesc: 'Relax before or after your experience in our comfortable lounge areas with refreshments available.',
+    loungeArea: 'Lounge Area',
+    loungeAreaDesc: 'Our spacious lounge area features comfortable seating, gaming stations, and a variety of snacks and beverages for purchase.',
+    snacksAndBeverages: 'Snacks & Beverages',
+    snacksDesc: 'Enjoy a selection of snacks, soft drinks, energy drinks, and light refreshments during your visit.',
     safetyFirst: 'Safety First',
     safetyFirstDesc: 'Our entire facility is designed with safety in mind, with padded surfaces and trained staff always present.',
     virtualTour: 'Virtual Tour',
@@ -265,6 +545,127 @@ export const translations = {
     french: 'Français',
     switchToEnglish: 'Switch to English',
     switchToFrench: 'Switch to French',
+
+    // Currency
+    currency: 'CAD',
+    currencySymbol: '$',
+    formatPrice: (price) => `$${price} CAD`,
+
+    // Booking Modal
+    bookVrSession: 'Book VR Session',
+    chooseVrExperience: 'Choose your VR experience',
+    loadingSessions: 'Loading sessions...',
+    noSessionsAvailable: 'No VR sessions available at the moment.',
+    retryLoadingSessions: 'Retry Loading Sessions',
+    backToSessions: '← Back to Sessions',
+    bookingConfiguration: 'Booking Configuration',
+    customizeVrExperience: 'Customize your VR experience',
+    sessionDetails: 'Session Details',
+    numberOfSessions: 'Number of Sessions:',
+    numberOfPlayers: 'Number of Players:',
+    perPerson: 'per person',
+    maxPlayers: 'Max',
+    howToBook: 'How would you like to book?',
+    continueAs: 'Continue as',
+    useAccountFasterBooking: 'Use your account for faster booking',
+    bookAsGuest: 'Book as Guest',
+    noAccountRequired: 'No account required',
+    backToCalendar: '← Back to Calendar',
+    guestDetails: 'Guest Details',
+    provideContactInfo: 'Please provide your contact information',
+    enterFullName: 'Enter your full name',
+    enterEmail: 'Enter your email',
+    enterPhoneNumber: 'Enter your phone number',
+    continueToConfirmation: 'Continue to Confirmation',
+    back: '← Back',
+    confirmBookingPayment: 'Confirm Booking & Payment',
+    bookingDetails: 'Booking Details',
+    session: 'Session:',
+    date: 'Date:',
+    time: 'Time:',
+    sessions: 'Sessions:',
+    players: 'Players:',
+    pricePerPerson: 'Price per person:',
+    subtotal: 'Subtotal:',
+    groupDiscount: 'Group Discount',
+    totalPrice: 'Total Price:',
+    name: 'Name:',
+    email: 'Email:',
+    paymentMethod: 'Payment Method',
+    howToPay: 'How would you like to pay for this VR session?',
+    payOnlineNow: '💳 Pay Online Now',
+    securePaymentStripe: 'Secure payment with Stripe',
+    payAtVenue: '🏢 Pay at the Venue',
+    payAtVenueDesc: 'Pay with cash or card when you arrive',
+    back: 'Back',
+    proceedToPayment: 'Proceed to Payment',
+    confirmBooking: 'Confirm Booking',
+    creatingBooking: 'Creating Booking...',
+    bookingConfirmed: 'Booking Confirmed!',
+    vrSessionBooked: 'Your VR session has been successfully booked.',
+    confirmationEmailSent: 'A confirmation email has been sent to your email address.',
+    close: 'Close',
+    groupDiscountInfo: 'Group discounts: 5+ people get 10-20% off',
+
+    // Common Messages
+    pleaseSelectItem: 'Please select an item first',
+    pleaseLoginToContinue: 'Please login to continue',
+    registeredForTournament: 'You have been registered for the tournament. Payment will be collected at the event.',
+    registeredForEvent: 'You have been registered for the event. Payment will be collected at the event.',
+    tournamentTicketAdded: 'Tournament ticket added to cart',
+    eventTicketAdded: 'Event ticket added to cart',
+    failedToAddToCart: 'Failed to add to cart',
+    unexpectedError: 'An unexpected error occurred',
+    register: 'Register',
+
+    // Success/Error Messages
+    thankYouOrder: 'Thank you for your order!',
+    orderReceivedDesc: 'We have received your order and will send you a confirmation email shortly!',
+    couldNotFindCheckoutSession: 'Could not find checkout session',
+    returnToHome: 'Return to home',
+    viewYourOrders: 'View Your Orders',
+    continueShopping: 'Continue Shopping',
+
+    // Contact Form Messages
+    messageSent: 'Message Sent Successfully!',
+    messageConfirmation: 'Thank you for contacting us. We will get back to you within 24 hours.',
+    messageSentDesc: 'Thank you for contacting us. We will get back to you soon.',
+    errorOccurred: 'Error',
+    mustAgreeToTerms: 'You must agree to the terms and conditions',
+    sending: 'Sending...',
+
+    // Tournament and Event Categories
+    gameTypes: {
+      battleRoyale: 'Battle Royale',
+      beatSaber: 'Beat Saber',
+      racing: 'Racing',
+      shooting: 'Shooting',
+      adventure: 'Adventure',
+      puzzle: 'Puzzle',
+      sports: 'Sports',
+      other: 'Other'
+    },
+    eventTypes: {
+      party: 'Party',
+      corporate: 'Corporate Event',
+      birthday: 'Birthday Party',
+      special: 'Special Event',
+      other: 'Other'
+    },
+
+    // Past Tournaments
+    pastTournaments: 'Past Tournaments',
+    pastTournamentsDescription: 'Check out the results and highlights from our previous tournaments.',
+    winner: 'Winner',
+    prizeWon: 'Prize Won',
+    viewGallery: 'View Gallery',
+    photos: 'photos',
+    morePhotos: 'more photos',
+
+    // Tournament Rules & Requirements
+    tournamentRules: 'Tournament Rules',
+    tournamentRequirements: 'Requirements',
+    rulesAndRequirements: 'Rules & Requirements',
     
     // Pricing Plans
     allInclusivePricing: 'All-Inclusive Pricing',
@@ -373,8 +774,85 @@ export const translations = {
     deals: 'Offres',
     contactUs: 'Contact',
     merchandise: 'Boutique',
+    shop: 'Boutique',
+
+    // Shop Categories
+    allProducts: 'Tous les Produits',
+    vrEssentials: 'Essentiels VR',
+    vrEssentialsDesc: 'Masques pour les yeux, accessoires de confort et plus',
+    vrHardware: 'Matériel VR',
+    vrHardwareDesc: 'Pistolets, fusils, stations de charge et périphériques',
+    brandedMerchandise: 'Marchandise de Marque',
+    brandedMerchandiseDesc: 'T-shirts, chapeaux, casquettes avec le logo VRtual Arena',
+    giftCards: 'Cartes Cadeaux et Expériences',
+    giftCardsDesc: 'Sessions prépayées et options cadeaux',
+    shopByCategory: 'Acheter par Catégorie',
+    dealsMembership: 'Offres et Adhésion',
+
+    // Shop Product Status and Actions
+    inStock: 'En Stock',
+    outOfStock: 'Rupture de Stock',
+    addToCart: 'Ajouter au Panier',
+    failedToLoadProducts: 'Échec du chargement des produits',
+    somethingWentWrong: 'Quelque chose s\'est mal passé',
+    noProductsAvailable: 'Aucun produit disponible dans cette catégorie',
+    checkBackLater: 'Revenez plus tard pour de nouveaux ajouts à notre boutique',
+
+    // Shop Special Offers
+    eyeMasksOffer: 'Masques pour les yeux à partir de 11,99 $ - 50% moins cher qu\'Amazon!',
+    eyeMaskPricing: 'Prix des Masques Oculaires VR',
+    disposableEyeMasks: 'Masques Oculaires VR Jetables',
+    disposableEyeMasksPrice: '11,99$ (Paquet de 50)',
+    reusableEyeMasks: 'Masques Oculaires VR Réutilisables',
+    reusableEyeMasksPrice: '24,99$ (Paquet de 10)',
+    premiumEyeMasks: 'Masques Oculaires Confort Premium',
+    premiumEyeMasksPrice: '39,99$ (Paquet de 5)',
+
+    // Cart
+    product: 'Produit',
+    price: 'Prix',
+    quantity: 'Quantité',
+    total: 'Total',
+    yourCartIsEmpty: 'Votre panier est vide.',
+    specialInstructionForSeller: 'Instructions spéciales pour le vendeur',
+    writeYourMessageHere: 'Écrivez votre message ici...',
+    cartsTotal: 'Total du Panier',
+    subtotal: 'Sous-total',
+    shipping: 'Livraison',
+    shippingTaxesCalculated: 'Livraison et taxes calculées à la caisse',
+    proceedToCheckout: 'PROCÉDER À LA CAISSE',
+
+    // Checkout
+    checkout: 'Caisse',
+    paymentMethod: 'Méthode de Paiement',
+    cashOnDelivery: 'Paiement à la Livraison',
+    onlinePayment: 'Paiement en Ligne',
+    shippingInformation: 'Informations de Livraison',
+    contactInformation: 'Informations de Contact',
+    fullName: 'Nom Complet',
+    address: 'Adresse',
+    city: 'Ville',
+    state: 'Province',
+    zipCode: 'Code Postal',
+    country: 'Pays',
+    shippingMethod: 'Méthode de Livraison',
+    standardShipping: 'Livraison Standard (5,00 $)',
+    expressShipping: 'Livraison Express (10,00 $)',
+    orderSummary: 'Résumé de la Commande',
+    confirmOrder: 'Confirmer la Commande',
+    orderPlacedSuccessfully: 'Commande passée avec succès!',
+    failedToPlaceOrder: 'Échec de la commande. Veuillez réessayer.',
+    cartIsEmpty: 'Votre panier est vide. Veuillez ajouter des articles à votre panier avant de passer une commande.',
+    pleaseFillRequiredFields: 'Veuillez remplir tous les champs obligatoires:',
+
+    // Wishlist
+    noWishlistAvailable: 'Aucune liste de souhaits disponible',
+    wishlist: 'Liste de Souhaits',
     experiences: 'Expériences',
     tournaments: 'Tournois',
+    tournamentRegistrations: 'Inscriptions aux Tournois',
+    eventRegistrations: 'Inscriptions aux Événements',
+    digitalItemsOnlineOnly: 'Les inscriptions aux tournois et événements nécessitent un paiement en ligne.',
     wishlist: 'Favoris',
     bookings: 'Réservations',
     orders: 'Commandes',
@@ -440,7 +918,173 @@ export const translations = {
     vrCat: 'Chat VR',
     freeRoaming: 'Arène de Libre Circulation',
     photoBooth: 'Photomaton',
-    
+
+    // Experience Descriptions for Navigation
+    ufoSpaceshipDesc: '5 places',
+    vr360Desc: '2 places',
+    vrBattleDesc: '2 joueurs',
+    vrWarriorDesc: 'Enfants - 2 joueurs',
+    vrCatDesc: 'Enfants - 2 machines',
+    freeRoamingDesc: '34x49 pieds, jusqu\'à 10 joueurs',
+    photoBoothDesc: 'Expériences photo',
+
+    // Common UI Text
+    learnMore: 'En Savoir Plus',
+    bookNow: 'Réserver Maintenant',
+    viewAvailablePackages: 'Voir les Forfaits Disponibles',
+    youMightAlsoLike: 'Vous Pourriez Aussi Aimer',
+    kids: 'Enfants',
+
+    // Experience Detailed Descriptions
+    vrBattleDescription: 'Défiez vos amis dans notre arène de bataille VR pour deux joueurs.',
+    vrWarriorDescription: 'Une expérience de bataille adaptée aux enfants, conçue spécialement pour les jeunes joueurs.',
+    vrCatDescription: 'Expérience VR éducative conçue pour les jeunes visiteurs.',
+    ufoSpaceshipDescription: 'Pilotez un OVNI à travers des mondes virtuels immersifs avec notre simulateur 5 places.',
+
+    // Experience Page Content
+    experienceOverview: 'Aperçu de l\'Expérience',
+    theExperience: 'L\'Expérience',
+    whatToExpect: 'À Quoi S\'Attendre',
+    safetyFirst: 'Sécurité Avant Tout',
+    perfectFor: 'Parfait Pour',
+
+    // UFO Spaceship specific
+    ufoOverviewText: 'Entrez dans notre simulateur OVNI de pointe et préparez-vous pour une aventure de réalité virtuelle hors de ce monde. Avec des sièges pour jusqu\'à 5 personnes, cette expérience immersive combine une technologie VR de pointe avec une simulation de mouvement pour créer la sensation de piloter un véritable OVNI à travers des environnements cosmiques époustouflants.',
+    ufoExperienceText: 'En entrant dans l\'OVNI, vous serez assis dans l\'un des cinq sièges de mouvement spécialement conçus. Chaque siège est équipé de son propre casque VR et de commandes interactives. Une fois que tout le monde est prêt, notre personnel vous aidera à mettre votre casque et vous expliquera comment utiliser les commandes.',
+    ufoAdventureText: 'Choisissez parmi plusieurs scénarios d\'aventure incluant l\'exploration spatiale, les rencontres extraterrestres ou les batailles intergalactiques. Chaque expérience dure environ 10-15 minutes et présente des visuels 360 degrés époustouflants, un audio spatial et des effets de mouvement synchronisés.',
+
+    // VR Battle specific
+    vrBattleOverviewText: 'Entrez dans l\'arène de combat VR ultime où la stratégie rencontre l\'action. Notre système de bataille à deux joueurs vous met, vous et un ami, en compétition directe à travers plusieurs modes de jeu et environnements.',
+    vrBattleExperienceText: 'Chaque joueur obtient sa propre configuration VR dédiée avec des casques sans fil et des contrôleurs de mouvement. Choisissez vos armes, sélectionnez votre champ de bataille et préparez-vous pour un combat intense en tête-à-tête.',
+
+    // VR Warrior specific
+    vrWarriorOverviewText: 'Une expérience VR spécialement conçue pour les jeunes aventuriers âgés de 6 à 12 ans. VR Warrior offre des défis et aventures adaptés à l\'âge dans un environnement sûr et supervisé.',
+    vrWarriorExperienceText: 'Les enfants se lanceront dans des quêtes passionnantes, résoudront des énigmes et exploreront des mondes magiques conçus spécifiquement pour leur groupe d\'âge. Tout le contenu est soigneusement sélectionné pour être à la fois amusant et éducatif.',
+
+    // VR Cat specific
+    vrCatOverviewText: 'Une expérience VR éducative et divertissante conçue pour les enfants. Explorez le monde à travers les yeux d\'un chat curieux dans cette aventure délicieuse.',
+    vrCatExperienceText: 'Les enfants apprendront sur différents environnements, animaux et résolution de problèmes tout en s\'amusant dans un monde virtuel complètement sûr.',
+
+    // Photo Booth specific
+    photoBoothOverviewText: 'Capturez des souvenirs comme jamais auparavant avec nos expériences de cabine photo VR de pointe. Créez des photos et vidéos époustouflantes dans des environnements virtuels.',
+    photoBoothExperienceText: 'Choisissez parmi des dizaines d\'arrière-plans et scénarios virtuels. Nos caméras et éclairages de qualité professionnelle garantissent que vous obtenez la photo parfaite à chaque fois.',
+
+    // Experience Page Details
+    freeRoamingTitle: 'Arène de Libre Circulation',
+    freeRoamingDescription: 'Explorez notre immense arène de 34x49 pieds avec une liberté de mouvement totale et jusqu\'à 10 joueurs simultanément.',
+    freeRoamingFullDescription: 'Entrez dans notre arène VR de libre circulation de pointe, où vous pouvez vous déplacer librement dans un espace de 34x49 pieds sans câbles ni restrictions. Parfait pour le team building, les fêtes d\'anniversaire ou les jeux compétitifs entre amis.',
+
+    vr360Title: 'VR 360',
+    vr360Description: 'Vivez une immersion complète à 360° avec nos chaises VR rotatives.',
+    vr360FullDescription: 'Immergez-vous dans des mondes virtuels époustouflants à 360 degrés avec notre expérience VR 360 premium. Nos chaises rotatives spécialement conçues offrent un confort ultime pendant que vous explorez des environnements virtuels magnifiques.',
+
+    vrBattleTitle: 'Bataille VR',
+    vrBattleDescription: 'Défiez vos amis dans notre arène de bataille VR pour deux joueurs.',
+    vrBattleFullDescription: 'Engagez-vous dans des batailles virtuelles épiques avec des amis dans notre arène de Bataille VR dédiée. Testez vos compétences, votre stratégie et vos réflexes dans des scénarios de combat multijoueur intenses.',
+
+    vrWarriorTitle: 'Guerrier VR (Enfants)',
+    vrWarriorDescription: 'Une expérience de bataille adaptée aux enfants, conçue spécifiquement pour les jeunes joueurs.',
+    vrWarriorFullDescription: 'Une expérience VR sûre et excitante conçue spécifiquement pour les enfants. Notre expérience Guerrier VR offre des aventures adaptées à l\'âge qui sont à la fois amusantes et éducatives.',
+
+    vrCatTitle: 'Chat VR',
+    vrCatDescription: 'Expérience VR amusante et engageante parfaite pour les enfants.',
+    vrCatFullDescription: 'Une expérience VR délicieuse mettant en vedette de mignons chats virtuels et un gameplay interactif conçu pour les enfants. Divertissement sûr, amusant et éducatif pour les jeunes passionnés de VR.',
+
+    ufoSpaceshipTitle: 'OVNI Vaisseau Spatial',
+    ufoSpaceshipDescription: 'Une expérience familiale pour jusqu\'à 5 personnes dans notre simulateur d\'OVNI.',
+    ufoSpaceshipFullDescription: 'Embarquez pour une aventure intergalactique dans notre simulateur de Vaisseau Spatial OVNI. Parfait pour les familles, cette expérience accueille jusqu\'à 5 personnes pour un voyage partagé à travers l\'espace.',
+
+    photoBoothTitle: 'Photomaton',
+    photoBoothDescription: 'Capturez des moments mémorables avec nos expériences photo VR.',
+    photoBoothFullDescription: 'Créez des photos uniques et mémorables avec notre Photomaton VR. Entrez dans des mondes virtuels et capturez des moments incroyables que vous pouvez partager avec vos amis et votre famille.',
+
+    // Experience Page Common
+    experienceOverview: 'Aperçu de l\'Expérience',
+    experienceHighlights: 'Points Forts de l\'Expérience',
+    experienceSpecs: 'Spécifications de l\'Expérience',
+    capacity: 'Capacité',
+    duration: 'Durée',
+    ageRecommendation: 'Recommandation d\'Âge',
+    difficulty: 'Difficulté',
+    pricing: 'Tarification',
+    pricingPlan: 'Plan de Tarification',
+    singleSession: 'Session Unique',
+    twoSessions: 'Deux Sessions',
+    bookExperience: 'Réserver Cette Expérience',
+    learnMore: 'En Savoir Plus',
+    relatedExperiences: 'Expériences Connexes',
+
+    // Free Roaming Arena Specific
+    freeRoamingHighlights: [
+      'Espace de jeu massif de 34x49 pieds avec cartographie d\'obstacles',
+      'Support pour jusqu\'à 10 joueurs simultanés',
+      'Casques VR sans fil et équipement pour un mouvement sans restriction',
+      'Accessoires physiques qui correspondent aux objets virtuels pour une immersion renforcée',
+      'Effets environnementaux incluant vent, chaleur et vibration',
+      'Multiples scénarios de jeu disponibles de la survie zombie à l\'exploration spatiale',
+      'Convient aux âges de 12 ans et plus'
+    ],
+
+    // VR 360 Specific
+    vr360Highlights: [
+      'Deux chaises VR entièrement rotatives pour une liberté de mouvement inégalée',
+      'Casques VR haute définition avec audio premium',
+      'Large sélection d\'expériences et de jeux immersifs',
+      'Synchronisation de mouvement fluide pour le confort',
+      'Parfait pour l\'exploration et les expériences atmosphériques',
+      'Convient aux âges de 10 ans et plus'
+    ],
+
+    // VR Battle Specific
+    vrBattleHighlights: [
+      'Deux stations de bataille VR dédiées avec suivi corporel complet',
+      'Technologie multijoueur avancée pour une interaction fluide',
+      'Matériel de qualité gaming professionnel pour des contrôles réactifs',
+      'Multiples genres de jeux incluant tir, sport et puzzles',
+      'Communication vocale en temps réel entre joueurs',
+      'Convient aux âges de 12 ans et plus'
+    ],
+
+    // VR Cat Specific
+    vrCatHighlights: [
+      'Deux stations VR adaptées aux enfants avec équipement simplifié',
+      'Contenu éducatif couvrant l\'art, les sciences, l\'histoire et plus',
+      'Outils de dessin et de création interactifs en VR',
+      'Excursions virtuelles dans des musées, sites historiques et merveilles naturelles',
+      'Expériences guidées avec narration vocale',
+      'Parfait pour les âges de 5 à 12 ans'
+    ],
+
+    // VR Warrior Specific
+    vrWarriorHighlights: [
+      'Deux stations VR adaptées aux enfants avec équipement ajusté',
+      'Contenu adapté aux enfants sans matériel effrayant ou inapproprié',
+      'Contrôles simplifiés faciles à maîtriser pour les enfants',
+      'Sessions de jeu plus courtes conçues pour l\'attention des jeunes',
+      'Écran de visualisation parental pour voir ce que vit votre enfant',
+      'Parfait pour les âges de 6 à 12 ans'
+    ],
+
+    // UFO Spaceship Specific
+    ufoSpaceshipHighlights: [
+      'Expérience multijoueur pour jusqu\'à 5 personnes simultanément',
+      'Sièges synchronisés au mouvement qui répondent à votre environnement virtuel',
+      'Visuels ultra haute résolution avec vision 360°',
+      'Contrôles interactifs qui vous permettent de piloter votre propre OVNI',
+      'Multiples scénarios d\'aventure au choix',
+      'Convient aux âges de 8 ans et plus'
+    ],
+
+    // Photo Booth Specific
+    photoBoothHighlights: [
+      'Photos de groupe pour jusqu\'à 6 personnes à la fois',
+      'Dizaines d\'arrière-plans virtuels au choix',
+      'Accessoires et effets numériques',
+      'Options d\'impression instantanée et de partage numérique',
+      'Parfait pour les fêtes, événements et occasions spéciales',
+      'Convient à tous les âges'
+    ],
+
     // Plans
     plansTitle: 'Nos Forfaits',
     plansDescription: 'Choisissez parmi notre gamme de forfaits conçus pour répondre à vos besoins et à votre budget.',
@@ -455,7 +1099,27 @@ export const translations = {
     letsGetStarted: 'Commençons',
     packageDescription: 'Que vous soyez un joueur, un développeur ou un innovateur d\'entreprise — nos packages VR immersifs sont conçus pour accélérer votre expérience. Choisissez celui qui vous convient le mieux et commencez dès aujourd\'hui.',
     exploreVrPackages: 'Explorer les Packages VR',
-    
+
+    // Events/Calendar
+    calendar: 'Calendrier',
+    ourEvents: 'Nos Événements',
+    eventsDescription: 'Rejoignez-nous pour des tournois VR passionnants, des événements communautaires et des célébrations spéciales. Des sessions de jeu compétitives aux activités familiales, il se passe toujours quelque chose à Virtual Arena.',
+
+    // Gallery
+    gallery: 'Galerie',
+    discoverGallery: 'Découvrez Notre Meilleure Galerie VRA',
+    galleryDescription: 'Entrez dans Virtual Arena et explorez des moments inoubliables capturés lors de nos meilleurs tournois, événements communautaires et actions en coulisses. Des parties intenses aux célébrations épiques, c\'est ici que les champions et les souvenirs se créent.',
+    viewAll: 'Voir Tout',
+
+    // Testimonials
+    testimonial: 'Témoignages',
+    whatCustomersSay: 'Ce Que Disent Nos Formidables Clients',
+    testimonialsDescription: 'Nos joueurs adorent les sensations fortes de Virtual Arena! Des batailles VR immersives aux sessions de groupe inoubliables, les commentaires parlent d\'eux-mêmes. Découvrez ce qui les fait revenir.',
+
+    // VR Package Section
+    readyToEnjoy: 'Prêt à Profiter?',
+    vrPackageDescription: 'Plongez dans l\'action avec nos packages de jeu VR immersifs. Que vous soyez ici pour une compétition intense, des batailles d\'équipe ou simplement pour le plaisir pur—Virtual Arena offre des expériences conçues pour tous les niveaux de compétence et tous les amateurs de sensations fortes.',
+
     // Why Choose
     whyChooseTitle: 'Pourquoi Nous Choisir',
     whyChooseDescription: 'Nous offrons la meilleure expérience de réalité virtuelle avec une technologie de pointe et un contenu innovant.',
@@ -480,22 +1144,35 @@ export const translations = {
     submit: 'Envoyer le message',
     
     // Contact Information
+    ourLocations: 'Nos Emplacements',
     ourLocation: 'Notre Emplacement',
     locationAddress: '8109 102 St NW, Edmonton, AB T6E 4A4',
+    forestburgLocation: 'Emplacement Forestburg',
+    forestburgAddress: '5619 46 Ave, Forestburg, AB T0B 1N0',
     corporation: 'Corporation: ABOUDA Enterprise Inc.',
     businessHours: 'Heures d\'Ouverture',
     mondayToFriday: 'Lundi - Vendredi',
-    mondayToFridayHours: '7:00 - 17:00',
+    mondayToFridayHours: '10:00 - 22:00',
     saturday: 'Samedi',
-    saturdayHours: '9:00 - 17:00',
+    saturdayHours: '10:00 - 22:00',
     sunday: 'Dimanche',
-    sundayHours: 'Fermé',
+    sundayHours: '10:00 - 22:00',
     phoneSupport: 'Support téléphonique disponible pendant les heures d\'ouverture',
     supportChannels: 'Canaux de Support',
     supportChannelsDesc: 'Nous offrons plusieurs façons d\'obtenir du support:',
     phoneSupport: 'Support Téléphonique',
     emailSupport: 'Support Email',
     liveChat: 'Chat en Direct (bientôt disponible)',
+    virtualTour: 'Visite Virtuelle',
+    virtualTourDesc: 'Faites une visite virtuelle de nos installations',
+    virtualTourComingSoon: 'Visite Virtuelle (bientôt disponible)',
+    virtualTourDescription: 'Obtenez un aperçu immersif de notre arène VR et de nos installations avant votre visite. Découvrez notre équipement de pointe et nos espaces de jeu spacieux.',
+    exploreOurFacility: 'Explorez Nos Installations',
+    play: 'Jouer',
+    pause: 'Pause',
+    fullscreen: 'Plein Écran',
+    exitFullscreen: 'Quitter Plein Écran',
+    bookYourVisit: 'Réservez Votre Visite',
     onsiteAssistance: 'Assistance sur Place',
     
     // Contact Info Cards
@@ -550,11 +1227,15 @@ export const translations = {
     ourFacility: 'Notre Installation',
     facilityDescription: 'Conçue pour l\'immersion, le confort et la sécurité à chaque instant',
     spaciousArena: 'Arène Spacieuse',
-    spaciousArenaDesc: 'Notre arène de libre circulation de 230 m² offre beaucoup d\'espace pour des aventures multijoueurs immersives.',
+    spaciousArenaDesc: 'Notre arène de libre circulation de 34x49 pieds (1,666 pi²) offre beaucoup d\'espace pour des aventures multijoueurs immersives.',
     premiumEquipment: 'Équipement Premium',
     premiumEquipmentDesc: 'Nous utilisons uniquement les derniers casques VR haut de gamme et la technologie de suivi de mouvement pour la meilleure expérience.',
     comfortZones: 'Zones de Confort',
     comfortZonesDesc: 'Détendez-vous avant ou après votre expérience dans nos espaces salon confortables avec des rafraîchissements disponibles.',
+    loungeArea: 'Espace Salon',
+    loungeAreaDesc: 'Notre spacieux espace salon dispose de sièges confortables, de stations de jeu et d\'une variété de collations et boissons à l\'achat.',
+    snacksAndBeverages: 'Collations et Boissons',
+    snacksDesc: 'Profitez d\'une sélection de collations, boissons gazeuses, boissons énergisantes et rafraîchissements légers pendant votre visite.',
     safetyFirst: 'La Sécurité d\'Abord',
     safetyFirstDesc: 'Toute notre installation est conçue en pensant à la sécurité, avec des surfaces rembourrées et du personnel formé toujours présent.',
     virtualTour: 'Visite Virtuelle',
@@ -624,10 +1305,131 @@ export const translations = {
     logoutSuccess: 'Déconnexion réussie',
     
     // Language
-    english: 'Anglais',
+    english: 'English',
     french: 'Français',
     switchToEnglish: 'Passer à l\'anglais',
     switchToFrench: 'Passer au français',
+
+    // Currency
+    currency: 'CAD',
+    currencySymbol: '$',
+    formatPrice: (price) => `${price} $ CAD`,
+
+    // Booking Modal
+    bookVrSession: 'Réserver une Session VR',
+    chooseVrExperience: 'Choisissez votre expérience VR',
+    loadingSessions: 'Chargement des sessions...',
+    noSessionsAvailable: 'Aucune session VR disponible pour le moment.',
+    retryLoadingSessions: 'Réessayer le Chargement des Sessions',
+    backToSessions: '← Retour aux Sessions',
+    bookingConfiguration: 'Configuration de Réservation',
+    customizeVrExperience: 'Personnalisez votre expérience VR',
+    sessionDetails: 'Détails de la Session',
+    numberOfSessions: 'Nombre de Sessions:',
+    numberOfPlayers: 'Nombre de Joueurs:',
+    perPerson: 'par personne',
+    maxPlayers: 'Max',
+    howToBook: 'Comment souhaitez-vous réserver?',
+    continueAs: 'Continuer en tant que',
+    useAccountFasterBooking: 'Utilisez votre compte pour une réservation plus rapide',
+    bookAsGuest: 'Réserver en tant qu\'Invité',
+    noAccountRequired: 'Aucun compte requis',
+    backToCalendar: '← Retour au Calendrier',
+    guestDetails: 'Détails de l\'Invité',
+    provideContactInfo: 'Veuillez fournir vos informations de contact',
+    enterFullName: 'Entrez votre nom complet',
+    enterEmail: 'Entrez votre email',
+    enterPhoneNumber: 'Entrez votre numéro de téléphone',
+    continueToConfirmation: 'Continuer vers la Confirmation',
+    back: '← Retour',
+    confirmBookingPayment: 'Confirmer la Réservation et le Paiement',
+    bookingDetails: 'Détails de la Réservation',
+    session: 'Session:',
+    date: 'Date:',
+    time: 'Heure:',
+    sessions: 'Sessions:',
+    players: 'Joueurs:',
+    pricePerPerson: 'Prix par personne:',
+    subtotal: 'Sous-total:',
+    groupDiscount: 'Réduction de Groupe',
+    totalPrice: 'Prix Total:',
+    name: 'Nom:',
+    email: 'Email:',
+    paymentMethod: 'Méthode de Paiement',
+    howToPay: 'Comment souhaitez-vous payer cette session VR?',
+    payOnlineNow: '💳 Payer en Ligne Maintenant',
+    securePaymentStripe: 'Paiement sécurisé avec Stripe',
+    payAtVenue: '🏢 Payer sur Place',
+    payAtVenueDesc: 'Payez en espèces ou par carte à votre arrivée',
+    back: 'Retour',
+    proceedToPayment: 'Procéder au Paiement',
+    confirmBooking: 'Confirmer la Réservation',
+    creatingBooking: 'Création de la Réservation...',
+    bookingConfirmed: 'Réservation Confirmée!',
+    vrSessionBooked: 'Votre session VR a été réservée avec succès.',
+    confirmationEmailSent: 'Un email de confirmation a été envoyé à votre adresse email.',
+    close: 'Fermer',
+    groupDiscountInfo: 'Réductions de groupe: 5+ personnes obtiennent 10-20% de réduction',
+
+    // Common Messages
+    pleaseSelectItem: 'Veuillez d\'abord sélectionner un élément',
+    pleaseLoginToContinue: 'Veuillez vous connecter pour continuer',
+    registeredForTournament: 'Vous avez été inscrit au tournoi. Le paiement sera collecté lors de l\'événement.',
+    registeredForEvent: 'Vous avez été inscrit à l\'événement. Le paiement sera collecté lors de l\'événement.',
+    tournamentTicketAdded: 'Billet de tournoi ajouté au panier',
+    eventTicketAdded: 'Billet d\'événement ajouté au panier',
+    failedToAddToCart: 'Échec de l\'ajout au panier',
+    unexpectedError: 'Une erreur inattendue s\'est produite',
+    register: 'S\'inscrire',
+
+    // Success/Error Messages
+    thankYouOrder: 'Merci pour votre commande!',
+    orderReceivedDesc: 'Nous avons reçu votre commande et vous enverrons un email de confirmation sous peu!',
+    couldNotFindCheckoutSession: 'Impossible de trouver la session de commande',
+    returnToHome: 'Retour à l\'accueil',
+    viewYourOrders: 'Voir Vos Commandes',
+    continueShopping: 'Continuer les Achats',
+
+    // Contact Form Messages
+    messageSent: 'Message Envoyé avec Succès!',
+    messageConfirmation: 'Merci de nous avoir contactés. Nous vous répondrons dans les 24 heures.',
+    messageSentDesc: 'Merci de nous avoir contactés. Nous vous répondrons bientôt.',
+    errorOccurred: 'Erreur',
+    mustAgreeToTerms: 'Vous devez accepter les termes et conditions',
+    sending: 'Envoi en cours...',
+
+    // Tournament and Event Categories
+    gameTypes: {
+      battleRoyale: 'Battle Royale',
+      beatSaber: 'Beat Saber',
+      racing: 'Course',
+      shooting: 'Tir',
+      adventure: 'Aventure',
+      puzzle: 'Puzzle',
+      sports: 'Sports',
+      other: 'Autre'
+    },
+    eventTypes: {
+      party: 'Fête',
+      corporate: 'Événement Corporatif',
+      birthday: 'Fête d\'Anniversaire',
+      special: 'Événement Spécial',
+      other: 'Autre'
+    },
+
+    // Past Tournaments
+    pastTournaments: 'Tournois Passés',
+    pastTournamentsDescription: 'Découvrez les résultats et les moments forts de nos tournois précédents.',
+    winner: 'Gagnant',
+    prizeWon: 'Prix Remporté',
+    viewGallery: 'Voir la Galerie',
+    photos: 'photos',
+    morePhotos: 'plus de photos',
+
+    // Tournament Rules & Requirements
+    tournamentRules: 'Règles du Tournoi',
+    tournamentRequirements: 'Exigences',
+    rulesAndRequirements: 'Règles et Exigences',
     
     // Pricing Plans
     allInclusivePricing: 'Tarification Tout Compris',

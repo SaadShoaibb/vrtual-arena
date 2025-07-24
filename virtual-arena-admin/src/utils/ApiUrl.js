@@ -10,9 +10,15 @@ export const SOCKET_URL = '/socket';
 // };
 
 export const getAuthHeaders = () => {
+  // Check if we're in a browser environment
+  if (typeof window === 'undefined') {
+    throw new Error('localStorage not available in server environment');
+  }
+
   const authToken = localStorage.getItem('token');
 
   if (!authToken) {
+    console.error('No auth token found in localStorage');
     throw new Error('No auth token found');
   }
 

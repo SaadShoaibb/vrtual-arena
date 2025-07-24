@@ -8,22 +8,28 @@ import Footer from '@/app/components/Footer'
 import AuthModel from '@/app/components/AuthModal'
 import AuthComponents from '@/app/components/AuthComponents'
 import { useSelector } from 'react-redux'
+import { useSearchParams } from 'next/navigation'
+import { translations } from '@/app/translations'
 
 const Merchandise = () => {
   const { showModal } = useSelector(state => state.modal)
+  const searchParams = useSearchParams()
+  const locale = searchParams.get('locale') || 'en'
+  const t = translations[locale] || translations.en
   
   return (
     <>
       <div className="relative">
-        <Navbar/>
+        <Navbar locale={locale} />
         <HeroHeader
-          btn='Shop'
-          title='Shop'
+          btn={t.shop}
+          title={t.shop}
           bg='bg-pricingbg'
+          locale={locale}
         />
-        <Merchandises/>
-        <Connected />
-        <Footer />
+        <Merchandises locale={locale} />
+        <Connected locale={locale} />
+        <Footer locale={locale} />
       </div>
       {showModal && (
         <AuthModel>

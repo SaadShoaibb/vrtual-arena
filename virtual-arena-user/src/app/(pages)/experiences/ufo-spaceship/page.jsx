@@ -2,14 +2,30 @@
 import React from 'react';
 import { IoMdPeople, IoMdTime } from 'react-icons/io';
 import { MdOutlineEventSeat } from 'react-icons/md';
+import { useSearchParams } from 'next/navigation';
+import { useDispatch } from 'react-redux';
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
+import BookModal from '@/app/components/BookModal';
+import { openBookModal } from '@/Store/ReduxSlice/bookModalSlice';
+import { translations } from '@/app/translations';
 
 const UfoSpaceshipPage = () => {
+  const searchParams = useSearchParams();
+  const locale = searchParams.get('locale') || 'en';
+  const t = translations[locale] || translations.en;
+  const dispatch = useDispatch();
+
+  const handleBookNow = () => {
+    dispatch(openBookModal({
+      experienceType: 'UFO Spaceship',
+      sessionName: 'UFO Spaceship Simulator'
+    }));
+  };
   return (
     <>
     <div className="bg-black text-white">
-      <Navbar />
+      <Navbar locale={locale} />
       
       {/* Hero Section */}
       <div className="relative h-[60vh] overflow-hidden">
@@ -21,9 +37,9 @@ const UfoSpaceshipPage = () => {
         />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
           <div className="max-w-[1600px] mx-auto">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white">UFO Spaceship</h1>
-            <p className="text-xl md:text-2xl text-gray-200 max-w-3xl">
-              Experience the thrill of piloting a UFO through immersive virtual worlds with our 5-seat UFO Spaceship simulator.
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white text-wrap-balance">{t.ufoSpaceshipTitle}</h1>
+            <p className="text-xl md:text-2xl text-gray-200 max-w-3xl text-wrap-balance">
+              {t.ufoSpaceshipDescription}
             </p>
           </div>
         </div>
@@ -34,38 +50,27 @@ const UfoSpaceshipPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Left Column - Description and Features */}
           <div className="lg:col-span-2">
-            <h2 className="text-3xl font-bold mb-6 text-white">Experience Overview</h2>
+            <h2 className="text-3xl font-bold mb-6 text-white">{t.experienceOverview}</h2>
             <p className="text-lg text-gray-200 mb-8">
-              Step into our cutting-edge UFO Spaceship simulator and prepare for an out-of-this-world virtual reality adventure. 
-              With seating for up to 5 people, this immersive experience combines state-of-the-art VR technology with motion 
-              simulation to create the sensation of piloting an actual UFO through stunning cosmic environments.
+              {t.ufoOverviewText}
             </p>
 
             <div className="mb-12">
-              <h3 className="text-2xl font-bold mb-4 text-white">Experience Highlights</h3>
+              <h3 className="text-2xl font-bold mb-4 text-white">{t.experienceHighlights}</h3>
               <ul className="list-disc list-inside space-y-3 text-gray-200">
-                <li>Multi-player experience for up to 5 people simultaneously</li>
-                <li>Motion-synchronized seats that respond to your virtual environment</li>
-                <li>Ultra-high resolution visuals with 360° viewing</li>
-                <li>Interactive controls that let you pilot your own UFO</li>
-                <li>Multiple adventure scenarios to choose from</li>
-                <li>Suitable for ages 8 and up</li>
+                {t.ufoSpaceshipHighlights.map((highlight, index) => (
+                  <li key={index}>{highlight}</li>
+                ))}
               </ul>
             </div>
 
             <div>
-              <h3 className="text-2xl font-bold mb-4 text-white">The Experience</h3>
+              <h3 className="text-2xl font-bold mb-4 text-white">{t.theExperience}</h3>
               <p className="text-lg text-gray-200 mb-4">
-                As you enter the UFO Spaceship, you'll be seated in one of five specially designed motion seats. 
-                Each seat is equipped with its own VR headset and interactive controls. Once everyone is ready, 
-                our staff will help you put on your headset and brief you on how to use the controls.
+                {t.ufoExperienceText}
               </p>
               <p className="text-lg text-gray-200 mb-8">
-                Choose from multiple adventure scenarios including space exploration, alien encounters, or 
-                cosmic racing. As the experience begins, you'll feel your seat move in perfect synchronization 
-                with the virtual environment, creating an incredibly realistic sensation of flight. 
-                Navigate through asteroid fields, explore alien planets, or race against friends in this 
-                unforgettable VR adventure.
+                {t.ufoAdventureText}
               </p>
             </div>
           </div>
@@ -117,12 +122,15 @@ const UfoSpaceshipPage = () => {
                 </p>
               </div>
               
-              <button className="w-full bg-gradient-to-r from-[#DB1FEB] to-[#24CBFF] hover:opacity-90 transition-opacity text-white text-lg font-bold py-3 px-6 rounded-full mb-4">
-                Book Now
+              <button
+                onClick={handleBookNow}
+                className="w-full bg-gradient-to-r from-[#DB1FEB] to-[#24CBFF] hover:opacity-90 transition-opacity text-white text-lg font-bold py-3 px-6 rounded-full mb-4"
+              >
+                {t.bookNow}
               </button>
-              
+
               <button className="w-full border border-white text-white hover:bg-white hover:text-black transition-colors font-bold py-3 px-6 rounded-full">
-                View Available Packages
+                {t.viewAvailablePackages}
               </button>
             </div>
           </div>
@@ -193,7 +201,10 @@ const UfoSpaceshipPage = () => {
           </div>
         </div>
       </div>
-      <Footer />
+      <Footer locale={locale} />
+
+      {/* Booking Modal */}
+      <BookModal locale={locale} />
     </div>
     </>
   );

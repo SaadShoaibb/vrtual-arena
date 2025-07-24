@@ -1,16 +1,124 @@
 'use client'
-import React from 'react'
-import { FaMapMarkerAlt, FaClock, FaPhone, FaEnvelope, FaComments } from 'react-icons/fa';
+import React, { useState } from 'react'
+import { FaMapMarkerAlt, FaClock, FaPhone, FaEnvelope, FaComments, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import { translations } from '@/app/translations'
 
 const Contact = ({ locale = 'en' }) => {
     const t = translations[locale] || translations.en;
+
+    // Form state
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        message: '',
+        agreeToTerms: false
+    });
+
+    const [formStatus, setFormStatus] = useState({
+        isSubmitting: false,
+        isSubmitted: false,
+        error: null
+    });
 
     const businessHours = [
         { day: t.mondayToFriday, hours: t.mondayToFridayHours },
         { day: t.saturday, hours: t.saturdayHours },
         { day: t.sunday, hours: t.sundayHours }
     ];
+
+    // Handle form input changes
+    const handleInputChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
+
+    // Handle form submission
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // Basic validation
+        if (!formData.firstName || !formData.lastName || !formData.email || !formData.message) {
+            setFormStatus({
+                isSubmitting: false,
+                isSubmitted: false,
+                error: t.pleaseSelectItem || 'Please fill in all required fields'
+            });
+            return;
+        }
+
+        if (!formData.agreeToTerms) {
+            setFormStatus({
+                isSubmitting: false,
+                isSubmitted: false,
+                error: t.mustAgreeToTerms || 'You must agree to the terms and conditions'
+            });
+            return;
+        }
+
+        setFormStatus({
+            isSubmitting: true,
+            isSubmitted: false,
+            error: null
+        });
+
+        try {
+            // Submit directly to FormSubmit
+            const formSubmitData = {
+                name: `${formData.firstName} ${formData.lastName}`,
+                email: formData.email,
+                phone: formData.phone || 'Not provided',
+                message: formData.message,
+                _subject: `VR Arena Contact (Contact Page): ${formData.firstName} ${formData.lastName}`,
+                _captcha: 'false',
+                _template: 'table'
+            };
+
+            const response = await fetch('https://formsubmit.co/ajax/affinitycoders@gmail.com', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(formSubmitData)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error('Failed to send message');
+            }
+
+            // Success
+            setFormStatus({
+                isSubmitting: false,
+                isSubmitted: true,
+                error: null
+            });
+
+            // Reset form
+            setFormData({
+                firstName: '',
+                lastName: '',
+                email: '',
+                phone: '',
+                message: '',
+                agreeToTerms: false
+            });
+
+        } catch (error) {
+            console.error('Contact form error:', error);
+            setFormStatus({
+                isSubmitting: false,
+                isSubmitted: false,
+                error: error.message || t.unexpectedError || 'An error occurred while sending your message. Please try again.'
+            });
+        }
+    };
 
     return (
         <div id='contact' className={`w-full h-full bg-blackish`}>
@@ -26,14 +134,28 @@ const Contact = ({ locale = 'en' }) => {
 
                         {/* Business Information */}
                         <div className="mt-8 space-y-6">
-                            {/* Business Address */}
+                            {/* Business Locations */}
                             <div className="flex items-start space-x-4">
                                 <FaMapMarkerAlt className="text-[#DB1FEB] text-xl mt-1" />
                                 <div>
-                                    <h3 className="text-white font-bold">{t.ourLocation}</h3>
-                                    <p className="text-white text-lg font-light">
-                                        {t.locationAddress}
-                                    </p>
+                                    <h3 className="text-white font-bold">{t.ourLocations}</h3>
+
+                                    {/* Edmonton Location */}
+                                    <div className="mb-3">
+                                        <h4 className="text-white font-semibold text-lg">{t.ourLocation} (Main)</h4>
+                                        <p className="text-white text-lg font-light">
+                                            {t.locationAddress}
+                                        </p>
+                                    </div>
+
+                                    {/* Forestburg Location */}
+                                    <div className="mb-3">
+                                        <h4 className="text-white font-semibold text-lg">{t.forestburgLocation}</h4>
+                                        <p className="text-white text-lg font-light">
+                                            {t.forestburgAddress}
+                                        </p>
+                                    </div>
+
                                     <p className="text-white text-sm">
                                         {t.corporation}
                                     </p>
@@ -90,18 +212,90 @@ const Contact = ({ locale = 'en' }) => {
                             ></iframe>
                         </div>
 
-                        <form className="mt-6">
+                        {/* Success Message */}
+                        {formStatus.isSubmitted && (
+                            <div className="mt-6 p-4 bg-green-600/20 border border-green-500 rounded-xl flex items-center space-x-3">
+                                <FaCheckCircle className="text-green-400 text-xl" />
+                                <div>
+                                    <h4 className="text-green-400 font-semibold">{t.messageSent || 'Message Sent Successfully!'}</h4>
+                                    <p className="text-green-300 text-sm">{t.messageSentDesc || 'Thank you for contacting us. We will get back to you soon.'}</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Error Message */}
+                        {formStatus.error && (
+                            <div className="mt-6 p-4 bg-red-600/20 border border-red-500 rounded-xl flex items-center space-x-3">
+                                <FaExclamationTriangle className="text-red-400 text-xl" />
+                                <div>
+                                    <h4 className="text-red-400 font-semibold">{t.errorOccurred || 'Error'}</h4>
+                                    <p className="text-red-300 text-sm">{formStatus.error}</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Success Message */}
+                        {formStatus.isSubmitted && (
+                            <div className="mb-6 p-6 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-xl">
+                                <div className="flex items-center space-x-3">
+                                    <div className="flex-shrink-0">
+                                        <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-green-400">
+                                            {t.messageSent || 'Message Sent Successfully!'}
+                                        </h3>
+                                        <p className="text-green-300 mt-1">
+                                            {t.messageConfirmation || 'Thank you for contacting us. We will get back to you within 24 hours.'}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Error Message */}
+                        {formStatus.error && (
+                            <div className="mb-6 p-6 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/30 rounded-xl">
+                                <div className="flex items-center space-x-3">
+                                    <div className="flex-shrink-0">
+                                        <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-red-400">
+                                            {t.errorOccurred || 'Error Occurred'}
+                                        </h3>
+                                        <p className="text-red-300 mt-1">
+                                            {formStatus.error}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <form className="mt-6" onSubmit={handleSubmit}>
                             {/* First Row */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                 <input
                                     type="text"
+                                    name="firstName"
+                                    value={formData.firstName}
+                                    onChange={handleInputChange}
                                     placeholder={t.namePlaceholder}
                                     className="bg-transparent focus:outline text-white p-5 rounded-xl border"
+                                    required
                                 />
                                 <input
                                     type="text"
+                                    name="lastName"
+                                    value={formData.lastName}
+                                    onChange={handleInputChange}
                                     placeholder={t.lastNamePlaceholder}
                                     className="bg-transparent focus:outline text-white p-5 rounded-xl border"
+                                    required
                                 />
                             </div>
 
@@ -109,11 +303,18 @@ const Contact = ({ locale = 'en' }) => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                 <input
                                     type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
                                     placeholder={t.emailPlaceholder}
                                     className="bg-transparent focus:outline text-white p-5 rounded-xl border"
+                                    required
                                 />
                                 <input
                                     type="text"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleInputChange}
                                     placeholder={t.phonePlaceholder}
                                     className="bg-transparent focus:outline text-white p-5 rounded-xl border"
                                 />
@@ -121,15 +322,35 @@ const Contact = ({ locale = 'en' }) => {
 
                             {/* Message Field */}
                             <textarea
+                                name="message"
+                                value={formData.message}
+                                onChange={handleInputChange}
                                 placeholder={t.messagePlaceholder}
-                                className="w-full border mb-6 bg-transparent text-white focus:outline-none p-5 rounded-xl h-[220px] resize-none "
+                                className="w-full border mb-6 bg-transparent text-white focus:outline-none p-5 rounded-xl h-[220px] resize-none"
+                                required
                             ></textarea>
 
-                            <input type="checkbox" name="" id="" className='h-[22px] w-[22px] bg-transparent text-white checked:bg-transparent checked:text-white border border-white' />
-                            <span className='text-xl font-light text-white ml-2 '>{t.termsAndConditions}</span>
+                            <div className="flex items-center mb-6">
+                                <input
+                                    type="checkbox"
+                                    name="agreeToTerms"
+                                    checked={formData.agreeToTerms}
+                                    onChange={handleInputChange}
+                                    id="agreeToTerms"
+                                    className='h-[22px] w-[22px] bg-transparent text-white checked:bg-transparent checked:text-white border border-white'
+                                    required
+                                />
+                                <label htmlFor="agreeToTerms" className='text-xl font-light text-white ml-2 cursor-pointer'>{t.termsAndConditions}</label>
+                            </div>
 
                             {/* Send Message Button */}
-                            <button className='col-span-5 lg:col-span-2 xl:col-span-1 text-xl mt-[45px] font-semibold flex items-center h-fit w-fit my-auto py-2 md:py-4 px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7]'>{t.submit}</button>
+                            <button
+                                type="submit"
+                                disabled={formStatus.isSubmitting}
+                                className='col-span-5 lg:col-span-2 xl:col-span-1 text-xl mt-[45px] font-semibold flex items-center h-fit w-fit my-auto py-2 md:py-4 px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] disabled:opacity-50 disabled:cursor-not-allowed'
+                            >
+                                {formStatus.isSubmitting ? (t.sending || 'Sending...') : t.submit}
+                            </button>
                         </form>
                     </div>
                 </div>
