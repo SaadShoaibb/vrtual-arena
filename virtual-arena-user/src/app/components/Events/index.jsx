@@ -136,26 +136,27 @@ const Calender = ({ locale = 'en' }) => {
                         const startDate = new Date(e.start_date);
                         const endDate = new Date(e.end_date);
                         const day = startDate.getDate();
-                        const month = startDate.toLocaleString('default', { month: 'long' });
+                        const monthFull = startDate.toLocaleString('default', { month: 'long' });
+                        const month = monthFull.substring(0, 3); // Get first 3 letters of month
                         const year = startDate.getFullYear();
                         const startTime = startDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
                         const endTime = endDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
                         const time = `${startTime} – ${endTime}`;
 
                         return (
-                            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 border-b gap-4 lg:gap-6 py-[35px]' key={i}>
+                            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 border-b gap-6 md:gap-8 lg:gap-6 xl:gap-8 py-[35px]' key={i}>
                                 {/* Date Section */}
-                                <div className='flex items-center gap-3 col-span-1 md:col-span-2 lg:col-span-1 justify-center md:justify-start mb-4 md:mb-0'>
+                                <div className='flex items-center gap-3 col-span-1 md:col-span-2 lg:col-span-1 justify-center md:justify-start mb-6 md:mb-0 lg:pr-4'>
                                     <h1 className='text-[50px] sm:text-[60px] md:text-[70px] lg:text-[80px] text-white font-bold leading-none flex-shrink-0'>{day}</h1>
                                     <div className='flex flex-col min-w-0'>
-                                        <h1 className='text-[20px] sm:text-[24px] md:text-[28px] lg:text-[32px] text-white leading-tight whitespace-nowrap'>{month},</h1>
-                                        <h1 className='text-[20px] sm:text-[24px] md:text-[28px] lg:text-[32px] text-white leading-tight'>{year}</h1>
+                                        <h1 className='text-[18px] sm:text-[20px] md:text-[24px] lg:text-[28px] xl:text-[32px] text-white leading-tight whitespace-nowrap'>{month},</h1>
+                                        <h1 className='text-[18px] sm:text-[20px] md:text-[24px] lg:text-[28px] xl:text-[32px] text-white leading-tight'>{year}</h1>
                                     </div>
                                 </div>
 
                                 {/* Event Details Section */}
-                                <div className='col-span-1 md:col-span-2 lg:col-span-3 flex flex-col text-white justify-center space-y-3 min-w-0'>
-                                    <h1 className='text-[24px] sm:text-[28px] md:text-[32px] lg:text-[36px] xl:text-[40px] 2xl:text-[50px] font-semibold leading-tight mb-2 capitalize break-words overflow-wrap-anywhere'>{e?.name}</h1>
+                                <div className='col-span-1 md:col-span-2 lg:col-span-3 flex flex-col text-white justify-center space-y-3 min-w-0 lg:pl-4 xl:pl-6'>
+                                    <h1 className='text-[22px] sm:text-[26px] md:text-[30px] lg:text-[34px] xl:text-[38px] 2xl:text-[42px] font-semibold leading-tight mb-2 capitalize break-words overflow-wrap-anywhere'>{e?.name}</h1>
                                     <div className='flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-12 items-start sm:items-center'>
                                         <div className='flex items-center gap-2 text-white min-w-0 flex-shrink-0'>
                                             <IoLocationOutline size={18} className="flex-shrink-0 sm:w-5 sm:h-5" />
@@ -169,7 +170,7 @@ const Calender = ({ locale = 'en' }) => {
                                 </div>
 
                                 {/* Button Section */}
-                                <div className='col-span-1 md:col-span-2 lg:col-span-1 flex justify-center lg:justify-end items-center mt-4 lg:mt-0'>
+                                <div className='col-span-1 md:col-span-2 lg:col-span-1 flex justify-center lg:justify-end items-center mt-6 lg:mt-0'>
                                     <button
                                         onClick={() => handleSelectTournament(e)}
                                         className='text-sm sm:text-base md:text-lg lg:text-xl font-semibold flex items-center justify-center h-fit w-fit py-3 px-4 sm:px-6 lg:py-4 lg:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] hover:opacity-90 transition-opacity whitespace-nowrap min-w-fit'
