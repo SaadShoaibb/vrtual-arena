@@ -70,9 +70,13 @@ const SEOHead = ({ page = 'home', locale = 'en', customTitle, customDescription 
       <meta name="contact:email" content="contact@vrtualarena.ca" />
       <meta name="contact:address" content="8109 102 St NW, Edmonton, AB T6E 4A4" />
 
-      {/* Favicon */}
-      <link rel="icon" href="/favicon.ico" />
+      {/* Favicon and Icons */}
+      <link rel="icon" href="/favicon.ico" sizes="any" />
+      <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png" />
+      <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
       <link rel="apple-touch-icon" href="/assets/logo.png" />
+      <link rel="shortcut icon" href="/favicon.ico" />
+      <link rel="manifest" href="/manifest.json" />
     </Head>
   );
 };
