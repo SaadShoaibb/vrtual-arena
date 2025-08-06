@@ -15,8 +15,14 @@ import GuestProductModal from '@/app/components/GuestProductModal'
 import { getMediaBaseUrl } from '@/utils/ApiUrl';
 import toast from 'react-hot-toast';
 import { formatDisplayPrice } from '@/app/utils/currency';
+import { translations } from '@/app/translations';
+import { useSearchParams } from 'next/navigation';
 
 const Merchandises = ({ locale = 'en' }) => {
+    const searchParams = useSearchParams();
+    const currentLocale = searchParams?.get('locale') || locale || 'en';
+    const t = translations[currentLocale] || translations.en;
+
     const dispatch = useDispatch()
     const { products, status, error } = useSelector(state => state.products)
     const { isAuthenticated } = useSelector(state => state.userData)
@@ -28,13 +34,14 @@ const Merchandises = ({ locale = 'en' }) => {
     const [showGuestModal, setShowGuestModal] = useState(false)
     const [selectedProduct, setSelectedProduct] = useState(null)
     const [guestCartCount, setGuestCartCount] = useState(0)
-    
+
     const categories = [
-        { id: 'all', name: 'All Products' },
-        { id: 'vr-essentials', name: 'VR Essentials', description: 'Eye masks, comfort accessories and more' },
-        { id: 'vr-hardware', name: 'VR Hardware', description: 'Guns, rifles, charging stations, and peripherals' },
-        { id: 'branded', name: 'Branded Merchandise', description: 'T-shirts, hats, caps with VRtual Arena logo' },
-        { id: 'gift-cards', name: 'Gift Cards & Experiences', description: 'Pre-paid sessions and gift options' }
+        { id: 'all', name: t.allProducts },
+        { id: 'vr-essentials', name: t.vrEssentials, description: t.vrEssentialsDesc },
+        { id: 'eye-masks', name: t.eyeMasks, description: t.eyeMasksDesc },
+        { id: 'vr-hardware', name: t.vrHardware, description: t.vrHardwareDesc },
+        { id: 'branded', name: t.brandedMerchandise, description: t.brandedMerchandiseDesc },
+        { id: 'gift-cards', name: t.giftCards, description: t.giftCardsDesc }
     ]
 
     useEffect(() => {
@@ -185,12 +192,14 @@ const Merchandises = ({ locale = 'en' }) => {
     };
 
     // Filter products based on selected category
-    const filteredProducts = activeCategory === 'all' 
-        ? products 
+    const filteredProducts = activeCategory === 'all'
+        ? products
         : products.filter(product => {
             switch(activeCategory) {
                 case 'vr-essentials':
                     return product.category === 'VR Essentials';
+                case 'eye-masks':
+                    return product.category === 'Eye Masks';
                 case 'vr-hardware':
                     return product.category === 'VR Hardware';
                 case 'branded':
@@ -226,7 +235,7 @@ const Merchandises = ({ locale = 'en' }) => {
             {/* Category Navigation */}
             <div className="py-8">
                 <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-white mb-6 text-center">Shop by Category</h2>
+                    <h2 className="text-3xl font-bold text-white mb-6 text-center">{t.shopByCategory}</h2>
                     
                     <div className="flex flex-wrap justify-center gap-4 mb-8">
                         {categories.map(category => (
@@ -296,9 +305,9 @@ const Merchandises = ({ locale = 'en' }) => {
                                     </div>
                                     <div className="flex items-center gap-2">
                                         {product.stock > 0 ? (
-                                            <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">In Stock</span>
+                                            <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">{t.inStock}</span>
                                         ) : (
-                                            <span className="text-xs bg-red-500 text-white px-2 py-1 rounded">Out of Stock</span>
+                                            <span className="text-xs bg-red-500 text-white px-2 py-1 rounded">{t.outOfStock}</span>
                                         )}
                                     </div>
                                 </div>
@@ -310,7 +319,7 @@ const Merchandises = ({ locale = 'en' }) => {
                                     >
                                         <img src="/icons/cart.png" alt="cart" />
                                         <h1 className={`text-lg font-semibold ${product.stock <= 0 ? 'text-gray-500' : ''}`}>
-                                            {product.stock > 0 ? 'Add To Cart' : 'Out of Stock'}
+                                            {product.stock > 0 ? t.addToCart : t.outOfStock}
                                         </h1>
                                     </button>
                                     <div

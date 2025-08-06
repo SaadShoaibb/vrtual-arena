@@ -35,7 +35,7 @@ const Testimonials = ({ locale = 'en' }) => {
                                         <FaStar size={20} />
                                         <FaStar size={20} />
                                     </div>
-                                    <h1 className='text-white font-semibold'>15k+ Reviews</h1>
+                                    <h1 className='text-white font-semibold'>{t.reviewsCount}</h1>
                                 </div>
                             </div>
 
@@ -66,13 +66,13 @@ const Testimonials = ({ locale = 'en' }) => {
                                                 <FaStar size={20} />
                                                 <FaStar size={20} />
                                             </div>
-                                            <h1 className='text-2xl md:text-3xl text-white font-bold'>Esther Howard</h1>
-                                            <h3 className='text-white text-lg'>Client Feedback</h3>
+                                            <h1 className='text-2xl md:text-3xl text-white font-bold'>{t.testimonialData[0].name}</h1>
+                                            <h3 className='text-white text-lg'>{t.clientFeedback}</h3>
                                         </div>
                                         <img src="/icons/comma.png" alt="Quote" className='w-12 h-12' />
                                     </div>
                                     <p className='text-base md:text-lg font-light text-white'>
-                                        "The VR experience at VRA was absolutely mind-blowing! The equipment was top-notch, the staff were super helpful, and I felt like I was really inside the game. Will definitely be back with friends!"
+                                        "{t.testimonialData[0].feedback}"
                                     </p>
                                 </div>
                             </div>
@@ -95,13 +95,13 @@ const Testimonials = ({ locale = 'en' }) => {
                                                 <FaStar size={20} />
                                                 <FaStar size={20} />
                                             </div>
-                                            <h1 className='text-3xl text-white font-bold'>Michael Lee</h1>
-                                            <h3 className='text-white text-lg'>Client Feedback</h3>
+                                            <h1 className='text-3xl text-white font-bold'>{t.testimonialData[1].name}</h1>
+                                            <h3 className='text-white text-lg'>{t.clientFeedback}</h3>
                                         </div>
                                         <img src="/icons/comma.png" alt="Quote" className='w-12 h-12' />
                                     </div>
                                     <p className='text-lg font-light text-white'>
-                                        "I hosted my son's birthday party at VRA and it was a total hit. The kids had a blast, and everything was perfectly organized. Thank you for making it so special!"
+                                        "{t.testimonialData[1].feedback}"
                                     </p>
                                 </div>
                             </div>

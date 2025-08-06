@@ -20,6 +20,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { closeBookModal } from '@/Store/ReduxSlice/bookModalSlice';
 import toast from 'react-hot-toast';
 import { fetchUserData } from '@/Store/Actions/userActions';
+import { translations } from '@/app/translations';
+import { useSearchParams } from 'next/navigation';
 
 const MODE = {
     BOOKING: "BOOKING",
@@ -29,6 +31,10 @@ const MODE = {
 }
 
 const BookingForm = ({ prefill = null, onClose }) => {
+    const searchParams = useSearchParams();
+    const locale = searchParams?.get('locale') || 'en';
+    const t = translations[locale] || translations.en;
+
     // Prefill-aware initial state
     const [formData, setFormData] = useState({
         machine_type: "",
@@ -191,22 +197,22 @@ console.log(bookings)
         <div className='text-white w-full max-w-[540px]'>
             {mode === "BOOKING" &&
                 <>
-                    <h1 className='text-[50px] font-bold text-white text-center'>Book Now</h1>
-                    <p className='text-lg text-white mt-2 text-center'>Please enter your details</p>
+                    <h1 className='text-[50px] font-bold text-white text-center'>{t.bookNow}</h1>
+                    <p className='text-lg text-white mt-2 text-center'>{t.pleaseEnterDetails}</p>
                     <Form onSubmit={handleSubmit} className='mt-[51px] w-full max-w-[540px]'>
-                        <FieldContainer label="Machine Type" htmlFor="machine_type">
+                        <FieldContainer label={t.machineType} htmlFor="machine_type">
                             <Select
                                 name="machine_type"
                                 value={selectedSessionId} // Use selectedSessionId as the value
                                 onChange={handleChange}
-                                options={[{ value: '', label: 'Select a session' }, ...sessionOptions]}
+                                options={[{ value: '', label: t.selectSession }, ...sessionOptions]}
                                 required
                             />
                         </FieldContainer>
-                        <FieldContainer label="Start Time" htmlFor="start_time">
+                        <FieldContainer label={t.startTime} htmlFor="start_time">
                             <Input
                                 type="datetime-local"
-                                placeholder="Start Time"
+                                placeholder={t.startTime}
                                 name="start_time"
                                 value={formData.start_time}
                                 onChange={handleChange}
@@ -214,10 +220,10 @@ console.log(bookings)
                                 min={new Date().toISOString().slice(0, 16)}
                             />
                         </FieldContainer>
-                        <FieldContainer label="End Time" htmlFor="end_time">
+                        <FieldContainer label={t.endTime} htmlFor="end_time">
                             <Input
                                 type="datetime-local"
-                                placeholder="End Time"
+                                placeholder={t.endTime}
                                 name="end_time"
                                 value={formData.end_time}
                                 onChange={handleChange}
@@ -225,10 +231,10 @@ console.log(bookings)
                                 disabled
                             />
                         </FieldContainer>
-                        <FieldContainer label="Price" htmlFor="price">
+                        <FieldContainer label={t.price} htmlFor="price">
                             <Input
                                 type="text"
-                                placeholder="Price"
+                                placeholder={t.price}
                                 name="price"
                                 value={formData.price}
                                 onChange={handleChange}
@@ -241,39 +247,39 @@ console.log(bookings)
                             className="bg-white text-black w-full p-[14px] text-lg rounded-md font-semibold"
                             type='submit'
                         >
-                            Book Now
+                            {t.bookNow}
                         </button>
                     </Form>
                 </>}
             {mode === 'DETAIL' &&
                 <div>
-                    <h1 className='text-[50px] font-bold text-white text-center'>Book Now</h1>
+                    <h1 className='text-[50px] font-bold text-white text-center'>{t.bookNow}</h1>
                     {selectedSession &&
 
 
                         <div className="text-white">
 
                             <p className="flex justify-between items-center border-b border-gray-600 py-2">
-                                <strong>Machine Type:</strong> {selectedSession.machine_type}
+                                <strong>{t.machineType}:</strong> {selectedSession.machine_type}
                             </p>
                             <p className="flex justify-between items-center border-b border-gray-600 py-2">
-                                <strong>Start Time:</strong> {formatDateTime(selectedSession?.start_time)}
+                                <strong>{t.startTime}:</strong> {formatDateTime(selectedSession?.start_time)}
                             </p>
                             <p className="flex justify-between items-center border-b border-gray-600 py-2">
-                                <strong>End Time:</strong> {formatDateTime(selectedSession?.end_time)}
+                                <strong>{t.endTime}:</strong> {formatDateTime(selectedSession?.end_time)}
                             </p>
                             <p className="flex justify-between items-center border-b border-gray-600 py-2">
-                                <strong>Payment Status:</strong> {selectedSession.payment_status}
+                                <strong>{t.paymentStatus}:</strong> {selectedSession.payment_status}
                             </p>
 
-                            <button onClick={() => setMode('BOOKING')} className='bg-[#5b2493] py-2 px-4 rounded-lg text-white mt-4'>Edit Details</button>
+                            <button onClick={() => setMode('BOOKING')} className='bg-[#5b2493] py-2 px-4 rounded-lg text-white mt-4'>{t.editDetails}</button>
                         </div>
                     }
                     <button
                         onClick={() => setMode('CHECKOUT')}
                         className="bg-white text-black w-full mt-4 p-[14px] text-lg rounded-md font-semibold"
                     >
-                        Checkout
+                        {t.checkout}
                     </button>
                 </div>
             }

@@ -1,12 +1,18 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { API_URL, getMediaBaseUrl, getPaymentApiUrl } from '@/utils/ApiUrl';
 import { getGuestCartImageUrl } from '@/app/utils/imageUtils';
 import axios from 'axios';
+import SEOHead from '@/app/components/SEOHead';
+import { translations } from '@/app/translations';
+import { validateLocale } from '@/app/utils/languageUtils';
 
 const GuestCheckoutPage = () => {
+    const searchParams = useSearchParams();
+    const locale = validateLocale(searchParams.get('locale'));
+    const t = translations[locale] || translations.en;
     const [cartItems, setCartItems] = useState([]);
     const [guestData, setGuestData] = useState({
         guest_name: '',
@@ -101,7 +107,8 @@ const GuestCheckoutPage = () => {
 
                 // Redirect to guest orders page with email pre-filled
                 setTimeout(() => {
-                    router.push(`/guest-orders?email=${encodeURIComponent(guestData.guest_email)}`);
+                    const currentLocale = searchParams?.get('locale') || 'en';
+                    router.push(`/guest-orders?email=${encodeURIComponent(guestData.guest_email)}&locale=${currentLocale}`);
                 }, 2000);
             } else {
                 // For online payment, create Stripe checkout session
@@ -174,9 +181,11 @@ const GuestCheckoutPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-blackish py-8">
-            <div className="container mx-auto px-4 max-w-4xl">
-                <h1 className="text-white text-3xl font-bold mb-8 text-center">Guest Checkout</h1>
+        <>
+            <SEOHead page="guest-checkout" locale={locale} />
+            <div className="min-h-screen bg-blackish py-8">
+                <div className="container mx-auto px-4 max-w-4xl">
+                    <h1 className="text-white text-3xl font-bold mb-8 text-center">{t.guestCheckout || 'Guest Checkout'}</h1>
                 
                 <div className="grid md:grid-cols-2 gap-8">
                     {/* Order Summary */}
@@ -425,6 +434,7 @@ const GuestCheckoutPage = () => {
                 </div>
             </div>
         </div>
+        </>
     );
 };
 

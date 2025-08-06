@@ -128,6 +128,7 @@ const AddProduct = () => {
 
     const categoryOptions = [
         { value: 'VR Essentials', label: 'VR Essentials' },
+        { value: 'Eye Masks', label: 'Eye Masks' },
         { value: 'VR Hardware', label: 'VR Hardware' },
         { value: 'Branded Merchandise', label: 'Branded Merchandise' },
         { value: 'Gift Cards', label: 'Gift Cards & Experiences' },

@@ -219,11 +219,11 @@ const Plans = ({ locale = 'en' }) => {
                             <h3 className='text-white text-xl font-bold mb-4'>{t.freeRoamingArena}</h3>
                             <div className='flex justify-between items-center border-b border-gray-700 pb-2 mb-2'>
                                 <span className='text-gray-300'>{t.singleSession}</span>
-                                <span className='font-bold text-white'>$12</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(12, locale)}</span>
                             </div>
                             <div className='flex justify-between items-center'>
                                 <span className='text-gray-300'>{t.twoSessions}</span>
-                                <span className='font-bold text-white'>$20</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(20, locale)}</span>
                             </div>
                         </div>
                         
@@ -231,35 +231,35 @@ const Plans = ({ locale = 'en' }) => {
                             <h3 className='text-white text-xl font-bold mb-4'>{t.ufoSpaceshipCinema}</h3>
                             <div className='flex justify-between items-center border-b border-gray-700 pb-2 mb-2'>
                                 <span className='text-gray-300'>{t.singleSession}</span>
-                                <span className='font-bold text-white'>$9</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(9, locale)}</span>
                             </div>
                             <div className='flex justify-between items-center'>
                                 <span className='text-gray-300'>{t.twoSessions}</span>
-                                <span className='font-bold text-white'>$15</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(15, locale)}</span>
                             </div>
                         </div>
-                        
+
                         <div className='bg-gray-900 rounded-xl p-6'>
                             <h3 className='text-white text-xl font-bold mb-4'>{t.vr360}</h3>
                             <div className='flex justify-between items-center border-b border-gray-700 pb-2 mb-2'>
                                 <span className='text-gray-300'>{t.singleSession}</span>
-                                <span className='font-bold text-white'>$9</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(9, locale)}</span>
                             </div>
                             <div className='flex justify-between items-center'>
                                 <span className='text-gray-300'>{t.twoSessions}</span>
-                                <span className='font-bold text-white'>$15</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(15, locale)}</span>
                             </div>
                         </div>
-                        
+
                         <div className='bg-gray-900 rounded-xl p-6'>
                             <h3 className='text-white text-xl font-bold mb-4'>{t.vrBattle}</h3>
                             <div className='flex justify-between items-center border-b border-gray-700 pb-2 mb-2'>
                                 <span className='text-gray-300'>{t.singleSession}</span>
-                                <span className='font-bold text-white'>$9</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(9, locale)}</span>
                             </div>
                             <div className='flex justify-between items-center'>
                                 <span className='text-gray-300'>{t.twoSessions}</span>
-                                <span className='font-bold text-white'>$15</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(15, locale)}</span>
                             </div>
                         </div>
                         
@@ -279,11 +279,11 @@ const Plans = ({ locale = 'en' }) => {
                             <h3 className='text-white text-xl font-bold mb-4'>{t.vrCat}</h3>
                             <div className='flex justify-between items-center border-b border-gray-700 pb-2 mb-2'>
                                 <span className='text-gray-300'>{t.singleSession}</span>
-                                <span className='font-bold text-white'>$6</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(6, locale)}</span>
                             </div>
                             <div className='flex justify-between items-center'>
                                 <span className='text-gray-300'>{t.twoSessions}</span>
-                                <span className='font-bold text-white'>$10</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(10, locale)}</span>
                             </div>
                         </div>
                     </div>
@@ -319,27 +319,27 @@ const Plans = ({ locale = 'en' }) => {
                             <p className='text-white mb-4'>{t.birthdayPackagesDesc}</p>
                             <div className='flex justify-between items-center border-b border-gray-700 pb-2 mb-2'>
                                 <span className='text-gray-300'>{t.startingPrice}</span>
-                                <span className='font-bold text-white'>$249</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(249, locale)}</span>
                             </div>
                             <p className='text-sm text-gray-400 mt-2'>{t.birthdayPackagesIncludes}</p>
                         </div>
-                        
+
                         <div className='bg-gray-900 rounded-xl p-6'>
                             <h3 className='text-white text-xl font-bold mb-4'>{t.corporateTeamBuilding}</h3>
                             <p className='text-white mb-4'>{t.corporateTeamBuildingDesc}</p>
                             <div className='flex justify-between items-center border-b border-gray-700 pb-2 mb-2'>
                                 <span className='text-gray-300'>{t.perPerson}</span>
-                                <span className='font-bold text-white'>$45</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(45, locale)}</span>
                             </div>
                             <p className='text-sm text-gray-400 mt-2'>{t.corporateTeamBuildingCustomizable}</p>
                         </div>
-                        
+
                         <div className='bg-gray-900 rounded-xl p-6'>
                             <h3 className='text-white text-xl font-bold mb-4'>{t.schoolFieldTrips}</h3>
                             <p className='text-white mb-4'>{t.schoolFieldTripsDesc}</p>
                             <div className='flex justify-between items-center border-b border-gray-700 pb-2 mb-2'>
                                 <span className='text-gray-300'>{t.perStudent}</span>
-                                <span className='font-bold text-white'>$25</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(25, locale)}</span>
                             </div>
                             <p className='text-sm text-gray-400 mt-2'>{t.teacherChaperonePasses}</p>
                         </div>

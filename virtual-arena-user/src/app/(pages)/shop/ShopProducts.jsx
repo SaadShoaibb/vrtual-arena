@@ -66,32 +66,50 @@ const ShopProducts = ({ category, locale = 'en' }) => {
 
 
     // Filter products based on selected category
-    const filteredProducts = category === 'all' 
-        ? products 
+    const filteredProducts = category === 'all'
+        ? products
         : products.filter(product => {
-            // This is a simplified example - in a real app, products would have a category field
-            // For now, we'll simulate categories based on product names or other attributes
-            switch(category) {
-                case 'vr-essentials':
-                    return product.name?.toLowerCase().includes('mask') || 
-                           product.name?.toLowerCase().includes('comfort') ||
-                           product.name?.toLowerCase().includes('accessory');
-                case 'vr-hardware':
-                    return product.name?.toLowerCase().includes('gun') || 
-                           product.name?.toLowerCase().includes('rifle') ||
-                           product.name?.toLowerCase().includes('charger') ||
-                           product.name?.toLowerCase().includes('station');
-                case 'branded':
-                    return product.name?.toLowerCase().includes('shirt') || 
-                           product.name?.toLowerCase().includes('hat') ||
-                           product.name?.toLowerCase().includes('mug') ||
-                           product.name?.toLowerCase().includes('cap');
-                case 'gift-cards':
-                    return product.name?.toLowerCase().includes('gift') || 
-                           product.name?.toLowerCase().includes('card') ||
-                           product.name?.toLowerCase().includes('session');
-                default:
-                    return true;
+            // Check if product has a category field, otherwise use name-based filtering
+            if (product.category) {
+                switch(category) {
+                    case 'vr-essentials':
+                        return product.category === 'VR Essentials';
+                    case 'eye-masks':
+                        return product.category === 'Eye Masks';
+                    case 'vr-hardware':
+                        return product.category === 'VR Hardware';
+                    case 'branded':
+                        return product.category === 'Branded Merchandise';
+                    case 'gift-cards':
+                        return product.category === 'Gift Cards';
+                    default:
+                        return true;
+                }
+            } else {
+                // Fallback to name-based filtering for products without category field
+                switch(category) {
+                    case 'vr-essentials':
+                        return product.name?.toLowerCase().includes('comfort') ||
+                               product.name?.toLowerCase().includes('accessory');
+                    case 'eye-masks':
+                        return product.name?.toLowerCase().includes('mask');
+                    case 'vr-hardware':
+                        return product.name?.toLowerCase().includes('gun') ||
+                               product.name?.toLowerCase().includes('rifle') ||
+                               product.name?.toLowerCase().includes('charger') ||
+                               product.name?.toLowerCase().includes('station');
+                    case 'branded':
+                        return product.name?.toLowerCase().includes('shirt') ||
+                               product.name?.toLowerCase().includes('hat') ||
+                               product.name?.toLowerCase().includes('mug') ||
+                               product.name?.toLowerCase().includes('cap');
+                    case 'gift-cards':
+                        return product.name?.toLowerCase().includes('gift') ||
+                               product.name?.toLowerCase().includes('card') ||
+                               product.name?.toLowerCase().includes('session');
+                    default:
+                        return true;
+                }
             }
         });
 

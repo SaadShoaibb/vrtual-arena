@@ -368,7 +368,7 @@ const Navbar = ({ locale = 'en' }) => {
                             {!isAuthenticated ? (
                                 <div className="flex items-center space-x-3">
                                     <Link
-                                        href="/guest-orders"
+                                        href={`/guest-orders?locale=${locale}`}
                                         className="text-sm text-white hover:text-[#DB1FEB] transition-colors navbar-button"
                                     >
                                         📦 {t.trackOrders}

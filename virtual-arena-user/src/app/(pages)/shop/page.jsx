@@ -23,6 +23,7 @@ const Shop = () => {
   const categories = [
     { id: 'all', name: t.allProducts },
     { id: 'vr-essentials', name: t.vrEssentials, description: t.vrEssentialsDesc },
+    { id: 'eye-masks', name: t.eyeMasks, description: t.eyeMasksDesc },
     { id: 'vr-hardware', name: t.vrHardware, description: t.vrHardwareDesc },
     { id: 'branded', name: t.brandedMerchandise, description: t.brandedMerchandiseDesc },
     { id: 'gift-cards', name: t.giftCards, description: t.giftCardsDesc }

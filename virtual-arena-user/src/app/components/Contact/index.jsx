@@ -102,7 +102,7 @@ const Contact = ({ locale = 'en' }) => {
                 _template: 'table'
             };
 
-            const response = await fetch('https://formsubmit.co/ajax/affinitycoders@gmail.com', {
+            const response = await fetch('https://formsubmit.co/ajax/contact@vrtualarena.ca', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

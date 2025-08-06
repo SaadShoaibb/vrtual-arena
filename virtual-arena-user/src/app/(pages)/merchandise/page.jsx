@@ -10,6 +10,7 @@ import AuthComponents from '@/app/components/AuthComponents'
 import { useSelector } from 'react-redux'
 import { useSearchParams } from 'next/navigation'
 import { translations } from '@/app/translations'
+import SEOHead from '@/app/components/SEOHead'
 
 const Merchandise = () => {
   const { showModal } = useSelector(state => state.modal)
@@ -19,6 +20,7 @@ const Merchandise = () => {
   
   return (
     <>
+      <SEOHead page="merchandise" locale={locale} />
       <div className="relative">
         <Navbar locale={locale} />
         <HeroHeader

@@ -6,8 +6,14 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { FaStar } from 'react-icons/fa'; // For star ratings
 import { useSelector } from 'react-redux';
+import { translations } from '@/app/translations';
+import { useSearchParams } from 'next/navigation';
 
 const Orders = () => {
+    const searchParams = useSearchParams();
+    const locale = searchParams?.get('locale') || 'en';
+    const t = translations[locale] || translations.en;
+
     const [orders, setOrders] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
@@ -64,20 +70,20 @@ const Orders = () => {
     return (
         <div className="p-6 bg-blackish text-white">
             <div className="mx-auto container">
-                <h1 className="text-2xl font-bold mb-6">Your Orders</h1>
+                <h1 className="text-2xl font-bold mb-6">{t.yourOrders}</h1>
                 {orders.length === 0 ? (
-                    <p>No orders found.</p>
+                    <p>{t.noOrdersFound}</p>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="min-w-full bg-blackish text-white border border-gray-200">
                             <thead>
                                 <tr className="bg-gray-900">
-                                    <th className="py-3 px-4 border-b text-left">Order ID</th>
-                                    <th className="py-3 px-4 border-b text-left">Total Amount</th>
-                                    <th className="py-3 px-4 border-b text-left">Status</th>
-                                    <th className="py-3 px-4 border-b text-left">Order Date</th>
-                                    <th className="py-3 px-4 border-b text-left">Items</th>
-                                    <th className="py-3 px-4 border-b text-left">Actions</th>
+                                    <th className="py-3 px-4 border-b text-left">{t.orderId}</th>
+                                    <th className="py-3 px-4 border-b text-left">{t.totalAmount}</th>
+                                    <th className="py-3 px-4 border-b text-left">{t.status}</th>
+                                    <th className="py-3 px-4 border-b text-left">{t.orderDate}</th>
+                                    <th className="py-3 px-4 border-b text-left">{t.items}</th>
+                                    <th className="py-3 px-4 border-b text-left">{t.actions}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -97,7 +103,7 @@ const Orders = () => {
                                                         : 'bg-gray-100 text-gray-800'
                                                 }`}
                                             >
-                                                {order.status}
+                                                {t[order.status] || order.status}
                                             </span>
                                         </td>
                                         <td className="py-3 px-4 border-b">
@@ -107,7 +113,7 @@ const Orders = () => {
                                             <ul className="list-disc list-inside">
                                                 {order.items.map((item) => (
                                                     <li key={item.order_item_id} className="text-sm">
-                                                        {item.product_name} (Qty: {item.quantity}, Price: ${item.item_price})
+                                                        {item.product_name} ({t.quantity}: {item.quantity}, {t.price}: ${item.item_price})
                                                     </li>
                                                 ))}
                                             </ul>
@@ -118,7 +124,7 @@ const Orders = () => {
                                                     onClick={() => openModal(order)}
                                                     className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                                                 >
-                                                    Leave Feedback
+                                                    {t.writeReview}
                                                 </button>
                                             )}
                                         </td>

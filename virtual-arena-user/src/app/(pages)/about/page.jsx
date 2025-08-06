@@ -11,9 +11,9 @@ import { translations } from '@/app/translations';
 // Define team members using translations
 const getTeamMembers = (t) => [
   {
-    name: t.teamMember1Name || 'Ahmed Abouda',
+    name: t.teamMember1Name || 'Abdallah Abouda',
     role: t.teamMember1Role || 'Founder & CEO',
-    bio: t.teamMember1Bio || 'With over 15 years in the tech industry, Ahmed founded VRtual Arena to bring cutting-edge VR experiences to Edmonton. His vision drives our commitment to innovation and exceptional customer experiences.',
+    bio: t.teamMember1Bio || 'With over 15 years in the tech industry, Abdallah founded VRtual Arena to bring cutting-edge VR experiences to Edmonton. His vision drives our commitment to innovation and exceptional customer experiences.',
     image: '/assets/team/ahmed.jpg'
   },
   {

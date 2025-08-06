@@ -16,7 +16,9 @@ export const translations = {
     // Shop Categories
     allProducts: 'All Products',
     vrEssentials: 'VR Essentials',
-    vrEssentialsDesc: 'Eye masks, comfort accessories and more',
+    vrEssentialsDesc: 'Comfort accessories and VR gear',
+    eyeMasks: 'Eye Masks',
+    eyeMasksDesc: 'Disposable and reusable VR eye masks for hygiene',
     vrHardware: 'VR Hardware',
     vrHardwareDesc: 'Guns, rifles, charging stations, and peripherals',
     brandedMerchandise: 'Branded Merchandise',
@@ -25,6 +27,24 @@ export const translations = {
     giftCardsDesc: 'Pre-paid sessions and gift options',
     shopByCategory: 'Shop by Category',
     dealsMembership: 'Deals & Membership',
+    addToCart: 'Add To Cart',
+    outOfStock: 'Out of Stock',
+    inStock: 'In Stock',
+
+    // User Orders Page
+    yourOrders: 'Your Orders',
+    noOrdersFound: 'No orders found.',
+    orderId: 'Order ID',
+    totalAmount: 'Total Amount',
+    status: 'Status',
+    orderDate: 'Order Date',
+    items: 'Items',
+    actions: 'Actions',
+    quantity: 'Qty',
+    writeReview: 'Write Review',
+    pending: 'pending',
+    shipped: 'shipped',
+    delivered: 'delivered',
 
     // Shop Product Status and Actions
     inStock: 'In Stock',
@@ -127,7 +147,7 @@ export const translations = {
     ourMission: 'Our Mission',
     missionDescription: 'To provide accessible, innovative, and engaging virtual reality experiences that inspire creativity and connection.',
     ourStory: 'Our Story',
-    storyDescription1: 'Founded in 2021 by tech entrepreneur Ahmed Abouda, VRtual Arena was born from a passion for technology and a vision to make cutting-edge virtual reality experiences accessible to everyone in Edmonton.',
+    storyDescription1: 'Founded in 2021 by tech entrepreneur Abdallah Abouda, VRtual Arena was born from a passion for technology and a vision to make cutting-edge virtual reality experiences accessible to everyone in Edmonton.',
     storyDescription2: 'What started as a small VR arcade has grown into Edmonton\'s premier virtual reality entertainment center, offering a wide range of immersive experiences for all ages and interests.',
     storyDescription3: 'As a locally owned business operating under ABOUDA Enterprise Inc., we\'re proud to be part of the Edmonton community and committed to bringing innovative entertainment experiences to our city.',
     missionStatement1: 'At VRtual Arena, our mission is to transport people beyond the boundaries of reality through immersive virtual experiences that inspire, entertain, and bring people together.',
@@ -352,6 +372,18 @@ export const translations = {
     testimonial: 'Testimonials',
     whatCustomersSay: 'What Our Awesome Customers Say',
     testimonialsDescription: 'Our players love the thrill of the Virtual Arena! From immersive VR battles to unforgettable group sessions, the feedback speaks for itself. Discover what keeps them coming back for more.',
+    clientFeedback: 'Client Feedback',
+    reviewsCount: '15k+ Reviews',
+    testimonialData: [
+      {
+        name: 'Esther Howard',
+        feedback: 'The VR experience at VRA was absolutely mind-blowing! The equipment was top-notch, the staff were super helpful, and I felt like I was really inside the game. Will definitely be back with friends!'
+      },
+      {
+        name: 'Michael Lee',
+        feedback: 'I hosted my son\'s birthday party at VRA and it was a total hit. The kids had a blast, and everything was perfectly organized. Thank you for making it so special!'
+      }
+    ],
 
     // VR Package Section
     readyToEnjoy: 'Ready to Enjoy?',
@@ -485,9 +517,9 @@ export const translations = {
     teamDescription: 'The passionate individuals dedicated to making your VR experience unforgettable',
     
     // Team Members
-    teamMember1Name: 'Ahmed Abouda',
+    teamMember1Name: 'Abdallah Abouda',
     teamMember1Role: 'Founder & CEO',
-    teamMember1Bio: 'With over 15 years in the tech industry, Ahmed founded VRtual Arena to bring cutting-edge VR experiences to Edmonton. His vision drives our commitment to innovation and exceptional customer experiences.',
+    teamMember1Bio: 'With over 15 years in the tech industry, Abdallah founded VRtual Arena to bring cutting-edge VR experiences to Edmonton. His vision drives our commitment to innovation and exceptional customer experiences.',
     
     teamMember2Name: 'Sarah Reynolds',
     teamMember2Role: 'Operations Manager',
@@ -608,6 +640,73 @@ export const translations = {
     close: 'Close',
     groupDiscountInfo: 'Group discounts: 5+ people get 10-20% off',
 
+    // Enhanced Booking Form Additional Translations
+    howToBook: 'How would you like to book?',
+    fullName: 'Full Name',
+    players: 'Players',
+    pricePerPerson: 'Price per person',
+    subtotal: 'Subtotal',
+    groupDiscount: 'Group Discount',
+    totalPrice: 'Total Price',
+    name: 'Name',
+    howToPay: 'How would you like to pay for this VR session?',
+    payOnlineNow: '💳 Pay Online Now',
+    securePaymentStripe: 'Secure payment with Stripe',
+    payAtVenue: '🏢 Pay at the Venue',
+
+    // VR Experience Names and Descriptions
+    experienceNames: {
+      'Free Roaming Arena': 'Free Roaming Arena',
+      'UFO Spaceship Cinema': 'UFO Spaceship Cinema',
+      'VR 360': 'VR 360',
+      'VR Battle': 'VR Battle',
+      'VR Warrior': 'VR Warrior',
+      'VR Cat': 'VR Cat',
+      'Photo Booth': 'Photo Booth',
+      // Legacy mappings
+      'Free Roaming VR Arena 2.0': 'Free Roaming Arena',
+      'VR UFO 5 Players': 'UFO Spaceship Cinema',
+      'VR 360° Motion Chair': 'VR 360',
+      'HTC VIVE VR Standing Platform': 'VR Battle',
+      'VR Warrior 2players': 'VR Warrior',
+      'VR CAT': 'VR Cat'
+    },
+    experienceDescriptions: {
+      'Free Roaming Arena': 'Experience ultimate freedom in our large-scale VR arena with wireless headsets and full-body tracking.',
+      'UFO Spaceship Cinema': 'Immerse yourself in cinematic VR experiences aboard our UFO spaceship simulator.',
+      'VR 360': 'Enjoy 360-degree virtual reality experiences with motion chairs for maximum immersion.',
+      'VR Battle': 'Engage in intense multiplayer VR battles with friends using our advanced VR combat system.',
+      'VR Warrior': 'Perfect for young warriors! Kid-friendly VR adventures and battles designed for children.',
+      'VR Cat': 'Delightful VR experiences designed specifically for children featuring cute cats and fun adventures.',
+      'Photo Booth': 'Capture memorable moments with our VR photo booth featuring virtual backgrounds and effects.'
+    },
+    seats: 'seats',
+    players: 'players',
+    perSession: 'per session',
+    session: 'session',
+    sessions: 'sessions',
+
+    // Calendar Translations
+    selectDateTime: 'Select Date & Time',
+    monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    dayNames: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    availableTimeSlots: 'Available Time Slots',
+    loadingAvailability: 'Loading availability...',
+    available: 'Available',
+    booked: 'Booked',
+
+    // Booking Form (Legacy)
+    bookNow: 'Book Now',
+    pleaseEnterDetails: 'Please enter your details',
+    machineType: 'Machine Type',
+    selectSession: 'Select a session',
+    startTime: 'Start Time',
+    endTime: 'End Time',
+    price: 'Price',
+    editDetails: 'Edit Details',
+    checkout: 'Checkout',
+    paymentStatus: 'Payment Status',
+
     // Common Messages
     pleaseSelectItem: 'Please select an item first',
     pleaseLoginToContinue: 'Please login to continue',
@@ -630,11 +729,20 @@ export const translations = {
     // Guest Order Tracking
     trackYourOrders: 'Track Your Orders',
     enterEmailToTrack: 'Enter your email address to view your order history',
+    enterEmailPlaceholder: 'Enter your email address...',
     searchOrders: 'Search Orders',
     searching: 'Searching...',
     noOrdersFound: 'No Orders Found',
     noOrdersFoundDesc: 'No orders were found for this email address.',
     foundOrders: 'Found {count} order(s)',
+    guestCheckout: 'Guest Checkout',
+    orderReference: 'Order #{reference}',
+    placedOn: 'Placed on {date}',
+    customer: 'Customer',
+    paymentMethod: 'Payment Method',
+    totalAmount: 'Total Amount',
+    cashOnDelivery: 'Cash on Delivery',
+    onlinePayment: 'Online Payment',
     orderReference: 'Order #{reference}',
     placedOn: 'Placed on {date}',
     customer: 'Customer',
@@ -800,7 +908,9 @@ export const translations = {
     // Shop Categories
     allProducts: 'Tous les Produits',
     vrEssentials: 'Essentiels VR',
-    vrEssentialsDesc: 'Masques pour les yeux, accessoires de confort et plus',
+    vrEssentialsDesc: 'Accessoires de confort et équipement VR',
+    eyeMasks: 'Masques Oculaires',
+    eyeMasksDesc: 'Masques oculaires VR jetables et réutilisables pour l\'hygiène',
     vrHardware: 'Matériel VR',
     vrHardwareDesc: 'Pistolets, fusils, stations de charge et périphériques',
     brandedMerchandise: 'Marchandise de Marque',
@@ -809,6 +919,24 @@ export const translations = {
     giftCardsDesc: 'Sessions prépayées et options cadeaux',
     shopByCategory: 'Acheter par Catégorie',
     dealsMembership: 'Offres et Adhésion',
+    addToCart: 'Ajouter au Panier',
+    outOfStock: 'Rupture de Stock',
+    inStock: 'En Stock',
+
+    // User Orders Page
+    yourOrders: 'Vos Commandes',
+    noOrdersFound: 'Aucune commande trouvée.',
+    orderId: 'ID de Commande',
+    totalAmount: 'Montant Total',
+    status: 'Statut',
+    orderDate: 'Date de Commande',
+    items: 'Articles',
+    actions: 'Actions',
+    quantity: 'Qté',
+    writeReview: 'Écrire un Avis',
+    pending: 'en attente',
+    shipped: 'expédié',
+    delivered: 'livré',
 
     // Shop Product Status and Actions
     inStock: 'En Stock',
@@ -911,7 +1039,7 @@ export const translations = {
     ourMission: 'Notre Mission',
     missionDescription: 'Fournir des expériences de réalité virtuelle accessibles, innovantes et engageantes qui inspirent la créativité et la connexion.',
     ourStory: 'Notre Histoire',
-    storyDescription1: 'Fondée en 2021 par l\'entrepreneur technologique Ahmed Abouda, VRtual Arena est née d\'une passion pour la technologie et d\'une vision visant à rendre les expériences de réalité virtuelle de pointe accessibles à tous à Edmonton.',
+    storyDescription1: 'Fondée en 2021 par l\'entrepreneur technologique Abdallah Abouda, VRtual Arena est née d\'une passion pour la technologie et d\'une vision visant à rendre les expériences de réalité virtuelle de pointe accessibles à tous à Edmonton.',
     storyDescription2: 'Ce qui a commencé comme une petite arcade VR est devenu le premier centre de divertissement de réalité virtuelle d\'Edmonton, offrant une large gamme d\'expériences immersives pour tous les âges et intérêts.',
     storyDescription3: 'En tant qu\'entreprise locale opérant sous ABOUDA Enterprise Inc., nous sommes fiers de faire partie de la communauté d\'Edmonton et nous nous engageons à apporter des expériences de divertissement innovantes à notre ville.',
     missionStatement1: 'Chez VRtual Arena, notre mission est de transporter les gens au-delà des limites de la réalité grâce à des expériences virtuelles immersives qui inspirent, divertissent et rassemblent les gens.',
@@ -1137,6 +1265,18 @@ export const translations = {
     testimonial: 'Témoignages',
     whatCustomersSay: 'Ce Que Disent Nos Formidables Clients',
     testimonialsDescription: 'Nos joueurs adorent les sensations fortes de Virtual Arena! Des batailles VR immersives aux sessions de groupe inoubliables, les commentaires parlent d\'eux-mêmes. Découvrez ce qui les fait revenir.',
+    clientFeedback: 'Commentaire Client',
+    reviewsCount: '15k+ Avis',
+    testimonialData: [
+      {
+        name: 'Esther Howard',
+        feedback: 'L\'expérience VR chez VRA était absolument époustouflante! L\'équipement était de premier ordre, le personnel était très serviable, et j\'avais l\'impression d\'être vraiment dans le jeu. Je reviendrai certainement avec des amis!'
+      },
+      {
+        name: 'Michael Lee',
+        feedback: 'J\'ai organisé la fête d\'anniversaire de mon fils chez VRA et ce fut un succès total. Les enfants se sont éclatés, et tout était parfaitement organisé. Merci d\'avoir rendu cela si spécial!'
+      }
+    ],
 
     // VR Package Section
     readyToEnjoy: 'Prêt à Profiter?',
@@ -1270,9 +1410,9 @@ export const translations = {
     teamDescription: 'Les personnes passionnées dédiées à rendre votre expérience VR inoubliable',
     
     // Team Members
-    teamMember1Name: 'Ahmed Abouda',
+    teamMember1Name: 'Abdallah Abouda',
     teamMember1Role: 'Fondateur et PDG',
-    teamMember1Bio: 'Avec plus de 15 ans dans l\'industrie technologique, Ahmed a fondé VRtual Arena pour apporter des expériences VR de pointe à Edmonton. Sa vision anime notre engagement envers l\'innovation et les expériences clients exceptionnelles.',
+    teamMember1Bio: 'Avec plus de 15 ans dans l\'industrie technologique, Abdallah a fondé VRtual Arena pour apporter des expériences VR de pointe à Edmonton. Sa vision anime notre engagement envers l\'innovation et les expériences clients exceptionnelles.',
     
     teamMember2Name: 'Sarah Reynolds',
     teamMember2Role: 'Responsable des Opérations',
@@ -1393,6 +1533,73 @@ export const translations = {
     close: 'Fermer',
     groupDiscountInfo: 'Réductions de groupe: 5+ personnes obtiennent 10-20% de réduction',
 
+    // Enhanced Booking Form Additional Translations
+    howToBook: 'Comment souhaitez-vous réserver?',
+    fullName: 'Nom Complet',
+    players: 'Joueurs',
+    pricePerPerson: 'Prix par personne',
+    subtotal: 'Sous-total',
+    groupDiscount: 'Réduction de Groupe',
+    totalPrice: 'Prix Total',
+    name: 'Nom',
+    howToPay: 'Comment souhaitez-vous payer cette session VR?',
+    payOnlineNow: '💳 Payer en Ligne Maintenant',
+    securePaymentStripe: 'Paiement sécurisé avec Stripe',
+    payAtVenue: '🏢 Payer sur Place',
+
+    // VR Experience Names and Descriptions
+    experienceNames: {
+      'Free Roaming Arena': 'Arène en Libre Circulation',
+      'UFO Spaceship Cinema': 'Cinéma Vaisseau OVNI',
+      'VR 360': 'VR 360',
+      'VR Battle': 'Combat VR',
+      'VR Warrior': 'VR Guerrier',
+      'VR Cat': 'VR Chat',
+      'Photo Booth': 'Cabine Photo',
+      // Legacy mappings
+      'Free Roaming VR Arena 2.0': 'Arène en Libre Circulation',
+      'VR UFO 5 Players': 'Cinéma Vaisseau OVNI',
+      'VR 360° Motion Chair': 'VR 360',
+      'HTC VIVE VR Standing Platform': 'Combat VR',
+      'VR Warrior 2players': 'VR Guerrier',
+      'VR CAT': 'VR Chat'
+    },
+    experienceDescriptions: {
+      'Free Roaming Arena': 'Découvrez la liberté ultime dans notre arène VR grande échelle avec casques sans fil et suivi corporel complet.',
+      'UFO Spaceship Cinema': 'Plongez dans des expériences VR cinématographiques à bord de notre simulateur de vaisseau OVNI.',
+      'VR 360': 'Profitez d\'expériences de réalité virtuelle à 360 degrés avec fauteuils de mouvement pour une immersion maximale.',
+      'VR Battle': 'Participez à des batailles VR multijoueurs intenses avec des amis en utilisant notre système de combat VR avancé.',
+      'VR Warrior': 'Parfait pour les jeunes guerriers! Aventures et batailles VR adaptées aux enfants.',
+      'VR Cat': 'Expériences VR délicieuses conçues spécialement pour les enfants avec des chats mignons et des aventures amusantes.',
+      'Photo Booth': 'Capturez des moments mémorables avec notre cabine photo VR avec arrière-plans virtuels et effets.'
+    },
+    seats: 'places',
+    players: 'joueurs',
+    perSession: 'par session',
+    session: 'session',
+    sessions: 'sessions',
+
+    // Calendar Translations
+    selectDateTime: 'Sélectionner Date et Heure',
+    monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+    dayNames: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+    availableTimeSlots: 'Créneaux Horaires Disponibles',
+    loadingAvailability: 'Chargement de la disponibilité...',
+    available: 'Disponible',
+    booked: 'Réservé',
+
+    // Booking Form (Legacy)
+    bookNow: 'Réserver Maintenant',
+    pleaseEnterDetails: 'Veuillez entrer vos détails',
+    machineType: 'Type de Machine',
+    selectSession: 'Sélectionner une session',
+    startTime: 'Heure de Début',
+    endTime: 'Heure de Fin',
+    price: 'Prix',
+    editDetails: 'Modifier les Détails',
+    checkout: 'Passer à la Caisse',
+    paymentStatus: 'Statut du Paiement',
+
     // Common Messages
     pleaseSelectItem: 'Veuillez d\'abord sélectionner un élément',
     pleaseLoginToContinue: 'Veuillez vous connecter pour continuer',
@@ -1415,16 +1622,20 @@ export const translations = {
     // Guest Order Tracking
     trackYourOrders: 'Suivre Vos Commandes',
     enterEmailToTrack: 'Entrez votre adresse e-mail pour voir l\'historique de vos commandes',
+    enterEmailPlaceholder: 'Entrez votre adresse e-mail...',
     searchOrders: 'Rechercher les Commandes',
     searching: 'Recherche en cours...',
     noOrdersFound: 'Aucune Commande Trouvée',
     noOrdersFoundDesc: 'Aucune commande n\'a été trouvée pour cette adresse e-mail.',
     foundOrders: '{count} commande(s) trouvée(s)',
+    guestCheckout: 'Commande Invité',
     orderReference: 'Commande #{reference}',
     placedOn: 'Passée le {date}',
     customer: 'Client',
     paymentMethod: 'Méthode de Paiement',
     totalAmount: 'Montant Total',
+    cashOnDelivery: 'Paiement à la Livraison',
+    onlinePayment: 'Paiement en Ligne',
     shippingCost: 'Frais de Livraison',
     shippingAddress: 'Adresse de Livraison',
     items: 'Articles ({count})',

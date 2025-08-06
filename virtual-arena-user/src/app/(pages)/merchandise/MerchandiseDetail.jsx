@@ -6,10 +6,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addToCart, fetchCart } from '@/Store/ReduxSlice/addToCartSlice'
 import { openSidebar } from '@/Store/ReduxSlice/cartSideBarSlice'
 import { openModal } from '@/Store/ReduxSlice/ModalSlice'
-import CardSidebar from '@/app/components/CartSidebar'
+import UnifiedCartSidebar from '@/app/components/UnifiedCartSidebar'
 import { MdOutlineShoppingCart } from 'react-icons/md'
 import { addToWishlist, fetchWishlist, removeFromWishlist } from '@/Store/ReduxSlice/wishlistSlice'
 import { FaHeart, FaRegHeart } from 'react-icons/fa'
+import toast from 'react-hot-toast'
 
 const MerchandiseDetail = ({ product }) => {
     const [currentIndex, setCurrentIndex] = useState(0)
@@ -59,7 +60,7 @@ const MerchandiseDetail = ({ product }) => {
 
     const handleAddToCart = () => {
         if (isAuthenticated) {
-            // Dispatch addToCart action
+            // Dispatch addToCart action for authenticated users
             dispatch(addToCart({ product_id: product.product_id, quantity: 1 }))
 
             // Add a 500ms delay before fetching the updated cart
@@ -68,8 +69,48 @@ const MerchandiseDetail = ({ product }) => {
                 dispatch(fetchCart())
             }, 500)
         } else {
-            // If not authenticated, open the login modal
-            dispatch(openModal("LOGIN"))
+            // For guests, add to guest cart using localStorage
+            addToGuestCart(product.product_id, 1);
+        }
+    }
+
+    // Guest cart functionality
+    const addToGuestCart = (productId, quantity) => {
+        try {
+            // Get existing cart from localStorage
+            const existingCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
+
+            // Check if product already exists in cart
+            const existingItemIndex = existingCart.findIndex(item => item.product_id === productId);
+
+            if (existingItemIndex > -1) {
+                // Update quantity if item exists
+                existingCart[existingItemIndex].quantity += quantity;
+            } else {
+                // Add new item to cart
+                const cartItem = {
+                    product_id: productId,
+                    name: product.name,
+                    price: product.discount_price || product.original_price,
+                    quantity: quantity,
+                    image: product.images?.[0] || '/assets/d1.png',
+                    type: 'product'
+                };
+                existingCart.push(cartItem);
+            }
+
+            // Save updated cart to localStorage
+            localStorage.setItem('guestCart', JSON.stringify(existingCart));
+
+            toast.success(`${product.name} added to cart!`);
+
+            // Trigger cart update event and open sidebar
+            window.dispatchEvent(new Event('guestCartUpdated'));
+            dispatch(openSidebar());
+
+        } catch (error) {
+            console.error('Error adding to guest cart:', error);
+            toast.error('Failed to add item to cart. Please try again.');
         }
     }
 
@@ -201,7 +242,7 @@ const MerchandiseDetail = ({ product }) => {
                         </div>
                     </div>
                 </div>
-                <CardSidebar isOpen={isOpen} cart={cart} />
+                <UnifiedCartSidebar isOpen={isOpen} cart={cart} />
             </div>
         </>
     )

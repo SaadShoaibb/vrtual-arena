@@ -5,9 +5,15 @@ import { API_URL } from '@/utils/ApiUrl';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { getGuestCartImageUrl } from '@/app/utils/imageUtils';
+import { translations } from '@/app/translations';
+import { validateLocale } from '@/app/utils/languageUtils';
+import SEOHead from '@/app/components/SEOHead';
+import LanguageSwitcher from '@/app/components/common/LanguageSwitcher';
 
 const GuestOrdersPage = () => {
     const searchParams = useSearchParams();
+    const locale = validateLocale(searchParams.get('locale'));
+    const t = translations[locale] || translations.en;
     const [email, setEmail] = useState('');
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -25,7 +31,7 @@ const GuestOrdersPage = () => {
 
     const handleSearchWithEmail = async (emailToSearch) => {
         if (!emailToSearch) {
-            toast.error('Please enter your email address');
+            toast.error(t.enterEmailToTrack);
             return;
         }
 
@@ -38,9 +44,9 @@ const GuestOrdersPage = () => {
                 setSearched(true);
 
                 if (response.data.orders.length === 0) {
-                    toast.info('No orders found for this email address');
+                    toast.info(t.noOrdersFoundDesc);
                 } else {
-                    toast.success(`Found ${response.data.orders.length} order(s)`);
+                    toast.success(t.foundOrders.replace('{count}', response.data.orders.length));
                 }
             } else {
                 toast.error('Failed to fetch orders');
@@ -74,17 +80,22 @@ const GuestOrdersPage = () => {
     };
 
     const getPaymentMethodDisplay = (method) => {
-        return method === 'cod' ? '💵 Cash on Delivery' : '💳 Online Payment';
+        return method === 'cod' ? `💵 ${t.cashOnDelivery}` : `💳 ${t.onlinePayment}`;
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 py-8">
-            <div className="container mx-auto px-4">
-                <div className="max-w-4xl mx-auto">
-                    {/* Header */}
+        <>
+            <SEOHead page="guest-orders" locale={locale} />
+            <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 py-8">
+                <div className="container mx-auto px-4">
+                    <div className="max-w-4xl mx-auto">
+                    {/* Header with Language Switcher */}
                     <div className="text-center mb-8">
-                        <h1 className="text-4xl font-bold text-white mb-4">Track Your Orders</h1>
-                        <p className="text-gray-300">Enter your email address to view your order history</p>
+                        <div className="flex justify-end mb-4">
+                            <LanguageSwitcher size="sm" variant="outline" />
+                        </div>
+                        <h1 className="text-4xl font-bold text-white mb-4">{t.trackYourOrders}</h1>
+                        <p className="text-gray-300">{t.enterEmailToTrack}</p>
                     </div>
 
                     {/* Search Form */}
@@ -95,7 +106,7 @@ const GuestOrdersPage = () => {
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="Enter your email address..."
+                                    placeholder={t.enterEmailPlaceholder}
                                     className="w-full p-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
                                     required
                                 />
@@ -105,7 +116,7 @@ const GuestOrdersPage = () => {
                                 disabled={loading}
                                 className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
                             >
-                                {loading ? 'Searching...' : 'Search Orders'}
+                                {loading ? t.searching : t.searchOrders}
                             </button>
                         </form>
                     </div>
@@ -116,8 +127,8 @@ const GuestOrdersPage = () => {
                             {orders.length === 0 ? (
                                 <div className="bg-gray-800 rounded-lg p-8 text-center">
                                     <div className="text-gray-400 text-lg mb-2">📦</div>
-                                    <h3 className="text-white text-xl font-semibold mb-2">No Orders Found</h3>
-                                    <p className="text-gray-400">No orders were found for this email address.</p>
+                                    <h3 className="text-white text-xl font-semibold mb-2">{t.noOrdersFound}</h3>
+                                    <p className="text-gray-400">{t.noOrdersFoundDesc}</p>
                                 </div>
                             ) : (
                                 orders.map((order) => (
@@ -126,10 +137,10 @@ const GuestOrdersPage = () => {
                                         <div className="flex justify-between items-start mb-4">
                                             <div>
                                                 <h3 className="text-white text-lg font-semibold">
-                                                    Order #{order.order_reference || order.order_id}
+                                                    {t.orderReference.replace('{reference}', order.order_reference || order.order_id)}
                                                 </h3>
                                                 <p className="text-gray-400 text-sm">
-                                                    Placed on {new Date(order.created_at).toLocaleDateString()}
+                                                    {t.placedOn.replace('{date}', new Date(order.created_at).toLocaleDateString())}
                                                 </p>
                                             </div>
                                             <div className="text-right">
@@ -145,15 +156,15 @@ const GuestOrdersPage = () => {
                                         {/* Order Details */}
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                             <div>
-                                                <p className="text-gray-400 text-sm">Customer</p>
+                                                <p className="text-gray-400 text-sm">{t.customer}</p>
                                                 <p className="text-white">{order.guest_name}</p>
                                             </div>
                                             <div>
-                                                <p className="text-gray-400 text-sm">Payment Method</p>
+                                                <p className="text-gray-400 text-sm">{t.paymentMethod}</p>
                                                 <p className="text-white">{getPaymentMethodDisplay(order.payment_method || 'online')}</p>
                                             </div>
                                             <div>
-                                                <p className="text-gray-400 text-sm">Total Amount</p>
+                                                <p className="text-gray-400 text-sm">{t.totalAmount}</p>
                                                 <p className="text-white font-semibold">${parseFloat(order.total_amount).toFixed(2)}</p>
                                             </div>
                                             <div>
@@ -211,6 +222,7 @@ const GuestOrdersPage = () => {
                 </div>
             </div>
         </div>
+        </>
     );
 };
 

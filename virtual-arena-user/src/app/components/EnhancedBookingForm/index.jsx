@@ -65,6 +65,7 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
         if (!session) return 0;
 
         // Pricing calculator logic - exact same as pricing calculator
+        // 🚨 CRITICAL FIX: Use only hardcoded prices, never database prices
         const pricingMap = {
             'Free Roaming Arena': { price1: 12, price2: 20 },
             'UFO Spaceship Cinema': { price1: 9, price2: 15 },
@@ -72,13 +73,21 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
             'VR Battle': { price1: 9, price2: 15 },
             'VR Warrior': { price1: 7, price2: 12 },
             'VR Cat': { price1: 6, price2: 10 },
-            'Photo Booth': { price1: 6, price2: 6 } // Photo booth has same price for both
+            'Photo Booth': { price1: 6, price2: 6 }, // Photo booth has same price for both
+            // Legacy session name mappings to prevent database price fallback
+            'Free Roaming VR Arena 2.0': { price1: 12, price2: 20 },
+            'VR UFO 5 Players': { price1: 9, price2: 15 },
+            'VR 360° Motion Chair': { price1: 9, price2: 15 },
+            'HTC VIVE VR Standing Platform': { price1: 9, price2: 15 },
+            'VR Warrior 2players': { price1: 7, price2: 12 },
+            'VR CAT': { price1: 6, price2: 10 }
         };
 
         const pricing = pricingMap[session.name];
         if (!pricing) {
-            // Fallback to session price if not in pricing map
-            return (session.price || 0) * sessionCount * playerCount;
+            // 🚨 NEVER use database prices - they may be incorrect
+            console.warn(`Unknown session name: ${session.name}, using default pricing`);
+            return 12 * sessionCount * playerCount; // Default to Free Roaming Arena price
         }
 
         const basePrice = sessionCount === 1 ? pricing.price1 : pricing.price2;
@@ -288,9 +297,19 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
         }
     };
 
+    // Helper function to get translated experience name
+    const getTranslatedExperienceName = (sessionName) => {
+        return t?.experienceNames?.[sessionName] || sessionName;
+    };
+
+    // Helper function to get translated experience description
+    const getTranslatedExperienceDescription = (sessionName) => {
+        return t?.experienceDescriptions?.[sessionName] || '';
+    };
+
     const sessionOptions = sessions.map(session => ({
         value: session.session_id,
-        label: `${session.name} - $${session.price} (${session.duration_minutes} min)`
+        label: `${getTranslatedExperienceName(session.name)} - $${session.price} (${session.duration_minutes} min)`
     }));
 
     const renderSessionSelection = () => (
@@ -321,12 +340,12 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                             onClick={() => handleSessionSelect(session.session_id)}
                             className="bg-blackish border border-gray-700 rounded-lg p-6 cursor-pointer hover:border-purple-500 transition-all duration-200"
                         >
-                            <h3 className="text-xl font-bold mb-2">{session.name}</h3>
-                            <p className="text-gray-300 mb-3">{session.description}</p>
+                            <h3 className="text-xl font-bold mb-2">{getTranslatedExperienceName(session.name)}</h3>
+                            <p className="text-gray-300 mb-3">{getTranslatedExperienceDescription(session.name) || session.description}</p>
                             <div className="flex justify-between items-center">
                                 <div className="text-left">
                                     {session.name === 'Photo Booth' ? (
-                                        <span className="text-2xl font-bold text-green-400">$6 per session</span>
+                                        <span className="text-2xl font-bold text-green-400">$6 {t?.perSession || 'per session'}</span>
                                     ) : (
                                         <div>
                                             <div className="text-lg font-bold text-green-400">
@@ -350,9 +369,9 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                                 </div>
                                 <div className="text-right">
                                     <div className="text-gray-400">
-                                        Max {session.max_players} {session.name === 'UFO Spaceship Cinema' ? 'seats' :
-                                             session.name === 'VR 360' ? 'seats' :
-                                             session.name === 'Free Roaming Arena' ? 'players' : 'players'}
+                                        Max {session.max_players} {session.name === 'UFO Spaceship Cinema' ? (t?.seats || 'seats') :
+                                             session.name === 'VR 360' ? (t?.seats || 'seats') :
+                                             session.name === 'Free Roaming Arena' ? (t?.players || 'players') : (t?.players || 'players')}
                                     </div>
                                     <div className="text-sm text-yellow-400 mt-1">
                                         {t?.groupDiscountInfo || 'Group discounts: 5+ people get 10-20% off'}
@@ -376,7 +395,7 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                     {t?.backToSessions || '← Back to Sessions'}
                 </button>
                 <h2 className="text-2xl font-bold text-white">
-                    {selectedSession?.name}
+                    {getTranslatedExperienceName(selectedSession?.name)}
                 </h2>
             </div>
             <BookingCalendar
@@ -408,7 +427,7 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                                         : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                                 }`}
                             >
-                                1 {t?.session || 'Session'} - ${calculatePrice(selectedSession, 1, 1)} {t?.perPerson || 'per person'}
+                                1 {t?.session || 'session'} - ${calculatePrice(selectedSession, 1, 1)} {t?.perPerson || 'per person'}
                             </button>
                             <button
                                 onClick={() => setSessionCount(2)}
@@ -418,7 +437,7 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                                         : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                                 }`}
                             >
-                                2 {t?.sessions || 'Sessions'} - ${calculatePrice(selectedSession, 2, 1)} {t?.perPerson || 'per person'}
+                                2 {t?.sessions || 'sessions'} - ${calculatePrice(selectedSession, 2, 1)} {t?.perPerson || 'per person'}
                             </button>
                         </div>
                     </div>
@@ -461,21 +480,28 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                 {/* Price Display */}
                 <div className="bg-gray-800 rounded-lg p-4 text-center">
                     {(() => {
-                        const basePrice = sessionCount === 1 ?
-                            (selectedSession?.name === 'Free Roaming Arena' ? 12 :
-                             selectedSession?.name === 'UFO Spaceship Cinema' ? 9 :
-                             selectedSession?.name === 'VR 360' ? 9 :
-                             selectedSession?.name === 'VR Battle' ? 9 :
-                             selectedSession?.name === 'VR Warrior' ? 7 :
-                             selectedSession?.name === 'VR Cat' ? 6 :
-                             selectedSession?.name === 'Photo Booth' ? 6 : 0) :
-                            (selectedSession?.name === 'Free Roaming Arena' ? 20 :
-                             selectedSession?.name === 'UFO Spaceship Cinema' ? 15 :
-                             selectedSession?.name === 'VR 360' ? 15 :
-                             selectedSession?.name === 'VR Battle' ? 15 :
-                             selectedSession?.name === 'VR Warrior' ? 12 :
-                             selectedSession?.name === 'VR Cat' ? 10 :
-                             selectedSession?.name === 'Photo Booth' ? 6 : 0);
+                        // 🚨 CRITICAL FIX: Use pricing map instead of hardcoded values
+                        const pricingMapLocal = {
+                            'Free Roaming Arena': { price1: 12, price2: 20 },
+                            'UFO Spaceship Cinema': { price1: 9, price2: 15 },
+                            'VR 360': { price1: 9, price2: 15 },
+                            'VR Battle': { price1: 9, price2: 15 },
+                            'VR Warrior': { price1: 7, price2: 12 },
+                            'VR Cat': { price1: 6, price2: 10 },
+                            'Photo Booth': { price1: 6, price2: 6 },
+                            // Legacy mappings
+                            'Free Roaming VR Arena 2.0': { price1: 12, price2: 20 },
+                            'VR UFO 5 Players': { price1: 9, price2: 15 },
+                            'VR 360° Motion Chair': { price1: 9, price2: 15 },
+                            'HTC VIVE VR Standing Platform': { price1: 9, price2: 15 },
+                            'VR Warrior 2players': { price1: 7, price2: 12 },
+                            'VR CAT': { price1: 6, price2: 10 }
+                        };
+
+                        const sessionPricing = pricingMapLocal[selectedSession?.name];
+                        const basePrice = sessionPricing ?
+                            (sessionCount === 1 ? sessionPricing.price1 : sessionPricing.price2) :
+                            12; // Default fallback
 
                         const subtotal = basePrice * playerCount;
                         const discountInfo = getDiscountInfo(playerCount);
@@ -497,7 +523,7 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                                     )}
                                     {selectedSession?.name !== 'Photo Booth' && (
                                         <div className="text-sm">
-                                            {sessionCount} session{sessionCount > 1 ? 's' : ''}
+                                            {sessionCount} {sessionCount > 1 ? (t?.sessions || 'sessions') : (t?.session || 'session')}
                                         </div>
                                     )}
                                 </div>
@@ -608,7 +634,7 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                 <div className="space-y-3">
                     <div className="flex justify-between">
                         <span className="text-gray-300">{t?.session || 'Session:'}</span>
-                        <span className="font-semibold text-white">{selectedSession?.name}</span>
+                        <span className="font-semibold text-white">{getTranslatedExperienceName(selectedSession?.name)}</span>
                     </div>
                     <div className="flex justify-between">
                         <span className="text-gray-300">{t?.date || 'Date:'}</span>
@@ -635,21 +661,28 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
 
                     {/* Pricing Breakdown */}
                     {(() => {
-                        const basePrice = sessionCount === 1 ?
-                            (selectedSession?.name === 'Free Roaming Arena' ? 12 :
-                             selectedSession?.name === 'UFO Spaceship Cinema' ? 9 :
-                             selectedSession?.name === 'VR 360' ? 9 :
-                             selectedSession?.name === 'VR Battle' ? 9 :
-                             selectedSession?.name === 'VR Warrior' ? 7 :
-                             selectedSession?.name === 'VR Cat' ? 6 :
-                             selectedSession?.name === 'Photo Booth' ? 6 : 0) :
-                            (selectedSession?.name === 'Free Roaming Arena' ? 20 :
-                             selectedSession?.name === 'UFO Spaceship Cinema' ? 15 :
-                             selectedSession?.name === 'VR 360' ? 15 :
-                             selectedSession?.name === 'VR Battle' ? 15 :
-                             selectedSession?.name === 'VR Warrior' ? 12 :
-                             selectedSession?.name === 'VR Cat' ? 10 :
-                             selectedSession?.name === 'Photo Booth' ? 6 : 0);
+                        // 🚨 CRITICAL FIX: Use pricing map for consistency
+                        const pricingMapLocal = {
+                            'Free Roaming Arena': { price1: 12, price2: 20 },
+                            'UFO Spaceship Cinema': { price1: 9, price2: 15 },
+                            'VR 360': { price1: 9, price2: 15 },
+                            'VR Battle': { price1: 9, price2: 15 },
+                            'VR Warrior': { price1: 7, price2: 12 },
+                            'VR Cat': { price1: 6, price2: 10 },
+                            'Photo Booth': { price1: 6, price2: 6 },
+                            // Legacy mappings
+                            'Free Roaming VR Arena 2.0': { price1: 12, price2: 20 },
+                            'VR UFO 5 Players': { price1: 9, price2: 15 },
+                            'VR 360° Motion Chair': { price1: 9, price2: 15 },
+                            'HTC VIVE VR Standing Platform': { price1: 9, price2: 15 },
+                            'VR Warrior 2players': { price1: 7, price2: 12 },
+                            'VR CAT': { price1: 6, price2: 10 }
+                        };
+
+                        const sessionPricing = pricingMapLocal[selectedSession?.name];
+                        const basePrice = sessionPricing ?
+                            (sessionCount === 1 ? sessionPricing.price1 : sessionPricing.price2) :
+                            12; // Default fallback
 
                         const subtotal = basePrice * playerCount;
                         const discountInfo = getDiscountInfo(playerCount);

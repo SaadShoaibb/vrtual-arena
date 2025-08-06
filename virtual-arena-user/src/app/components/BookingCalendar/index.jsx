@@ -3,8 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { FaChevronLeft, FaChevronRight, FaClock, FaUser, FaCalendarAlt } from 'react-icons/fa';
 import axios from 'axios';
 import { API_URL } from '@/utils/ApiUrl';
+import { translations } from '@/app/translations';
+import { useSearchParams } from 'next/navigation';
 
 const BookingCalendar = ({ onTimeSlotSelect, selectedSession }) => {
+    const searchParams = useSearchParams();
+    const locale = searchParams?.get('locale') || 'en';
+    const t = translations[locale] || translations.en;
+
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [bookings, setBookings] = useState([]);
@@ -169,16 +175,17 @@ const BookingCalendar = ({ onTimeSlotSelect, selectedSession }) => {
     };
 
     const calendarDays = generateCalendarDays();
-    const monthNames = [
+    const monthNames = t.monthNames || [
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
     ];
+    const dayNames = t.dayNames || ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
     return (
         <div className="bg-blackish2 rounded-lg p-6 text-white">
             <h2 className="text-2xl font-bold mb-6 text-center text-white">
                 <FaCalendarAlt className="inline mr-2" />
-                Select Date & Time
+                {t.selectDateTime}
             </h2>
 
             {/* Calendar Header */}
@@ -202,7 +209,7 @@ const BookingCalendar = ({ onTimeSlotSelect, selectedSession }) => {
 
             {/* Calendar Grid */}
             <div className="grid grid-cols-7 gap-1 mb-6">
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                {dayNames.map(day => (
                     <div key={day} className="text-center text-white font-semibold py-2">
                         {day}
                     </div>
@@ -230,13 +237,13 @@ const BookingCalendar = ({ onTimeSlotSelect, selectedSession }) => {
             <div className="border-t border-gray-700 pt-6">
                 <h4 className="text-lg font-semibold mb-4 flex items-center">
                     <FaClock className="mr-2" />
-                    Available Time Slots - {selectedDate.toLocaleDateString()}
+                    {t.availableTimeSlots} - {selectedDate.toLocaleDateString()}
                 </h4>
                 
                 {loading ? (
                     <div className="text-center py-8">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
-                        <p className="mt-2">Loading availability...</p>
+                        <p className="mt-2">{t.loadingAvailability}</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -264,11 +271,11 @@ const BookingCalendar = ({ onTimeSlotSelect, selectedSession }) => {
                                     {!isAvailable && slotBookings.length > 0 && (
                                         <div className="text-xs mt-1 flex items-center">
                                             <FaUser className="mr-1" />
-                                            {slotBookings[0].customer_name || 'Booked'}
+                                            {slotBookings[0].customer_name || t.booked}
                                         </div>
                                     )}
                                     {isAvailable && (
-                                        <div className="text-xs mt-1 text-green-400">Available</div>
+                                        <div className="text-xs mt-1 text-green-400">{t.available}</div>
                                     )}
                                 </button>
                             );

@@ -114,6 +114,84 @@ export const seoMetadata = {
         description: 'Achetez des cartes cadeaux et marchandises de jeu VR chez VRtual Arena Edmonton. Cadeaux parfaits pour gamers et passionnés VR. Achetez en ligne maintenant!',
         keywords: 'cartes cadeaux VR Edmonton, marchandises VR, cadeaux gaming, boutique VRtual Arena, magasin jeux VR, cadeaux réalité virtuelle'
       }
+    },
+
+    merchandise: {
+      en: {
+        title: 'VR Merchandise & Accessories - Eye Masks, Hardware | VRtual Arena',
+        description: 'Shop VR accessories, eye masks, hardware, and branded merchandise at VRtual Arena Edmonton. Quality VR gear for enthusiasts and professionals.',
+        keywords: 'VR accessories Edmonton, VR eye masks, VR hardware, VR merchandise, virtual reality gear, VR equipment store'
+      },
+      fr: {
+        title: 'Marchandises et Accessoires VR - Masques Oculaires, Matériel | VRtual Arena',
+        description: 'Achetez des accessoires VR, masques oculaires, matériel et marchandises de marque chez VRtual Arena Edmonton. Équipement VR de qualité pour passionnés et professionnels.',
+        keywords: 'accessoires VR Edmonton, masques oculaires VR, matériel VR, marchandises VR, équipement réalité virtuelle, magasin équipement VR'
+      }
+    },
+
+    tournaments: {
+      en: {
+        title: 'VR Gaming Tournaments & Competitions | VRtual Arena Edmonton',
+        description: 'Join exciting VR gaming tournaments and competitions at VRtual Arena Edmonton. Compete with players, win prizes, and experience competitive VR gaming.',
+        keywords: 'VR tournaments Edmonton, VR competitions, VR gaming events, competitive VR, VR esports, virtual reality tournaments'
+      },
+      fr: {
+        title: 'Tournois et Compétitions de Jeu VR | VRtual Arena Edmonton',
+        description: 'Rejoignez des tournois et compétitions de jeu VR excitants chez VRtual Arena Edmonton. Affrontez des joueurs, gagnez des prix et vivez le jeu VR compétitif.',
+        keywords: 'tournois VR Edmonton, compétitions VR, événements jeu VR, VR compétitif, esports VR, tournois réalité virtuelle'
+      }
+    },
+
+    events: {
+      en: {
+        title: 'VR Events & Private Parties | VRtual Arena Edmonton',
+        description: 'Host unforgettable VR events and private parties at VRtual Arena Edmonton. Birthday parties, corporate events, team building, and more.',
+        keywords: 'VR events Edmonton, VR birthday parties, corporate VR events, VR team building, private VR parties, VR event hosting'
+      },
+      fr: {
+        title: 'Événements VR et Fêtes Privées | VRtual Arena Edmonton',
+        description: 'Organisez des événements VR et fêtes privées inoubliables chez VRtual Arena Edmonton. Fêtes d\'anniversaire, événements corporatifs, team building et plus.',
+        keywords: 'événements VR Edmonton, fêtes anniversaire VR, événements corporatifs VR, team building VR, fêtes privées VR, organisation événements VR'
+      }
+    },
+
+    contact: {
+      en: {
+        title: 'Contact VRtual Arena Edmonton - Book Your VR Experience',
+        description: 'Contact VRtual Arena Edmonton for bookings, inquiries, and information. Located at 8109 102 St NW. Call +1 780-901-0804 or email us today!',
+        keywords: 'contact VRtual Arena, VR booking Edmonton, VRtual Arena location, VR gaming contact, Edmonton VR center phone'
+      },
+      fr: {
+        title: 'Contactez VRtual Arena Edmonton - Réservez Votre Expérience VR',
+        description: 'Contactez VRtual Arena Edmonton pour réservations, demandes et informations. Situé au 8109 102 St NW. Appelez +1 780-901-0804 ou écrivez-nous aujourd\'hui!',
+        keywords: 'contact VRtual Arena, réservation VR Edmonton, emplacement VRtual Arena, contact jeu VR, centre VR Edmonton téléphone'
+      }
+    },
+
+    'guest-checkout': {
+      en: {
+        title: 'Guest Checkout - Complete Your VR Purchase | VRtual Arena',
+        description: 'Complete your VR merchandise purchase as a guest at VRtual Arena. Secure checkout for VR accessories, gift cards, and gaming gear.',
+        keywords: 'VR guest checkout, VR merchandise purchase, VR accessories checkout, VRtual Arena shopping'
+      },
+      fr: {
+        title: 'Commande Invité - Complétez Votre Achat VR | VRtual Arena',
+        description: 'Complétez votre achat de marchandises VR en tant qu\'invité chez VRtual Arena. Commande sécurisée pour accessoires VR, cartes cadeaux et équipement gaming.',
+        keywords: 'commande invité VR, achat marchandises VR, commande accessoires VR, shopping VRtual Arena'
+      }
+    },
+
+    'guest-orders': {
+      en: {
+        title: 'Track Your Orders - Order Status | VRtual Arena',
+        description: 'Track your VR merchandise orders and check order status at VRtual Arena. Enter your email to view order history and delivery information.',
+        keywords: 'track VR orders, order status VRtual Arena, VR merchandise tracking, order history'
+      },
+      fr: {
+        title: 'Suivez Vos Commandes - Statut de Commande | VRtual Arena',
+        description: 'Suivez vos commandes de marchandises VR et vérifiez le statut chez VRtual Arena. Entrez votre email pour voir l\'historique et informations de livraison.',
+        keywords: 'suivre commandes VR, statut commande VRtual Arena, suivi marchandises VR, historique commandes'
+      }
     }
   }
 };

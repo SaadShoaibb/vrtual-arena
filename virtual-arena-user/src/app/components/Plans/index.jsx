@@ -11,6 +11,14 @@ const translations = {
         soloDescription: "Perfect for solo users or startups beginning their VR journey.",
         teamDescription: "Ideal for small teams looking to enhance VR access and support.",
         bookNow: "Book Now",
+        viewMore: "View More",
+        basicPlanDescription: "4 free sessions + 10% off any other paid sessions",
+        basicFeatures: [
+            "4 Free VR Sessions Monthly",
+            "10% Discount on Additional Sessions",
+            "Access to All VR Experiences",
+            "Priority Booking"
+        ],
         features: [
             "Cross-platform Synchronization",
             "Marketing, Regulatory & Public",
@@ -28,6 +36,14 @@ const translations = {
         soloDescription: "Parfait pour les utilisateurs individuels ou les startups qui commencent leur voyage en VR.",
         teamDescription: "Idéal pour les petites équipes cherchant à améliorer l'accès et le support VR.",
         bookNow: "Réserver",
+        viewMore: "Voir Plus",
+        basicPlanDescription: "4 sessions gratuites + 10% de réduction sur toute autre session payante",
+        basicFeatures: [
+            "4 Sessions VR Gratuites Mensuelles",
+            "10% de Réduction sur Sessions Supplémentaires",
+            "Accès à Toutes les Expériences VR",
+            "Réservation Prioritaire"
+        ],
         features: [
             "Synchronisation multiplateforme",
             "Marketing, réglementaire et public",
@@ -63,37 +79,27 @@ const Plans = ({ locale = 'en' }) => {
                     <div className='rounded-[20px] py-6 md:py-[31px] px-6 md:px-[33px] border'>
                         <div className='relative rounded-[20px] border border-[#23A1FF] flex flex-col justify-center items-center py-[30px] drop-shadow-xl shadow-[#209FFF]'>
                             <img src="/assets/shdow.png" alt="" className='absolute top-0 h-full z-0' />
-                            <h1 className='text-white text-[22px] sm:text-[26px] font-semibold z-10 text-wrap-balance'>Basic</h1>
+                            <h1 className='text-white text-[22px] sm:text-[26px] font-semibold z-10 text-wrap-balance'>{t.basicPlan}</h1>
                             <h1 className='text-[22px] sm:text-[26px] z-10'>
                                 <span className='text-[#23A1FF] text-[35px] sm:text-[40px] md:text-[50px] font-semibold'>$49.99</span>
                                 <span className='text-white text-[16px] sm:text-[18px]'>{t.perMonth}</span>
                             </h1>
                         </div>
                         <p className='text-base sm:text-lg text-white mt-[28px] pb-[25px] leading-none border-b text-wrap-balance'>
-                            4 free sessions + 10% off any other paid sessions
+                            {t.basicPlanDescription}
                         </p>
                         <div className='flex flex-col gap-2.5 mt-[34px]'>
-                            <div className='flex items-start gap-1.5'>
-                                <img src="/icons/check.png" alt="" className="flex-shrink-0 mt-1" />
-                                <span className="text-wrap-balance">4 Free VR Sessions Monthly</span>
-                            </div>
-                            <div className='flex items-start gap-1.5'>
-                                <img src="/icons/check.png" alt="" className="flex-shrink-0 mt-1" />
-                                <span className="text-wrap-balance">10% Discount on Additional Sessions</span>
-                            </div>
-                            <div className='flex items-start gap-1.5'>
-                                <img src="/icons/check.png" alt="" className="flex-shrink-0 mt-1" />
-                                <span className="text-wrap-balance">Access to All VR Experiences</span>
-                            </div>
-                            <div className='flex items-start gap-1.5'>
-                                <img src="/icons/check.png" alt="" className="flex-shrink-0 mt-1" />
-                                <span className="text-wrap-balance">Priority Booking</span>
-                            </div>
+                            {t.basicFeatures.map((feature, index) => (
+                                <div key={index} className='flex items-start gap-1.5'>
+                                    <img src="/icons/check.png" alt="" className="flex-shrink-0 mt-1" />
+                                    <span className="text-wrap-balance">{feature}</span>
+                                </div>
+                            ))}
                         </div>
                         <button
                             onClick={() => window.location.href = '/pricing'}
                             className='text-base sm:text-lg md:text-xl mt-[43px] font-semibold flex items-center py-2 md:py-4 px-4 sm:px-6 md:px-8 text-white rounded-full bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] overflow-hidden'>
-                            <span className="text-wrap-balance whitespace-normal">View More</span>
+                            <span className="text-wrap-balance whitespace-normal">{t.viewMore}</span>
                             <img src="/icons/arrow.svg" alt="" className='h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] ml-2 sm:ml-[11px] flex-shrink-0 rounded-full' />
                         </button>
                     </div>
