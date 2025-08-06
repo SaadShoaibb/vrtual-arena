@@ -58,8 +58,7 @@ const Plans = ({ locale = 'en' }) => {
                 <PricingCalculator locale={locale} />
                 
                 <div className='bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] rounded-xl w-[303px] px-5 py-[14px] flex gap-2 mt-20'>
-                    <button className='bg-white text-[26px] font-semibold px-8 py-4 rounded-xl text-gradnt'><span className='text-gradiant'>{t.monthly}</span> </button>
-                    <button className='text-[26px] font-semibold text-white'>{t.yearly}</button>
+                    <h2 className='bg-white w-full items-center justify-center flex text-[26px] font-semibold px-8 py-4 rounded-xl text-gradnt'><span className='text-gradiant'>{t.monthly}</span> </h2>
                 </div>
 
                 <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-y-8 mt-[60px]'>

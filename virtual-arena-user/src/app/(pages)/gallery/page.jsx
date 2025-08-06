@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux'
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
 import SimpleImage from '@/app/components/SimpleImage';
+import LazyMedia from '@/app/components/LazyMedia';
 import BookModal from '@/app/components/BookModal';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
@@ -49,20 +50,29 @@ const GalleryPage = () => {
     }));
   };
 
-  // Simplified media processing - only process what we need
+  // Process all available media data
   const processMediaData = useCallback((data) => {
-    // Only process first 6 images for initial load (ignore videos for now)
-    const imageFiles = (data.images || []).slice(0, 6).map((item, index) => ({
+    // Process all images and videos
+    const imageFiles = (data.images || []).map((item, index) => ({
       type: 'image',
       src: item.url || item,
       filename: item.filename || `image-${index}`,
       index
     }))
 
-    setMediaItems(imageFiles)
-    // Show only first 2 items initially for ultra-fast loading
-    setVisibleItems(imageFiles.slice(0, 2))
-    setHasMore(imageFiles.length > 2)
+    const videoFiles = (data.videos || []).map((item, index) => ({
+      type: 'video',
+      src: item.url || item,
+      poster: item.poster || null,
+      filename: item.filename || `video-${index}`,
+      index: index + imageFiles.length
+    }))
+
+    const allMedia = [...imageFiles, ...videoFiles]
+    setMediaItems(allMedia)
+    // Show first 6 items initially for good initial load
+    setVisibleItems(allMedia.slice(0, 6))
+    setHasMore(allMedia.length > 6)
   }, [])
 
   const fetchMedia = useCallback(async () => {
@@ -171,15 +181,28 @@ const GalleryPage = () => {
           <h2 className="text-3xl font-bold mb-8 text-white">Our Gallery</h2>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-            {visibleItems.map(({ src, index, filename }) => (
-              <SimpleImage
-                key={`image-${index}-${filename || index}`}
-                src={src}
-                index={index}
-                alt={`Gallery Image ${index + 1}`}
-                className="aspect-video rounded-2xl shadow-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-shadow duration-300"
-                priority={index === 0} // Only prioritize the very first item
-              />
+            {visibleItems.map(({ type, src, index, filename, poster }) => (
+              type === 'video' ? (
+                <LazyMedia
+                  key={`${type}-${index}-${filename || index}`}
+                  type={type}
+                  src={src}
+                  poster={poster}
+                  index={index}
+                  alt={`Gallery ${type} ${index + 1}`}
+                  className="aspect-video rounded-2xl shadow-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-shadow duration-300"
+                  priority={index === 0}
+                />
+              ) : (
+                <SimpleImage
+                  key={`${type}-${index}-${filename || index}`}
+                  src={src}
+                  index={index}
+                  alt={`Gallery Image ${index + 1}`}
+                  className="aspect-video rounded-2xl shadow-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-shadow duration-300"
+                  priority={index === 0}
+                />
+              )
             ))}
           </div>
 

@@ -2,25 +2,31 @@ import { promises as fs } from 'fs';
 import path from 'path';
 
 // Helper function to get media base URL
-function getMediaBaseUrl() {
+function getMediaBaseUrl(request) {
   // For deployment, use the environment variable or construct from request
   if (process.env.NEXT_PUBLIC_MEDIA_BASE_URL) {
     return process.env.NEXT_PUBLIC_MEDIA_BASE_URL.replace(/\/$/, '');
   }
 
-  // For development, use localhost
+  // For development, try to get the actual port from the request
   if (process.env.NODE_ENV === 'development') {
-    return 'http://localhost:3000';
+    try {
+      const url = new URL(request.url);
+      return `${url.protocol}//${url.host}`;
+    } catch {
+      // Fallback to default port
+      return 'http://localhost:3000';
+    }
   }
 
-  // For production, try to get from headers or use relative paths
+  // For production, use relative paths (empty string)
   return '';
 }
 
 export async function GET(request) {
   try {
     const galleryDir = path.join(process.cwd(), 'public', 'gallery');
-    const mediaBaseUrl = getMediaBaseUrl();
+    const mediaBaseUrl = getMediaBaseUrl(request);
 
     // Check if directory exists
     try {
@@ -76,7 +82,7 @@ export async function GET(request) {
     return Response.json({
       images: [],
       videos: [],
-      mediaBaseUrl: getMediaBaseUrl(),
+      mediaBaseUrl: getMediaBaseUrl(request),
       error: 'Failed to fetch gallery content'
     });
   }
