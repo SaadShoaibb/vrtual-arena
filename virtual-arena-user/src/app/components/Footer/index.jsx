@@ -86,6 +86,15 @@ const Footer = ({ locale = 'en' }) => {
                                 <span><img src="/icons/location.png" alt="" className='min-h-full h-4 min-w-3' /></span>
                                 {t.physicalAddress}
                             </h3>
+                            <a
+                                href="https://share.google/rZ7xFBlbv9VNpk9IO"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center text-[#DB1FEB] hover:text-[#FF1FEB] transition-colors text-sm font-medium mb-5"
+                            >
+                                <span><img src="/icons/location.png" alt="" className='min-h-full h-4 min-w-3 mr-2' /></span>
+                                {t.getDirections}
+                            </a>
                             
                             {/* Newsletter Signup */}
                             <h3 className='text-[22px] font-bold mt-8 mb-4'>{t.newsletter}</h3>

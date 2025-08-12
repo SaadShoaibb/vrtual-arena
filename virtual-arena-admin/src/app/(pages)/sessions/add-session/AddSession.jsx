@@ -52,15 +52,7 @@ console.log(response)
             alert('Error creating session');
         }
     };
-    const sessionOptions = [
-        { value: '', label: 'Select a session' },
-        { value: 'Free Roaming VR Arena 2.0', label: 'Free Roaming VR Arena 2.0' },
-        { value: 'VR UFO 5 Players', label: 'VR UFO 5 Players' },
-        { value: 'VR 360° Motion Chair', label: 'VR 360° Motion Chair' },
-        { value: 'HTC VIVE VR Standing Platform', label: 'HTC VIVE VR Standing Platform' },
-        { value: 'VR Warrior 2players', label: 'VR Warrior 2players' },
-        { value: 'VR CAT', label: 'VR CAT' },
-    ];
+    // Removed hardcoded session options - now using text input for flexibility
 
     return (
         <div className="flex items-center justify-center">
@@ -69,11 +61,12 @@ console.log(response)
                 <Form onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <FieldContainer label="Session Name" htmlFor="name">
-                            <Select
+                            <Input
+                                type="text"
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
-                                options={sessionOptions}
+                                placeholder="Enter session name (e.g., VR Racing Arena)"
                                 required
                             />
                         </FieldContainer>

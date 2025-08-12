@@ -16,6 +16,7 @@ import Plans from "./components/Plans";
 import Testimonials from "./components/Testimonials";
 import VRPackage from "./components/VrPackages";
 import WhyChoose from "./components/WhyChoose";
+import CountdownTimer from "./components/CountdownTimer";
 import { addLocaleToUrl, validateLocale } from './utils/languageUtils';
 import { useDispatch } from 'react-redux';
 import { setLanguage } from '@/Store/ReduxSlice/languageSlice';
@@ -50,6 +51,7 @@ export default function HomePage() {
       <div className="relative">
         <Navbar locale={locale} />
         <HeroSection locale={locale} />
+        <CountdownTimer />
         <About locale={locale} />
         <Offers locale={locale} />
         <Experience locale={locale} />

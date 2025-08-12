@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import BookNowButton from '../common/BookNowButton'
 import { useTranslation } from '@/app/hooks/useTranslation'
 import { translations } from '@/app/translations'
-import { FaPause, FaPlay } from 'react-icons/fa'
+
 import Link from 'next/link'
 import AuthModel from '../AuthModal'
 import BookingForm from '../BookingForm'
@@ -60,20 +60,14 @@ const HeroSection = ({ locale = 'en' }) => {
     setIsPlaying(true);
   };
 
-  // Toggle play/pause
-  const togglePlayPause = () => {
-    setIsPlaying(!isPlaying);
-  };
+
 
   // Open booking modal using Redux
   const handleOpenBookModal = () => {
     dispatch(openBookModal());
   };
 
-  // Description text with proper translation
-  const descriptionText = locale === 'fr' 
-    ? "Vous rapprocher de la réalité grâce à des expériences VR inoubliables."
-    : "Bringing you closer to reality through unforgettable VR experiences.";
+
 
   return (
     <div className="relative h-[70vh] md:h-[75vh] lg:h-[85vh] overflow-hidden">
@@ -107,19 +101,22 @@ const HeroSection = ({ locale = 'en' }) => {
               transition={{ duration: 0.5 }}
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 text-wrap-balance text-shadow"
             >
-              <span className="block">Explore the</span>
-              <span className="block">Future</span>
-              <span className="block">With <img src="/assets/logo.png" alt="VRtual Arena" className="h-12 sm:h-14 md:h-16 inline-block" /></span>
+              <span className="block">{t.stepIntoThe}</span>
+              <span className="block">{t.newReality}</span>
             </motion.h1>
-            <motion.p
-              key={`desc-${currentIndex}`}
+            <motion.div
+              key={`logo-${currentIndex}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-base sm:text-lg md:text-xl mb-8 max-w-2xl mx-auto text-wrap-balance text-shadow"
+              className="mb-8 flex justify-center"
             >
-              {descriptionText}
-            </motion.p>
+              <img
+                src="/assets/logo.png"
+                alt="VRtual Arena"
+                className="h-16 sm:h-20 md:h-24 lg:h-28 w-auto"
+              />
+            </motion.div>
             <motion.div
               key={`buttons-${currentIndex}`}
               initial={{ opacity: 0, y: 20 }}
@@ -152,14 +149,7 @@ const HeroSection = ({ locale = 'en' }) => {
       </div>
 
       {/* Slide navigation */}
-      <div className="absolute bottom-4 left-0 right-0 z-20 flex justify-center items-center gap-3">
-        <button
-          onClick={togglePlayPause}
-          className="text-white hover:text-[#DB1FEB] transition-colors"
-          aria-label={isPlaying ? "Pause slideshow" : "Play slideshow"}
-        >
-          {isPlaying ? <FaPause /> : <FaPlay />}
-        </button>
+      <div className="absolute bottom-4 left-0 right-0 z-20 flex justify-center items-center">
         <div className="flex space-x-2">
           {slides.map((_, index) => (
             <button

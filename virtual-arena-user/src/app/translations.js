@@ -695,6 +695,53 @@ export const translations = {
     available: 'Available',
     booked: 'Booked',
 
+    // Countdown Timer
+    grandOpeningCountdown: '🎉 Grand Opening Countdown',
+    countdownDescription: 'Get ready for the ultimate VR experience!',
+    days: 'Days',
+    hours: 'Hours',
+    minutes: 'Minutes',
+    seconds: 'Seconds',
+    stayTuned: 'Stay tuned for an incredible VR adventure!',
+
+    // Location & Directions
+    getDirections: 'Get Directions',
+
+    // Hero Section
+    stepIntoThe: 'Step into the',
+    newReality: 'New Reality',
+
+    // Enhanced Booking Form - Multiple Sessions
+    yourCart: 'Your Cart',
+    configureSession: 'Configure Session',
+    numberOfSessions: 'Number of Sessions:',
+    numberOfPlayers: 'Number of Players:',
+    addToCart: 'Add to Cart',
+    remove: 'Remove',
+    proceedToBooking: 'Proceed to Booking',
+    selectVrExperience: 'Select VR Experience',
+    pleaseSelectSessionAndTime: 'Please select a session and time slot',
+    sessionAddedToCart: 'Session added to cart!',
+    sessionRemovedFromCart: 'Session removed from cart',
+    pleaseAddSessionsToCart: 'Please add at least one session to your cart',
+    backToSessions: '← Back to Sessions',
+
+    // Hourly Booking
+    bookingType: 'Booking Type:',
+    sessionBased: 'Session-Based',
+    hourlyBased: 'Hourly-Based',
+    duration: 'Duration (hours):',
+    hour: 'hour',
+    hours: 'hours',
+    durationRange: 'Duration: 15 minutes to 8 hours',
+
+    // Step Indicators
+    selectSession: 'Select Session',
+    userType: 'User Type',
+    confirmation: 'Confirmation',
+    payment: 'Payment',
+    success: 'Success',
+
     // Booking Form (Legacy)
     bookNow: 'Book Now',
     pleaseEnterDetails: 'Please enter your details',
@@ -1587,6 +1634,53 @@ export const translations = {
     loadingAvailability: 'Chargement de la disponibilité...',
     available: 'Disponible',
     booked: 'Réservé',
+
+    // Countdown Timer
+    grandOpeningCountdown: '🎉 Compte à Rebours de l\'Ouverture',
+    countdownDescription: 'Préparez-vous pour l\'expérience VR ultime!',
+    days: 'Jours',
+    hours: 'Heures',
+    minutes: 'Minutes',
+    seconds: 'Secondes',
+    stayTuned: 'Restez à l\'écoute pour une aventure VR incroyable!',
+
+    // Location & Directions
+    getDirections: 'Obtenir l\'Itinéraire',
+
+    // Hero Section
+    stepIntoThe: 'Entrez dans la',
+    newReality: 'Nouvelle Réalité',
+
+    // Enhanced Booking Form - Multiple Sessions
+    yourCart: 'Votre Panier',
+    configureSession: 'Configurer la Session',
+    numberOfSessions: 'Nombre de Sessions:',
+    numberOfPlayers: 'Nombre de Joueurs:',
+    addToCart: 'Ajouter au Panier',
+    remove: 'Supprimer',
+    proceedToBooking: 'Procéder à la Réservation',
+    selectVrExperience: 'Sélectionner l\'Expérience VR',
+    pleaseSelectSessionAndTime: 'Veuillez sélectionner une session et un créneau horaire',
+    sessionAddedToCart: 'Session ajoutée au panier!',
+    sessionRemovedFromCart: 'Session supprimée du panier',
+    pleaseAddSessionsToCart: 'Veuillez ajouter au moins une session à votre panier',
+    backToSessions: '← Retour aux Sessions',
+
+    // Hourly Booking
+    bookingType: 'Type de Réservation:',
+    sessionBased: 'Basé sur les Sessions',
+    hourlyBased: 'Basé sur les Heures',
+    duration: 'Durée (heures):',
+    hour: 'heure',
+    hours: 'heures',
+    durationRange: 'Durée: 15 minutes à 8 heures',
+
+    // Step Indicators
+    selectSession: 'Sélectionner Session',
+    userType: 'Type d\'Utilisateur',
+    confirmation: 'Confirmation',
+    payment: 'Paiement',
+    success: 'Succès',
 
     // Booking Form (Legacy)
     bookNow: 'Réserver Maintenant',

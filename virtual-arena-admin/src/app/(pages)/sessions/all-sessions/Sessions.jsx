@@ -18,23 +18,14 @@ const Sessions = () => {
         // { header: 'Slots', accessor: 'slots' },
         // { header: 'Bookings', accessor: 'bookings' },
     ];
-    const [sessions, setSessions] = useState([])
-    // Pricing calculator pricing map
-    const getPricingInfo = (sessionName) => {
-        const pricingMap = {
-            'Free Roaming Arena': { price1: 12, price2: 20 },
-            'UFO Spaceship Cinema': { price1: 9, price2: 15 },
-            'VR 360': { price1: 9, price2: 15 },
-            'VR Battle': { price1: 9, price2: 15 },
-            'VR Warrior': { price1: 7, price2: 12 },
-            'VR Cat': { price1: 6, price2: 10 },
-            'Photo Booth': { price1: 6, price2: 6 }
-        };
-        return pricingMap[sessionName] || { price1: 0, price2: 0 };
-    };
+    const [sessions, setSessions] = useState([]);
+    const [sessionPricing, setSessionPricing] = useState({});
 
     const data = sessions?.map((session) => {
-        const pricing = getPricingInfo(session.name);
+        // Get dynamic pricing from database
+        const pricing1 = sessionPricing[session.session_id]?.[1] || session.price || 0;
+        const pricing2 = sessionPricing[session.session_id]?.[2] || session.price || 0;
+
         return {
             name: session.name,
             session_id: session.session_id,
@@ -43,10 +34,10 @@ const Sessions = () => {
             maxPlayers: session.max_players,
             max_players: session.max_players,
             session_price: session.name === 'Photo Booth'
-                ? `$${pricing.price1}`
-                : `$${pricing.price1} / $${pricing.price2}`,
+                ? `$${pricing1}`
+                : `$${pricing1} / $${pricing2}`,
             price: session.price,
-            pricing_info: `1 session: $${pricing.price1}${session.name !== 'Photo Booth' ? `, 2 sessions: $${pricing.price2}` : ''}`,
+            pricing_info: `1 session: $${pricing1}${session.name !== 'Photo Booth' ? `, 2 sessions: $${pricing2}` : ''}`,
             status: session.is_active ? 'Active' : 'Inactive',
             is_active: session.is_active,
             slots: session?.available_slots,
@@ -65,14 +56,33 @@ const Sessions = () => {
         try {
             const response = await axios.get(`${API_URL}/admin/get-sessions/`, getAuthHeaders())
             setSessions(response?.data?.sessions)
-
         } catch (error) {
             console.log(error)
         }
     }
 
+    const handleFetchSessionPricing = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/admin/sessions/pricing`, getAuthHeaders());
+            if (response.data.success) {
+                // Convert array to object for easy lookup
+                const pricingMap = {};
+                response.data.pricing.forEach(item => {
+                    if (!pricingMap[item.session_id]) {
+                        pricingMap[item.session_id] = {};
+                    }
+                    pricingMap[item.session_id][item.session_count] = item.price;
+                });
+                setSessionPricing(pricingMap);
+            }
+        } catch (error) {
+            console.log('Error fetching session pricing:', error);
+        }
+    }
+
     useEffect(() => {
-        handleFetchSessions()
+        handleFetchSessions();
+        handleFetchSessionPricing();
     }, [])
 
     useEffect(() => {
@@ -81,6 +91,7 @@ const Sessions = () => {
         
         channel.bind('my-event', (data) => {
             handleFetchSessions();
+            handleFetchSessionPricing();
         });
     
         // Cleanup
@@ -137,15 +148,18 @@ const Sessions = () => {
     };
 
     const handleEdit = (row) => {
-
-        setSelectedSession(row);
+        // Find the original session data by session_id
+        const originalSession = sessions.find(session => session.session_id === row.session_id);
+        setSelectedSession(originalSession);
         setSidebarMode('edit');
         setSidebarOpen(true);
         setDropdownOpen(null)
     };
 
     const handleDetail = (row) => {
-        setSelectedSession(row);
+        // Find the original session data by session_id
+        const originalSession = sessions.find(session => session.session_id === row.session_id);
+        setSelectedSession(originalSession);
         setSidebarMode('view');
         setSidebarOpen(true);
         setDropdownOpen(null)
@@ -173,12 +187,12 @@ const Sessions = () => {
                 data={data}
                 onEdit={handleEdit}
                 onDetail={handleDetail}
-                onDelete={null} // Disable delete functionality
-                onConfirm={null}
+                onDelete={handleDelete}
+                onConfirm={confirmDelete}
                 sidebarMode={sidebarMode}
                 dropdownOpen={dropdownOpen}
                 setDropdownOpen={setDropdownOpen}
-                deleteModalOpen={false}
+                deleteModalOpen={deleteModalOpen}
                 setDeleteModalOpen={() => {}} // Disable delete modal
                 hideDeleteButton={true} // Hide delete button
             />

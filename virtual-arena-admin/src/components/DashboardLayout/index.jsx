@@ -120,14 +120,17 @@ const DashboardLayout = ({ children, pageTitle }) => {
                             </Link>
                         </li>
 
-                        <li className="p-4">
-                            <Link href="/sessions/all-sessions" className={`flex items-center ${pathname === '/sessions/all-sessions' ? "text-gradiant font-bold" : ""}`}>
-                                <div className='flex items-center gap-2 leading-none'>
-                                    <SiSession className='text-[#926BB9]' size={20} />
-                                    {isSidebarOpen && "VR Sessions"}
-                                </div>
-                            </Link>
-                        </li>
+                        <SidebarDropdown
+                            isSidebarOpen={isSidebarOpen}
+                            title="VR Sessions"
+                            icon={<SiSession className='text-[#926BB9]' size={20} />}
+                            items={[
+                                { label: "Add Session", href: "/sessions/add-session" },
+                                { label: "All Sessions", href: "/sessions/all-sessions" },
+                                { label: "Pricing Management", href: "/pricing-management" },
+                            ]}
+                            dropdownId="sessions"
+                        />
 
                         <li className="p-4">
                             <Link href="/bookings/all-bookings" className={`flex items-center ${pathname === '/bookings/all-bookings' ? "text-gradiant font-bold" : ""}`}>
@@ -198,6 +201,15 @@ const DashboardLayout = ({ children, pageTitle }) => {
                                 <div className='flex items-center gap-2 leading-none'>
                                     <BsCurrencyDollar className='text-[#926BB9]' size={20} />
                                     {isSidebarOpen && "Payments"}
+                                </div>
+                            </Link>
+                        </li>
+
+                        <li className="p-4">
+                            <Link href="/countdown-timer" className={`flex items-center ${pathname === '/countdown-timer' ? "text-gradiant font-bold" : ""}`}>
+                                <div className='flex items-center gap-2 leading-none'>
+                                    <MdOutlineDashboard className='text-[#926BB9]' size={20} />
+                                    {isSidebarOpen && "Countdown Timer"}
                                 </div>
                             </Link>
                         </li>

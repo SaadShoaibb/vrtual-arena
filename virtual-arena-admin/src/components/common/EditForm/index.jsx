@@ -6,7 +6,7 @@ import Input from '../Input';
 import Checkbox from '../Checkbox';
 
 const EditForm = ({ data, onSave }) => {
-    const [formData, setFormData] = useState(data);
+    const [formData, setFormData] = useState(data || {});
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -21,26 +21,19 @@ const EditForm = ({ data, onSave }) => {
         onSave(formData);
     };
    
-    const sessionOptions = [
-        { value: '', label: 'Select a session' },
-        { value: 'Free Roaming VR Arena 2.0', label: 'Free Roaming VR Arena 2.0' },
-        { value: 'VR UFO 5 Players', label: 'VR UFO 5 Players' },
-        { value: 'VR 360° Motion Chair', label: 'VR 360° Motion Chair' },
-        { value: 'HTC VIVE VR Standing Platform', label: 'HTC VIVE VR Standing Platform' },
-        { value: 'VR Warrior 2players', label: 'VR Warrior 2players' },
-        { value: 'VR CAT', label: 'VR CAT' },
-    ];
+    // For editing, we use text input instead of dropdown to allow any session name
     return (
         <form onSubmit={handleSubmit}>
             <div className="mb-4">
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <FieldContainer label="Session Name" htmlFor="name">
-                            <Select
+                            <Input
+                                type="text"
                                 name="name"
-                                value={formData.name}
+                                value={formData.name || ''}
                                 onChange={handleChange}
-                                options={sessionOptions}
+                                placeholder="Enter session name"
                                 required
                             />
                         </FieldContainer>
@@ -48,7 +41,7 @@ const EditForm = ({ data, onSave }) => {
                             <Input
                                 type="number"
                                 name="duration_minutes"
-                                value={formData.duration_minutes}
+                                value={formData.duration_minutes || ''}
                                 onChange={handleChange}
                                 required
                             />
@@ -57,7 +50,7 @@ const EditForm = ({ data, onSave }) => {
                             <Input
                                 type="number"
                                 name="max_players"
-                                value={formData.max_players}
+                                value={formData.max_players || ''}
                                 onChange={handleChange}
                                 required
                             />
@@ -68,7 +61,7 @@ const EditForm = ({ data, onSave }) => {
                                 type="number"
                                 step="0.01"
                                 name="price"
-                                value={formData.price}
+                                value={formData.price || ''}
                                 onChange={handleChange}
                                 required
                             />
@@ -78,7 +71,7 @@ const EditForm = ({ data, onSave }) => {
                             <Input
                                 type="textarea"
                                 name="description"
-                                value={formData.description}
+                                value={formData.description || ''}
                                 onChange={handleChange}
                                 required
                             />

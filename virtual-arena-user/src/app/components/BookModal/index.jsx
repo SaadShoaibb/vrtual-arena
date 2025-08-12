@@ -26,7 +26,7 @@ const BookModal = ({ locale = 'en' }) => {
       />
 
       {/* Modal Content */}
-      <div className="relative flex flex-col items-center max-h-[90vh] overflow-auto w-full max-w-[700px] rounded-2xl bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] pt-16 pb-12 px-2 md:px-6">
+      <div id="booking-modal-container" className="relative flex flex-col items-center max-h-[90vh] overflow-auto w-full max-w-[700px] rounded-2xl bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7] pt-16 pb-12 px-2 md:px-6">
         {/* Close Icons */}
         <div
           className="cursor-pointer h-[50px] w-[50px] text-white rounded-full bg-[#47B0FF] flex justify-center items-center absolute md:top-[45px] md:left-[30px] top-6 left-6"

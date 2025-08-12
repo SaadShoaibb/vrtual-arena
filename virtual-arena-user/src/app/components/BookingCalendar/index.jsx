@@ -6,17 +6,19 @@ import { API_URL } from '@/utils/ApiUrl';
 import { translations } from '@/app/translations';
 import { useSearchParams } from 'next/navigation';
 
-const BookingCalendar = ({ onTimeSlotSelect, selectedSession }) => {
+const BookingCalendar = ({ onTimeSlotSelect, selectedSession, bookingType = 'session', allowMultipleSlots = false, onDateSelect }) => {
     const searchParams = useSearchParams();
     const locale = searchParams?.get('locale') || 'en';
     const t = translations[locale] || translations.en;
 
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
+    const [showTimeSlots, setShowTimeSlots] = useState(false);
     const [bookings, setBookings] = useState([]);
     const [sessions, setSessions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
+    const [selectedTimeSlots, setSelectedTimeSlots] = useState([]); // For multiple slot selection
 
     // Generate time slots (9 AM to 9 PM, 1-hour intervals)
     const generateTimeSlots = () => {
@@ -105,24 +107,89 @@ const BookingCalendar = ({ onTimeSlotSelect, selectedSession }) => {
             return; // Don't allow selection of unavailable slots
         }
 
-        const startTime = new Date(selectedDate);
-        startTime.setHours(timeSlot.hour, 0, 0, 0);
-        
-        const endTime = new Date(startTime);
-        if (selectedSession?.duration_minutes) {
-            endTime.setMinutes(endTime.getMinutes() + selectedSession.duration_minutes);
-        } else {
-            endTime.setHours(endTime.getHours() + 1); // Default 1 hour
-        }
+        if (allowMultipleSlots && bookingType === 'hourly') {
+            // Multiple slot selection for time-based bookings
+            console.log('🔄 Multiple slot selection mode');
+            console.log('📅 Current selected slots:', selectedTimeSlots);
+            console.log('🎯 Clicked slot:', timeSlot);
 
-        setSelectedTimeSlot(timeSlot);
-        
-        if (onTimeSlotSelect) {
-            onTimeSlotSelect({
-                startTime: startTime.toISOString(),
-                endTime: endTime.toISOString(),
-                timeSlot: timeSlot
-            });
+            const isAlreadySelected = selectedTimeSlots.some(slot => slot.time === timeSlot.time);
+            console.log('✅ Is already selected:', isAlreadySelected);
+
+            if (isAlreadySelected) {
+                // Remove slot if already selected
+                const newSlots = selectedTimeSlots.filter(slot => slot.time !== timeSlot.time);
+                console.log('➖ Removing slot, new slots:', newSlots);
+                setSelectedTimeSlots(newSlots);
+
+                if (onTimeSlotSelect && newSlots.length > 0) {
+                    // Send the earliest and latest times as start/end
+                    const sortedSlots = newSlots.sort((a, b) => a.hour - b.hour);
+                    const startTime = new Date(selectedDate);
+                    startTime.setHours(sortedSlots[0].hour, 0, 0, 0);
+
+                    const endTime = new Date(selectedDate);
+                    endTime.setHours(sortedSlots[sortedSlots.length - 1].hour + 1, 0, 0, 0);
+
+                    onTimeSlotSelect({
+                        startTime: startTime.toISOString(),
+                        endTime: endTime.toISOString(),
+                        timeSlots: newSlots,
+                        duration: newSlots.length
+                    });
+                } else if (newSlots.length === 0) {
+                    // Clear selection if no slots left
+                    onTimeSlotSelect(null);
+                }
+            } else {
+                // Add slot to selection
+                const newSlots = [...selectedTimeSlots, timeSlot].sort((a, b) => a.hour - b.hour);
+                console.log('➕ Adding slot, new slots:', newSlots);
+                setSelectedTimeSlots(newSlots);
+
+                if (onTimeSlotSelect) {
+                    const startTime = new Date(selectedDate);
+                    startTime.setHours(newSlots[0].hour, 0, 0, 0);
+
+                    const endTime = new Date(selectedDate);
+                    endTime.setHours(newSlots[newSlots.length - 1].hour + 1, 0, 0, 0);
+
+                    console.log('📤 Sending time slot data:', {
+                        startTime: startTime.toISOString(),
+                        endTime: endTime.toISOString(),
+                        timeSlots: newSlots,
+                        duration: newSlots.length
+                    });
+
+                    onTimeSlotSelect({
+                        startTime: startTime.toISOString(),
+                        endTime: endTime.toISOString(),
+                        timeSlots: newSlots,
+                        duration: newSlots.length
+                    });
+                }
+            }
+        } else {
+            // Single slot selection for session-based bookings
+            const startTime = new Date(selectedDate);
+            startTime.setHours(timeSlot.hour, 0, 0, 0);
+
+            const endTime = new Date(startTime);
+            if (selectedSession?.duration_minutes) {
+                endTime.setMinutes(endTime.getMinutes() + selectedSession.duration_minutes);
+            } else {
+                endTime.setHours(endTime.getHours() + 1); // Default 1 hour
+            }
+
+            setSelectedTimeSlot(timeSlot);
+
+            if (onTimeSlotSelect) {
+                onTimeSlotSelect({
+                    startTime: startTime.toISOString(),
+                    endTime: endTime.toISOString(),
+                    timeSlot: timeSlot
+                });
+            }
         }
     };
 
@@ -136,6 +203,13 @@ const BookingCalendar = ({ onTimeSlotSelect, selectedSession }) => {
     const selectDate = (date) => {
         setSelectedDate(date);
         setSelectedTimeSlot(null);
+        setSelectedTimeSlots([]);
+        setShowTimeSlots(true);
+        fetchBookingAvailability(date);
+
+        if (onDateSelect) {
+            onDateSelect(date);
+        }
     };
 
     // Generate calendar days
@@ -233,12 +307,18 @@ const BookingCalendar = ({ onTimeSlotSelect, selectedSession }) => {
                 ))}
             </div>
 
-            {/* Time Slots */}
-            <div className="border-t border-gray-700 pt-6">
-                <h4 className="text-lg font-semibold mb-4 flex items-center">
-                    <FaClock className="mr-2" />
-                    {t.availableTimeSlots} - {selectedDate.toLocaleDateString()}
-                </h4>
+            {/* Time Slots - Only show after date selection */}
+            {showTimeSlots && (
+                <div className="border-t border-gray-700 pt-6">
+                    <h4 className="text-lg font-semibold mb-4 flex items-center">
+                        <FaClock className="mr-2" />
+                        {t.availableTimeSlots} - {selectedDate.toLocaleDateString()}
+                        {allowMultipleSlots && (
+                            <span className="ml-2 text-sm text-gray-400">
+                                ({t.selectMultiple || 'Select multiple slots'})
+                            </span>
+                        )}
+                    </h4>
                 
                 {loading ? (
                     <div className="text-center py-8">
@@ -250,7 +330,9 @@ const BookingCalendar = ({ onTimeSlotSelect, selectedSession }) => {
                         {timeSlots.map((timeSlot) => {
                             const isAvailable = isTimeSlotAvailable(timeSlot, selectedSession?.session_id);
                             const slotBookings = getBookingsForTimeSlot(timeSlot);
-                            const isSelected = selectedTimeSlot?.time === timeSlot.time;
+                            const isSelected = allowMultipleSlots
+                                ? selectedTimeSlots.some(slot => slot.time === timeSlot.time)
+                                : selectedTimeSlot?.time === timeSlot.time;
                             
                             return (
                                 <button
@@ -282,7 +364,8 @@ const BookingCalendar = ({ onTimeSlotSelect, selectedSession }) => {
                         })}
                     </div>
                 )}
-            </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -146,6 +146,15 @@ const Contact = ({ locale = 'en' }) => {
                                         <p className="text-white text-lg font-light">
                                             {t.locationAddress}
                                         </p>
+                                        <a
+                                            href="https://share.google/rZ7xFBlbv9VNpk9IO"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center mt-2 text-[#DB1FEB] hover:text-[#FF1FEB] transition-colors text-sm font-medium"
+                                        >
+                                            <FaMapMarkerAlt className="mr-2" />
+                                            {t.getDirections}
+                                        </a>
                                     </div>
 
                                     {/* Forestburg Location */}
@@ -245,16 +254,35 @@ const Contact = ({ locale = 'en' }) => {
 
                     <div>
                         {/* Google Map Integration */}
-                        <div className="mb-8 rounded-xl overflow-hidden h-[300px]">
-                            <iframe 
-                                src="https://maps.google.com/maps?q=8109+102+St+NW,+Edmonton,+AB+T6E+4A4&output=embed" 
-                                width="100%" 
-                                height="100%" 
-                                style={{border:0}} 
-                                allowFullScreen="" 
-                                loading="lazy" 
+                        <div className="mb-8 rounded-xl overflow-hidden h-[300px] relative">
+                            <iframe
+                                src="https://maps.google.com/maps?q=8109+102+St+NW,+Edmonton,+AB+T6E+4A4&output=embed"
+                                width="100%"
+                                height="100%"
+                                style={{border:0}}
+                                allowFullScreen=""
+                                loading="lazy"
                                 referrerPolicy="no-referrer-when-downgrade"
                             ></iframe>
+
+                            {/* Directions Button Overlay */}
+                            <div className="absolute top-4 right-4">
+                                <a
+                                    href="https://share.google/rZ7xFBlbv9VNpk9IO"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="bg-white/90 backdrop-blur-sm hover:bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg transition-all duration-200 flex items-center gap-2 text-sm font-medium hover:shadow-xl"
+                                >
+                                    <FaMapMarkerAlt className="text-[#DB1FEB]" />
+                                    {t.getDirections}
+                                </a>
+                            </div>
+
+                            {/* Location Info Overlay */}
+                            <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm text-white px-4 py-3 rounded-lg">
+                                <div className="text-sm font-semibold">VRtual Arena</div>
+                                <div className="text-xs text-gray-300">{t.locationAddress}</div>
+                            </div>
                         </div>
 
                         {/* Success Message */}
