@@ -30,12 +30,12 @@ const CountdownTimerPage = () => {
     const fetchCountdownSettings = async () => {
         try {
             console.log('🔄 Fetching countdown settings...');
-            const response = await axios.get(`${API_URL}/admin/site-settings/grand-opening-date`, getAuthHeaders());
+            const response = await axios.get(`${API_URL}/admin/site-settings/grand_opening_date`, getAuthHeaders());
             console.log('📅 Date response:', response.data);
 
             if (response.data.success) {
                 // Handle both response formats
-                const date = response.data.setting?.value || response.data.date;
+                const date = response.data.setting?.setting_value || response.data.date;
                 console.log('📅 Retrieved date:', date);
                 if (date) {
                     // Convert to local datetime format for input
@@ -46,11 +46,11 @@ const CountdownTimerPage = () => {
                 }
             }
 
-            const enabledResponse = await axios.get(`${API_URL}/admin/site-settings/countdown-enabled`, getAuthHeaders());
+            const enabledResponse = await axios.get(`${API_URL}/admin/site-settings/countdown_enabled`, getAuthHeaders());
             console.log('🔘 Enabled response:', enabledResponse.data);
 
             if (enabledResponse.data.success) {
-                const enabled = enabledResponse.data.setting?.value === 'true';
+                const enabled = enabledResponse.data.setting?.setting_value === 'true';
                 console.log('🔘 Enabled status:', enabled);
                 setIsEnabled(enabled);
             }
@@ -76,16 +76,24 @@ const CountdownTimerPage = () => {
 
             // Save grand opening date
             const dateResponse = await axios.put(
-                `${API_URL}/admin/site-settings/grand-opening-date`,
-                { value: new Date(grandOpeningDate).toISOString() },
+                `${API_URL}/admin/site-settings/grand_opening_date`,
+                {
+                    value: new Date(grandOpeningDate).toISOString(),
+                    type: 'date',
+                    description: 'Grand opening countdown target date'
+                },
                 getAuthHeaders()
             );
             console.log('📅 Date save response:', dateResponse.data);
 
             // Save enabled status
             const enabledResponse = await axios.put(
-                `${API_URL}/admin/site-settings/countdown-enabled`,
-                { value: isEnabled.toString() },
+                `${API_URL}/admin/site-settings/countdown_enabled`,
+                {
+                    value: isEnabled.toString(),
+                    type: 'boolean',
+                    description: 'Enable/disable countdown banner'
+                },
                 getAuthHeaders()
             );
             console.log('🔘 Enabled save response:', enabledResponse.data);

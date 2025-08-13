@@ -9,22 +9,85 @@ import PaymentModal from '@/app/components/PaymentForm';
 import { formatDisplayPrice } from '@/app/utils/currency';
 import EnhancedBookingForm from '@/app/components/EnhancedBookingForm';
 import AuthModel from '@/app/components/AuthModal';
+import { API_URL } from '@/utils/ApiUrl';
+import axios from 'axios';
 
 const PricingCalculator = ({ locale = 'en' }) => {
   const dispatch = useDispatch();
   const { isAuthenticated, userData } = useSelector(state => state.userData);
   const router = useRouter();
   const t = translations[locale] || translations.en;
-  
-  // Pricing data
+
+  const [sessionPricing, setSessionPricing] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  // Fetch session pricing from database
+  useEffect(() => {
+    fetchSessionPricing();
+  }, []);
+
+  const fetchSessionPricing = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/admin/sessions/public/pricing`);
+      if (response.data.success) {
+        // Convert array to object for easy lookup by session name
+        const pricingMap = {};
+        response.data.pricing.forEach(item => {
+          if (!pricingMap[item.session_id]) {
+            pricingMap[item.session_id] = {};
+          }
+          pricingMap[item.session_id][item.session_count] = item.price;
+        });
+        setSessionPricing(pricingMap);
+      }
+    } catch (error) {
+      console.error('Error fetching session pricing:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Helper function to get price by session name
+  const getPriceBySessionName = (sessionName, sessionCount) => {
+    // Map session names to their likely session IDs (you may need to adjust these)
+    const sessionNameMap = {
+      'Free Roaming Arena': 1,
+      'UFO Spaceship Cinema': 2,
+      'VR 360': 3,
+      'VR Battle': 4,
+      'VR Warrior': 5,
+      'VR Cat': 6,
+      'Photo Booth': 7
+    };
+
+    const sessionId = sessionNameMap[sessionName];
+    if (sessionId && sessionPricing[sessionId] && sessionPricing[sessionId][sessionCount]) {
+      return sessionPricing[sessionId][sessionCount];
+    }
+
+    // Fallback pricing if database pricing is not available
+    const fallbackPricing = {
+      'Free Roaming Arena': { 1: 12, 2: 20 },
+      'UFO Spaceship Cinema': { 1: 9, 2: 15 },
+      'VR 360': { 1: 9, 2: 15 },
+      'VR Battle': { 1: 9, 2: 15 },
+      'VR Warrior': { 1: 7, 2: 12 },
+      'VR Cat': { 1: 6, 2: 10 },
+      'Photo Booth': { 1: 6, 2: 6 }
+    };
+
+    return fallbackPricing[sessionName]?.[sessionCount] || 0;
+  };
+
+  // Dynamic pricing data
   const experiences = [
-    { id: 'free-roaming', name: t.freeRoamingArena, price1: 12, price2: 20 },
-    { id: 'ufo-spaceship', name: t.ufoSpaceshipCinema, price1: 9, price2: 15 },
-    { id: 'vr-360', name: t.vr360, price1: 9, price2: 15 },
-    { id: 'vr-battle', name: t.vrBattle, price1: 9, price2: 15 },
-    { id: 'vr-warrior', name: t.vrWarrior, price1: 7, price2: 12 },
-    { id: 'vr-cat', name: t.vrCat, price1: 6, price2: 10 },
-    { id: 'photo-booth', name: t.photoBooth, price1: 6, price2: 6, isPhoto: true }
+    { id: 'free-roaming', name: t.freeRoamingArena, price1: getPriceBySessionName('Free Roaming Arena', 1), price2: getPriceBySessionName('Free Roaming Arena', 2) },
+    { id: 'ufo-spaceship', name: t.ufoSpaceshipCinema, price1: getPriceBySessionName('UFO Spaceship Cinema', 1), price2: getPriceBySessionName('UFO Spaceship Cinema', 2) },
+    { id: 'vr-360', name: t.vr360, price1: getPriceBySessionName('VR 360', 1), price2: getPriceBySessionName('VR 360', 2) },
+    { id: 'vr-battle', name: t.vrBattle, price1: getPriceBySessionName('VR Battle', 1), price2: getPriceBySessionName('VR Battle', 2) },
+    { id: 'vr-warrior', name: t.vrWarrior, price1: getPriceBySessionName('VR Warrior', 1), price2: getPriceBySessionName('VR Warrior', 2) },
+    { id: 'vr-cat', name: t.vrCat, price1: getPriceBySessionName('VR Cat', 1), price2: getPriceBySessionName('VR Cat', 2) },
+    { id: 'photo-booth', name: t.photoBooth, price1: getPriceBySessionName('Photo Booth', 1), price2: getPriceBySessionName('Photo Booth', 2), isPhoto: true }
   ];
   
   const hourlyPasses = [

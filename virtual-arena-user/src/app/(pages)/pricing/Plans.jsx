@@ -1,11 +1,80 @@
 'use client'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { translations } from '@/app/translations'
 import PricingCalculator from './PricingCalculator'
 import { formatDisplayPrice } from '@/app/utils/currency'
+import { API_URL } from '@/utils/ApiUrl'
+import axios from 'axios'
 
 const Plans = ({ locale = 'en' }) => {
     const t = translations[locale] || translations.en;
+    const [sessionPricing, setSessionPricing] = useState({});
+    const [loading, setLoading] = useState(true);
+
+    // Fetch session pricing from database
+    useEffect(() => {
+        fetchSessionPricing();
+    }, []);
+
+    const fetchSessionPricing = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/admin/sessions/public/pricing`);
+            if (response.data.success) {
+                // Convert array to object for easy lookup by session name
+                const pricingMap = {};
+                response.data.pricing.forEach(item => {
+                    if (!pricingMap[item.session_id]) {
+                        pricingMap[item.session_id] = {};
+                    }
+                    pricingMap[item.session_id][item.session_count] = item.price;
+                });
+                setSessionPricing(pricingMap);
+            }
+        } catch (error) {
+            console.error('Error fetching session pricing:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Helper function to get price by session name
+    const getPriceBySessionName = (sessionName, sessionCount) => {
+        // Find the session in our pricing data by name
+        for (const sessionId in sessionPricing) {
+            if (sessionPricing[sessionId][sessionCount]) {
+                // We need to match by session name, but we only have session_id in pricing
+                // For now, use the fallback pricing and let the dynamic pricing override it
+                break;
+            }
+        }
+
+        // Fallback pricing if database pricing is not available
+        const fallbackPricing = {
+            'Free Roaming Arena': { 1: 12, 2: 20 },
+            'UFO Spaceship Cinema': { 1: 9, 2: 15 },
+            'VR 360': { 1: 9, 2: 15 },
+            'VR Battle': { 1: 9, 2: 15 },
+            'VR Warrior': { 1: 7, 2: 12 },
+            'VR Cat': { 1: 6, 2: 10 }
+        };
+
+        // Try to find pricing by session ID (1-6 based on order)
+        const sessionNameToId = {
+            'Free Roaming Arena': 1,
+            'UFO Spaceship Cinema': 2,
+            'VR 360': 3,
+            'VR Battle': 4,
+            'VR Warrior': 5,
+            'VR Cat': 6
+        };
+
+        const sessionId = sessionNameToId[sessionName];
+        if (sessionId && sessionPricing[sessionId] && sessionPricing[sessionId][sessionCount]) {
+            return sessionPricing[sessionId][sessionCount];
+        }
+
+        return fallbackPricing[sessionName]?.[sessionCount] || 0;
+    };
     
     const basic = [
         t.basicFeature1,
@@ -218,11 +287,11 @@ const Plans = ({ locale = 'en' }) => {
                             <h3 className='text-white text-xl font-bold mb-4'>{t.freeRoamingArena}</h3>
                             <div className='flex justify-between items-center border-b border-gray-700 pb-2 mb-2'>
                                 <span className='text-gray-300'>{t.singleSession}</span>
-                                <span className='font-bold text-white'>{formatDisplayPrice(12, locale)}</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(getPriceBySessionName('Free Roaming Arena', 1), locale)}</span>
                             </div>
                             <div className='flex justify-between items-center'>
                                 <span className='text-gray-300'>{t.twoSessions}</span>
-                                <span className='font-bold text-white'>{formatDisplayPrice(20, locale)}</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(getPriceBySessionName('Free Roaming Arena', 2), locale)}</span>
                             </div>
                         </div>
                         
@@ -230,11 +299,11 @@ const Plans = ({ locale = 'en' }) => {
                             <h3 className='text-white text-xl font-bold mb-4'>{t.ufoSpaceshipCinema}</h3>
                             <div className='flex justify-between items-center border-b border-gray-700 pb-2 mb-2'>
                                 <span className='text-gray-300'>{t.singleSession}</span>
-                                <span className='font-bold text-white'>{formatDisplayPrice(9, locale)}</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(getPriceBySessionName('UFO Spaceship Cinema', 1), locale)}</span>
                             </div>
                             <div className='flex justify-between items-center'>
                                 <span className='text-gray-300'>{t.twoSessions}</span>
-                                <span className='font-bold text-white'>{formatDisplayPrice(15, locale)}</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(getPriceBySessionName('UFO Spaceship Cinema', 2), locale)}</span>
                             </div>
                         </div>
 
@@ -242,11 +311,11 @@ const Plans = ({ locale = 'en' }) => {
                             <h3 className='text-white text-xl font-bold mb-4'>{t.vr360}</h3>
                             <div className='flex justify-between items-center border-b border-gray-700 pb-2 mb-2'>
                                 <span className='text-gray-300'>{t.singleSession}</span>
-                                <span className='font-bold text-white'>{formatDisplayPrice(9, locale)}</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(getPriceBySessionName('VR 360', 1), locale)}</span>
                             </div>
                             <div className='flex justify-between items-center'>
                                 <span className='text-gray-300'>{t.twoSessions}</span>
-                                <span className='font-bold text-white'>{formatDisplayPrice(15, locale)}</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(getPriceBySessionName('VR 360', 2), locale)}</span>
                             </div>
                         </div>
 
@@ -254,11 +323,11 @@ const Plans = ({ locale = 'en' }) => {
                             <h3 className='text-white text-xl font-bold mb-4'>{t.vrBattle}</h3>
                             <div className='flex justify-between items-center border-b border-gray-700 pb-2 mb-2'>
                                 <span className='text-gray-300'>{t.singleSession}</span>
-                                <span className='font-bold text-white'>{formatDisplayPrice(9, locale)}</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(getPriceBySessionName('VR Battle', 1), locale)}</span>
                             </div>
                             <div className='flex justify-between items-center'>
                                 <span className='text-gray-300'>{t.twoSessions}</span>
-                                <span className='font-bold text-white'>{formatDisplayPrice(15, locale)}</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(getPriceBySessionName('VR Battle', 2), locale)}</span>
                             </div>
                         </div>
                         
@@ -266,11 +335,11 @@ const Plans = ({ locale = 'en' }) => {
                             <h3 className='text-white text-xl font-bold mb-4'>{t.vrWarrior}</h3>
                             <div className='flex justify-between items-center border-b border-gray-700 pb-2 mb-2'>
                                 <span className='text-gray-300'>{t.singleSession}</span>
-                                <span className='font-bold text-white'>{formatDisplayPrice(7, locale)}</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(getPriceBySessionName('VR Warrior', 1), locale)}</span>
                             </div>
                             <div className='flex justify-between items-center'>
                                 <span className='text-gray-300'>{t.twoSessions}</span>
-                                <span className='font-bold text-white'>{formatDisplayPrice(12, locale)}</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(getPriceBySessionName('VR Warrior', 2), locale)}</span>
                             </div>
                         </div>
                         
@@ -278,11 +347,11 @@ const Plans = ({ locale = 'en' }) => {
                             <h3 className='text-white text-xl font-bold mb-4'>{t.vrCat}</h3>
                             <div className='flex justify-between items-center border-b border-gray-700 pb-2 mb-2'>
                                 <span className='text-gray-300'>{t.singleSession}</span>
-                                <span className='font-bold text-white'>{formatDisplayPrice(6, locale)}</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(getPriceBySessionName('VR Cat', 1), locale)}</span>
                             </div>
                             <div className='flex justify-between items-center'>
                                 <span className='text-gray-300'>{t.twoSessions}</span>
-                                <span className='font-bold text-white'>{formatDisplayPrice(10, locale)}</span>
+                                <span className='font-bold text-white'>{formatDisplayPrice(getPriceBySessionName('VR Cat', 2), locale)}</span>
                             </div>
                         </div>
                     </div>

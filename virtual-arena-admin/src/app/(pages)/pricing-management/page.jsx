@@ -5,12 +5,11 @@ import toast from 'react-hot-toast';
 import { API_URL, getAuthHeaders } from '@/utils/ApiUrl';
 
 const PricingManagementPage = () => {
-    const [sessions, setSessions] = useState([]);
-    const [sessionPricing, setSessionPricing] = useState([]);
+
     const [groupDiscounts, setGroupDiscounts] = useState([]);
     const [passes, setPasses] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('sessions');
+    const [activeTab, setActiveTab] = useState('discounts');
 
     useEffect(() => {
         fetchAllData();
@@ -20,8 +19,6 @@ const PricingManagementPage = () => {
         try {
             setLoading(true);
             await Promise.all([
-                fetchSessions(),
-                fetchSessionPricing(),
                 fetchGroupDiscounts(),
                 fetchPasses()
             ]);
@@ -32,25 +29,7 @@ const PricingManagementPage = () => {
         }
     };
 
-    const fetchSessions = async () => {
-        try {
-            const response = await axios.get(`${API_URL}/admin/get-sessions/`, getAuthHeaders());
-            setSessions(response.data.sessions || []);
-        } catch (error) {
-            console.error('Error fetching sessions:', error);
-        }
-    };
 
-    const fetchSessionPricing = async () => {
-        try {
-            const response = await axios.get(`${API_URL}/admin/sessions/pricing`, getAuthHeaders());
-            if (response.data.success) {
-                setSessionPricing(response.data.pricing || []);
-            }
-        } catch (error) {
-            console.error('Error fetching session pricing:', error);
-        }
-    };
 
     const fetchGroupDiscounts = async () => {
         try {
@@ -81,20 +60,7 @@ const PricingManagementPage = () => {
         }
     };
 
-    const updateSessionPricing = async (sessionId, sessionCount, price) => {
-        try {
-            await axios.put(
-                `${API_URL}/admin/sessions/admin-pricing`,
-                { session_id: sessionId, session_count: sessionCount, price },
-                getAuthHeaders()
-            );
-            toast.success('Session pricing updated successfully');
-            fetchSessionPricing();
-        } catch (error) {
-            console.error('Error updating session pricing:', error);
-            toast.error('Failed to update session pricing');
-        }
-    };
+
 
     const updateGroupDiscount = async (discountId, data) => {
         try {
@@ -123,6 +89,22 @@ const PricingManagementPage = () => {
         } catch (error) {
             console.error('Error creating group discount:', error);
             toast.error('Failed to create group discount');
+        }
+    };
+
+    const updateSessionDuration = async (sessionId, durationMinutes) => {
+        try {
+            await axios.put(
+                `${API_URL}/admin/sessions/${sessionId}`,
+                { duration_minutes: durationMinutes },
+                getAuthHeaders()
+            );
+            toast.success('Session duration updated successfully');
+            // Refresh sessions data
+            fetchSessions();
+        } catch (error) {
+            console.error('Error updating session duration:', error);
+            toast.error('Failed to update session duration');
         }
     };
 
@@ -168,12 +150,20 @@ const PricingManagementPage = () => {
         <div className="p-6">
             <div className="max-w-7xl mx-auto">
                 <h1 className="text-3xl font-bold mb-6">Pricing Management</h1>
-                
+
+                {/* Information Note */}
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-700">
+                        <strong>Note:</strong> Session pricing (1 session and 2 session prices) is now managed in the
+                        <a href="/sessions/all-sessions" className="underline ml-1 font-medium">All Sessions page</a>.
+                        Use this page to configure group discounts and time passes only.
+                    </p>
+                </div>
+
                 {/* Tab Navigation */}
                 <div className="border-b border-gray-200 mb-6">
                     <nav className="-mb-px flex space-x-8">
                         {[
-                            { id: 'sessions', name: 'Session Pricing' },
                             { id: 'discounts', name: 'Group Discounts' },
                             { id: 'passes', name: 'Time Passes' }
                         ].map((tab) => (
@@ -192,14 +182,7 @@ const PricingManagementPage = () => {
                     </nav>
                 </div>
 
-                {/* Session Pricing Tab */}
-                {activeTab === 'sessions' && (
-                    <SessionPricingTab 
-                        sessions={sessions}
-                        sessionPricing={sessionPricing}
-                        onUpdatePricing={updateSessionPricing}
-                    />
-                )}
+
 
                 {/* Group Discounts Tab */}
                 {activeTab === 'discounts' && (
@@ -223,108 +206,9 @@ const PricingManagementPage = () => {
     );
 };
 
-// Session Pricing Component
-const SessionPricingTab = ({ sessions, sessionPricing, onUpdatePricing }) => {
-    const [editingPricing, setEditingPricing] = useState({});
 
-    const getSessionPricing = (sessionId, sessionCount) => {
-        const pricing = sessionPricing.find(p => p.session_id === sessionId && p.session_count === sessionCount);
-        return pricing ? pricing.price : '';
-    };
 
-    const handlePricingChange = (sessionId, sessionCount, price) => {
-        setEditingPricing(prev => ({
-            ...prev,
-            [`${sessionId}_${sessionCount}`]: price
-        }));
-    };
 
-    const savePricing = (sessionId, sessionCount) => {
-        const price = editingPricing[`${sessionId}_${sessionCount}`];
-        if (price && !isNaN(price)) {
-            onUpdatePricing(sessionId, sessionCount, parseFloat(price));
-            setEditingPricing(prev => {
-                const newState = { ...prev };
-                delete newState[`${sessionId}_${sessionCount}`];
-                return newState;
-            });
-        }
-    };
-
-    return (
-        <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">Session Pricing Configuration</h2>
-            <p className="text-gray-600 mb-6">Set individual session prices and 2-session bundle prices for each VR experience.</p>
-            
-            <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                VR Experience
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Duration
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                1 Session Price
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                2 Sessions Price
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Actions
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {sessions.map((session) => (
-                            <tr key={session.session_id}>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm font-medium text-gray-900">{session.name}</div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-gray-500">{session.duration_minutes} minutes</div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
-                                        value={editingPricing[`${session.session_id}_1`] ?? getSessionPricing(session.session_id, 1)}
-                                        onChange={(e) => handlePricingChange(session.session_id, 1, e.target.value)}
-                                        onBlur={() => savePricing(session.session_id, 1)}
-                                    />
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
-                                        value={editingPricing[`${session.session_id}_2`] ?? getSessionPricing(session.session_id, 2)}
-                                        onChange={(e) => handlePricingChange(session.session_id, 2, e.target.value)}
-                                        onBlur={() => savePricing(session.session_id, 2)}
-                                    />
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <button
-                                        onClick={() => {
-                                            savePricing(session.session_id, 1);
-                                            savePricing(session.session_id, 2);
-                                        }}
-                                        className="text-blue-600 hover:text-blue-900"
-                                    >
-                                        Save
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    );
-};
 
 // Group Discounts Component
 const GroupDiscountsTab = ({ discounts, onUpdateDiscount, onCreateDiscount }) => {

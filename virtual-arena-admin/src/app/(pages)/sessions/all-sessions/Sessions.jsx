@@ -113,20 +113,22 @@ const Sessions = () => {
             is_active: updatedSession.is_active,
             price: updatedSession.price,
             max_players: updatedSession.max_players
-
         }
         try {
             const response = await axios.put(`${API_URL}/admin/update-session/${updatedSession?.session_id}`, payload, getAuthHeaders())
-            
+
             if (response.status === 200) {
-                toast.success('Session Updated')
-                handleFetchSessions()
+                // Refresh both sessions and pricing data
+                handleFetchSessions();
+                handleFetchSessionPricing();
                 setSidebarOpen(false);
+                // Don't show success toast here as EditForm will handle it
             } else {
-                toast.error('Somemthing went wrong.')
+                toast.error('Something went wrong.')
             }
         } catch (error) {
-
+            console.error('Error updating session:', error);
+            throw error; // Re-throw so EditForm can handle the error
         }
     };
 
@@ -164,15 +166,22 @@ const Sessions = () => {
         setSidebarOpen(true);
         setDropdownOpen(null)
     };
-    const sessionData = [
-        { label: "Name", value: selectedSession?.name },
-        { label: "Duration", value: selectedSession?.duration },
-        { label: "Max Players", value: selectedSession?.maxPlayers },
-        { label: "Price", value: selectedSession?.price },
-        { label: "Status", value: selectedSession?.status },
-        { label: "Total Bookings", value: selectedSession?.bookings },
-        { label: "Available Slots", value: selectedSession?.slots },
-    ];
+    const getSessionDetailData = () => {
+        if (!selectedSession) return [];
+
+        const pricing1 = sessionPricing[selectedSession.session_id]?.[1] || 0;
+        const pricing2 = sessionPricing[selectedSession.session_id]?.[2] || 0;
+
+        return [
+            { label: "Name", value: selectedSession?.name },
+            { label: "Duration", value: `${selectedSession?.duration_minutes} mins` },
+            { label: "Max Players", value: selectedSession?.max_players },
+            { label: "1 Session Price", value: `$${pricing1}` },
+            ...(selectedSession?.name !== 'Photo Booth' ? [{ label: "2 Sessions Price", value: `$${pricing2}` }] : []),
+            { label: "Status", value: selectedSession?.is_active ? 'Active' : 'Inactive' },
+            { label: "Description", value: selectedSession?.description || 'No description' },
+        ];
+    };
 
     return (
         <div className="p-6">
@@ -211,7 +220,7 @@ const Sessions = () => {
                                {sidebarMode === 'edit' ? (
                                    <EditForm data={selectedSession} onSave={handleSave} />
                                ) : (
-                                   <DetailView data={sessionData} title='Session Details' />
+                                   <DetailView data={getSessionDetailData()} title='Session Details' />
                                )}
                                </div>
                            </div>

@@ -1,12 +1,41 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FieldContainer from '../FieldContainer';
 import Select from '../Select';
 import Input from '../Input';
 import Checkbox from '../Checkbox';
+import axios from 'axios';
+import { API_URL, getAuthHeaders } from '@/utils/ApiUrl';
+import toast from 'react-hot-toast';
 
 const EditForm = ({ data, onSave }) => {
     const [formData, setFormData] = useState(data || {});
+    const [sessionPricing, setSessionPricing] = useState({
+        1: '',
+        2: ''
+    });
+
+    // Fetch session pricing when component mounts
+    useEffect(() => {
+        if (data?.session_id) {
+            fetchSessionPricing();
+        }
+    }, [data?.session_id]);
+
+    const fetchSessionPricing = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/admin/sessions/pricing/${data.session_id}`, getAuthHeaders());
+            if (response.data.success) {
+                const pricing = {};
+                response.data.pricing.forEach(item => {
+                    pricing[item.session_count] = item.price;
+                });
+                setSessionPricing(pricing);
+            }
+        } catch (error) {
+            console.log('Error fetching session pricing:', error);
+        }
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -16,9 +45,53 @@ const EditForm = ({ data, onSave }) => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handlePricingChange = (sessionCount, value) => {
+        setSessionPricing({
+            ...sessionPricing,
+            [sessionCount]: value
+        });
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        onSave(formData);
+
+        try {
+            // Save session data first
+            await onSave(formData);
+
+            // Then save pricing data
+            await updateSessionPricing();
+
+            toast.success('Session and pricing updated successfully');
+        } catch (error) {
+            console.error('Error saving session:', error);
+            toast.error('Failed to update session');
+        }
+    };
+
+    const updateSessionPricing = async () => {
+        try {
+            // Update 1 session pricing
+            if (sessionPricing[1] !== undefined && sessionPricing[1] !== '') {
+                await axios.put(`${API_URL}/admin/sessions/admin-pricing`, {
+                    session_id: data.session_id,
+                    session_count: 1,
+                    price: parseFloat(sessionPricing[1])
+                }, getAuthHeaders());
+            }
+
+            // Update 2 session pricing (only if not Photo Booth)
+            if (data.name !== 'Photo Booth' && sessionPricing[2] !== undefined && sessionPricing[2] !== '') {
+                await axios.put(`${API_URL}/admin/sessions/admin-pricing`, {
+                    session_id: data.session_id,
+                    session_count: 2,
+                    price: parseFloat(sessionPricing[2])
+                }, getAuthHeaders());
+            }
+        } catch (error) {
+            console.error('Error updating session pricing:', error);
+            throw error;
+        }
     };
    
     // For editing, we use text input instead of dropdown to allow any session name
@@ -56,16 +129,32 @@ const EditForm = ({ data, onSave }) => {
                             />
                         </FieldContainer>
 
-                        <FieldContainer label="Price" htmlFor="price">
+                        <FieldContainer label="1 Session Price" htmlFor="price_1_session">
                             <Input
                                 type="number"
                                 step="0.01"
-                                name="price"
-                                value={formData.price || ''}
-                                onChange={handleChange}
+                                name="price_1_session"
+                                value={sessionPricing[1] || ''}
+                                onChange={(e) => handlePricingChange(1, e.target.value)}
+                                placeholder="Enter 1 session price"
                                 required
                             />
                         </FieldContainer>
+
+                        {/* Only show 2 session pricing for non-Photo Booth sessions */}
+                        {formData.name !== 'Photo Booth' && (
+                            <FieldContainer label="2 Sessions Price" htmlFor="price_2_sessions">
+                                <Input
+                                    type="number"
+                                    step="0.01"
+                                    name="price_2_sessions"
+                                    value={sessionPricing[2] || ''}
+                                    onChange={(e) => handlePricingChange(2, e.target.value)}
+                                    placeholder="Enter 2 sessions price"
+                                    required
+                                />
+                            </FieldContainer>
+                        )}
 
                         <FieldContainer label="Description" htmlFor="description">
                             <Input

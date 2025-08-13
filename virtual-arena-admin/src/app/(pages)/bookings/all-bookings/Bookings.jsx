@@ -43,7 +43,26 @@ const Bookings = () => {
       )
     },
     { header: 'Session Status', accessor: 'session_status' },
-    { header: 'Payment Status', accessor: 'status' },
+    {
+      header: 'Payment Status',
+      accessor: 'payment_status',
+      render: (value) => (
+        <span className={`px-2 py-1 rounded text-xs font-medium ${
+          value === 'paid'
+            ? 'bg-green-100 text-green-800 border border-green-200'
+            : value === 'pending'
+            ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+            : value === 'failed'
+            ? 'bg-red-100 text-red-800 border border-red-200'
+            : 'bg-gray-100 text-gray-800 border border-gray-200'
+        }`}>
+          {value === 'paid' ? '✅ Paid' :
+           value === 'pending' ? '⏳ Pending' :
+           value === 'failed' ? '❌ Failed' :
+           value || 'Unknown'}
+        </span>
+      )
+    },
   ];
 
   const formatDateTime = (isoString) => {
@@ -67,9 +86,8 @@ const Bookings = () => {
     user_name: booking.user_name,
     user_email: booking.user_email,
     booking_type: booking.is_guest_booking ? 'Guest' : 'Registered User',
-    status: booking.payment_status,
     session_status: booking.session_status,
-    payment_status: booking.payment_status,
+    payment_status: booking.payment_status, // Use actual payment_status from database
     payment_method: booking.payment_method,
     is_guest_booking: booking.is_guest_booking,
     booking_reference: booking.booking_reference,

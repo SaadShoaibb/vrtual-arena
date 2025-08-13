@@ -6,7 +6,7 @@ import { API_URL } from '@/utils/ApiUrl';
 import { translations } from '@/app/translations';
 import { useSearchParams } from 'next/navigation';
 
-const BookingCalendar = ({ onTimeSlotSelect, selectedSession, bookingType = 'session', allowMultipleSlots = false, onDateSelect }) => {
+const BookingCalendar = ({ onTimeSlotSelect, selectedSession, bookingType = 'session', allowMultipleSlots = false, onDateSelect, maxSlots = 1, durationHours = 1 }) => {
     const searchParams = useSearchParams();
     const locale = searchParams?.get('locale') || 'en';
     const t = translations[locale] || translations.en;
@@ -107,19 +107,25 @@ const BookingCalendar = ({ onTimeSlotSelect, selectedSession, bookingType = 'ses
             return; // Don't allow selection of unavailable slots
         }
 
-        if (allowMultipleSlots && bookingType === 'hourly') {
-            // Multiple slot selection for time-based bookings
-            console.log('🔄 Multiple slot selection mode');
-            console.log('📅 Current selected slots:', selectedTimeSlots);
-            console.log('🎯 Clicked slot:', timeSlot);
+        if (allowMultipleSlots) {
+            // Multiple slot selection for time-based bookings and passes
+            if (process.env.NODE_ENV === 'development') {
+                console.log('🔄 Multiple slot selection mode');
+                console.log('📅 Current selected slots:', selectedTimeSlots);
+                console.log('🎯 Clicked slot:', timeSlot);
+            }
 
             const isAlreadySelected = selectedTimeSlots.some(slot => slot.time === timeSlot.time);
-            console.log('✅ Is already selected:', isAlreadySelected);
+            if (process.env.NODE_ENV === 'development') {
+                console.log('✅ Is already selected:', isAlreadySelected);
+            }
 
             if (isAlreadySelected) {
                 // Remove slot if already selected
                 const newSlots = selectedTimeSlots.filter(slot => slot.time !== timeSlot.time);
-                console.log('➖ Removing slot, new slots:', newSlots);
+                if (process.env.NODE_ENV === 'development') {
+                    console.log('➖ Removing slot, new slots:', newSlots);
+                }
                 setSelectedTimeSlots(newSlots);
 
                 if (onTimeSlotSelect && newSlots.length > 0) {
@@ -142,9 +148,19 @@ const BookingCalendar = ({ onTimeSlotSelect, selectedSession, bookingType = 'ses
                     onTimeSlotSelect(null);
                 }
             } else {
+                // Check if we've reached the maximum number of slots
+                if (selectedTimeSlots.length >= maxSlots) {
+                    if (process.env.NODE_ENV === 'development') {
+                        console.log(`⚠️ Maximum slots reached (${maxSlots}). Cannot add more slots.`);
+                    }
+                    return;
+                }
+
                 // Add slot to selection
                 const newSlots = [...selectedTimeSlots, timeSlot].sort((a, b) => a.hour - b.hour);
-                console.log('➕ Adding slot, new slots:', newSlots);
+                if (process.env.NODE_ENV === 'development') {
+                    console.log('➕ Adding slot, new slots:', newSlots);
+                }
                 setSelectedTimeSlots(newSlots);
 
                 if (onTimeSlotSelect) {
@@ -154,12 +170,14 @@ const BookingCalendar = ({ onTimeSlotSelect, selectedSession, bookingType = 'ses
                     const endTime = new Date(selectedDate);
                     endTime.setHours(newSlots[newSlots.length - 1].hour + 1, 0, 0, 0);
 
-                    console.log('📤 Sending time slot data:', {
-                        startTime: startTime.toISOString(),
-                        endTime: endTime.toISOString(),
-                        timeSlots: newSlots,
-                        duration: newSlots.length
-                    });
+                    if (process.env.NODE_ENV === 'development') {
+                        console.log('📤 Sending time slot data:', {
+                            startTime: startTime.toISOString(),
+                            endTime: endTime.toISOString(),
+                            timeSlots: newSlots,
+                            duration: newSlots.length
+                        });
+                    }
 
                     onTimeSlotSelect({
                         startTime: startTime.toISOString(),
@@ -315,10 +333,17 @@ const BookingCalendar = ({ onTimeSlotSelect, selectedSession, bookingType = 'ses
                         {t.availableTimeSlots} - {selectedDate.toLocaleDateString()}
                         {allowMultipleSlots && (
                             <span className="ml-2 text-sm text-gray-400">
-                                ({t.selectMultiple || 'Select multiple slots'})
+                                ({selectedTimeSlots.length}/{maxSlots} {t.slotsSelected || 'slots selected'})
                             </span>
                         )}
                     </h4>
+                    {allowMultipleSlots && (
+                        <div className="mb-4 p-3 bg-blue-900/30 border border-blue-500/30 rounded-lg">
+                            <p className="text-blue-300 text-sm">
+                                💡 {t.selectSlotsInfo || `Select up to ${maxSlots} time slots for your ${durationHours} hour booking`}
+                            </p>
+                        </div>
+                    )}
                 
                 {loading ? (
                     <div className="text-center py-8">

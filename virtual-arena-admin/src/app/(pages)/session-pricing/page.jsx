@@ -405,8 +405,8 @@ const SessionManagementCard = ({ session, onUpdate }) => {
     const [formData, setFormData] = useState({
         name: session.name || '',
         description: session.description || '',
-        duration_hours: session.duration_hours || 0.25,
-        min_duration_hours: session.min_duration_hours || 0.25,
+        duration_hours: session.duration_hours || 0.5,
+        min_duration_hours: session.min_duration_hours || 0.5,
         max_duration_hours: session.max_duration_hours || 4.0,
         hourly_rate: session.hourly_rate || 0,
         setup_time_minutes: session.setup_time_minutes || 5,
@@ -435,8 +435,8 @@ const SessionManagementCard = ({ session, onUpdate }) => {
         setFormData({
             name: session.name || '',
             description: session.description || '',
-            duration_hours: session.duration_hours || 0.25,
-            min_duration_hours: session.min_duration_hours || 0.25,
+            duration_hours: session.duration_hours || 0.5,
+            min_duration_hours: session.min_duration_hours || 0.5,
             max_duration_hours: session.max_duration_hours || 4.0,
             hourly_rate: session.hourly_rate || 0,
             setup_time_minutes: session.setup_time_minutes || 5,

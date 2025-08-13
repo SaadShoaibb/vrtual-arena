@@ -17,6 +17,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
 
 const MODE = {
     SESSION_SELECTION: "SESSION_SELECTION",
+    CONFIGURE_SESSION: "CONFIGURE_SESSION",
     CALENDAR: "CALENDAR",
     USER_TYPE: "USER_TYPE",
     GUEST_DETAILS: "GUEST_DETAILS",
@@ -33,14 +34,15 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
     const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
     const [userType, setUserType] = useState(''); // 'registered' or 'guest'
     const [paymentMethod, setPaymentMethod] = useState(''); // 'online' or 'at_venue'
+    const [showUserTypeModal, setShowUserTypeModal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [sessionPricing, setSessionPricing] = useState({}); // Dynamic pricing from database
     const [groupDiscounts, setGroupDiscounts] = useState([]); // Dynamic discounts from database
     const [timePasses, setTimePasses] = useState([]); // Available time passes
     const [sessionCount, setSessionCount] = useState(1); // Number of sessions for current selection
     const [playerCount, setPlayerCount] = useState(1); // Number of players for current selection
-    const [durationHours, setDurationHours] = useState(0.25); // Duration in hours for current selection
-    const [bookingType, setBookingType] = useState('session'); // 'session' or 'hourly'
+    const [durationHours, setDurationHours] = useState(0.5); // Duration in hours for current selection
+    const [bookingType, setBookingType] = useState('session'); // Always use 'session' for session-based booking
 
     const { userData } = useSelector((state) => state.userData);
     const isLoggedIn = !!userData?.user_id;
@@ -63,14 +65,14 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
         ]).finally(() => setLoading(false));
     }, []);
 
-    // Refetch data every 30 seconds to get real-time updates
+    // Refetch data every 10 seconds to get real-time updates for pricing changes
     useEffect(() => {
         const interval = setInterval(() => {
             fetchSessions();
             fetchSessionPricing();
             fetchGroupDiscounts();
             fetchTimePasses();
-        }, 30000); // 30 seconds
+        }, 10000); // 10 seconds for faster pricing updates
 
         return () => clearInterval(interval);
     }, []);
@@ -83,64 +85,138 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
         };
     }, [mode, userType]);
 
-    // Calculate base price per person (without discounts)
-    const getBasePrice = (session, sessionCount, bookingType = 'session', durationHours = 0.25) => {
+    // Enhanced scroll to top utility function
+    const scrollToTop = () => {
+        if (process.env.NODE_ENV === 'development') {
+            console.log('🔄 Enhanced scroll to top initiated');
+        }
+
+        // Multiple scroll targets for maximum compatibility
+        const scrollTargets = [
+            // Primary targets
+            document.getElementById('booking-modal-container'),
+            document.querySelector('[data-modal-content]'),
+            document.querySelector('.modal-content'),
+
+            // Secondary targets
+            document.querySelector('.overflow-y-auto'),
+            document.querySelector('.overflow-auto'),
+            document.querySelector('.overflow-scroll'),
+
+            // Parent containers
+            document.querySelector('.fixed'),
+            document.querySelector('.relative'),
+
+            // Fallback targets
+            document.body,
+            document.documentElement
+        ];
+
+        let scrolled = false;
+
+        // Try each target
+        scrollTargets.forEach((target, index) => {
+            if (target && !scrolled) {
+                try {
+                    if (target.scrollTo) {
+                        target.scrollTo({ top: 0, behavior: 'smooth' });
+                        if (process.env.NODE_ENV === 'development') {
+                            console.log(`✅ Scrolled target ${index} to top using scrollTo`);
+                        }
+                        scrolled = true;
+                    } else {
+                        target.scrollTop = 0;
+                        if (process.env.NODE_ENV === 'development') {
+                            console.log(`✅ Scrolled target ${index} to top using scrollTop`);
+                        }
+                        scrolled = true;
+                    }
+                } catch (error) {
+                    if (process.env.NODE_ENV === 'development') {
+                        console.log(`❌ Failed to scroll target ${index}:`, error);
+                    }
+                }
+            }
+        });
+
+        // Force scroll for mobile devices
+        if (window.innerWidth <= 768) {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+            window.scrollTo(0, 0);
+            if (process.env.NODE_ENV === 'development') {
+                console.log('📱 Applied mobile-specific scroll fixes');
+            }
+        }
+
+        // Final fallback
+        if (!scrolled) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (process.env.NODE_ENV === 'development') {
+                console.log('🔄 Applied final fallback window scroll');
+            }
+        }
+    };
+
+    // Calculate base price per person (without discounts) - Session-based only
+    const getBasePrice = (session, sessionCount, bookingType = 'session', durationHours = 1) => {
         if (!session) return 0;
 
-        if (bookingType === 'hourly') {
-            // For time-based booking, calculate how many session units are needed
-            const sessionDurationMinutes = session.duration_minutes || 15;
-            const sessionDurationHours = sessionDurationMinutes / 60;
-            const sessionUnitsNeeded = durationHours / sessionDurationHours;
-            const totalPrice = session.price * sessionUnitsNeeded;
-
-            console.log(`💰 Time-based pricing calculation:
-                Session: ${session.name}
-                Session Duration: ${sessionDurationMinutes} minutes (${sessionDurationHours} hours)
-                Session Price: $${session.price} per ${sessionDurationMinutes} minutes
-                Requested Duration: ${durationHours} hours (${durationHours * 60} minutes)
-                Session Units Needed: ${sessionUnitsNeeded.toFixed(2)}
-                Final Price: $${session.price} × ${sessionUnitsNeeded.toFixed(2)} = $${totalPrice.toFixed(2)}`);
-
-            return totalPrice;
+        // For time-based booking, calculate based on hourly rate
+        if (bookingType === 'hourly' && session.hourly_rate) {
+            return Number(session.hourly_rate * durationHours) || 0;
         }
 
-        // Try to get price from database first
-        if (sessionPricing[session.session_id] && sessionPricing[session.session_id][sessionCount]) {
-            return sessionPricing[session.session_id][sessionCount];
+        // Use session count pricing from database first
+        if (sessionPricing[session.session_id]) {
+            const pricing = sessionPricing[session.session_id];
+            const price = pricing[sessionCount];
+            if (price !== undefined) {
+                if (process.env.NODE_ENV === 'development') {
+                    console.log(`💰 Database pricing for ${session.name} (${sessionCount} session(s)): $${price}`);
+                }
+                return Number(price) || 0;
+            }
         }
 
-        // Fallback pricing
+        // Updated fallback pricing to match your exact requirements
         const fallbackPricing = {
+            'Free-Roaming Arena': { price1: 12, price2: 20 },
             'Free Roaming Arena': { price1: 12, price2: 20 },
+            'Free Roaming VR Arena 2.0': { price1: 12, price2: 20 },
             'UFO Spaceship Cinema': { price1: 9, price2: 15 },
+            'VR UFO 5 Players': { price1: 9, price2: 15 },
             'VR 360': { price1: 9, price2: 15 },
+            'VR 360° Motion Chair': { price1: 9, price2: 15 },
             'VR Battle': { price1: 9, price2: 15 },
             'VR Warrior': { price1: 7, price2: 12 },
-            'VR Cat': { price1: 6, price2: 10 },
-            'Photo Booth': { price1: 6, price2: 6 },
-            'Free Roaming VR Arena 2.0': { price1: 12, price2: 20 },
-            'VR UFO 5 Players': { price1: 9, price2: 15 },
-            'VR 360° Motion Chair': { price1: 9, price2: 15 },
-            'HTC VIVE VR Standing Platform': { price1: 9, price2: 15 },
             'VR Warrior 2players': { price1: 7, price2: 12 },
-            'VR CAT': { price1: 6, price2: 10 }
+            'VR Cat': { price1: 6, price2: 10 },
+            'VR CAT': { price1: 6, price2: 10 },
+            'Photo Booth': { price1: 6, price2: 6 },
+            'HTC VIVE VR Standing Platform': { price1: 9, price2: 15 }
         };
 
         const pricing = fallbackPricing[session.name];
-        return pricing ? (sessionCount === 1 ? pricing.price1 : pricing.price2) : session.price || 12;
+        if (pricing) {
+            const price = sessionCount === 1 ? pricing.price1 : pricing.price2;
+            return Number(price) || 0;
+        }
+
+        // Final fallback to session.price
+        return Number(session.price) || 0;
     };
 
-    // Calculate total price with discounts
-    const calculatePrice = (session, sessionCount, playerCount, bookingType = 'session', durationHours = 0.25) => {
+    // Calculate total price with discounts - Session-based only
+    const calculatePrice = (session, sessionCount, playerCount) => {
         if (!session) return 0;
 
         // For time passes, price is fixed per pass (no per-player pricing or discounts)
-        if (bookingType === 'pass' || session?.pass_type) {
+        if (session?.pass_type) {
             return session.price; // Time passes are per-pass, not per-player
         }
 
-        const basePrice = getBasePrice(session, sessionCount, bookingType, durationHours);
+        const basePrice = getBasePrice(session, sessionCount);
         let totalPrice = basePrice * playerCount;
 
         // Apply dynamic group discounts
@@ -155,12 +231,30 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
 
     // Get applied discount info for display - use dynamic discounts
     const getDiscountInfo = (playerCount) => {
+        if (process.env.NODE_ENV === 'development') {
+            console.log(`💰 Checking discount for ${playerCount} players`);
+            console.log('💰 Available discounts:', groupDiscounts);
+        }
+
         // Sort discounts by min_players descending to check highest thresholds first
         const sortedDiscounts = [...groupDiscounts].sort((a, b) => b.min_players - a.min_players);
 
+        if (process.env.NODE_ENV === 'development') {
+            console.log('💰 Sorted discounts:', sortedDiscounts);
+        }
+
         for (const discount of sortedDiscounts) {
-            if (playerCount >= discount.min_players &&
-                (discount.max_players === null || playerCount <= discount.max_players)) {
+            const meetsMin = playerCount >= discount.min_players;
+            const meetsMax = discount.max_players === null || playerCount <= discount.max_players;
+
+            if (process.env.NODE_ENV === 'development') {
+                console.log(`💰 Checking discount: ${discount.discount_name} (${discount.min_players}-${discount.max_players || '∞'}) - Min: ${meetsMin}, Max: ${meetsMax}`);
+            }
+
+            if (meetsMin && meetsMax) {
+                if (process.env.NODE_ENV === 'development') {
+                    console.log(`💰 Applied discount: ${discount.discount_name} - ${discount.discount_percentage}%`);
+                }
                 return {
                     name: discount.discount_name,
                     discount: discount.discount_percentage
@@ -170,6 +264,9 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
 
         // Fallback to hardcoded discounts if no dynamic discounts loaded
         if (groupDiscounts.length === 0) {
+            if (process.env.NODE_ENV === 'development') {
+                console.log('💰 Using fallback discounts');
+            }
             if (playerCount >= 20) {
                 return { name: '20+ people', discount: 20 };
             } else if (playerCount >= 10) {
@@ -179,6 +276,9 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
             }
         }
 
+        if (process.env.NODE_ENV === 'development') {
+            console.log('💰 No discount applied');
+        }
         return null;
     };
 
@@ -186,8 +286,8 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
     const StepIndicator = () => {
         const steps = [
             { key: MODE.SESSION_SELECTION, label: t?.selectSession || 'Select Session', icon: '🎮' },
+            { key: MODE.CONFIGURE_SESSION, label: t?.configureSession || 'Configure Session', icon: '⚙️' },
             { key: MODE.CALENDAR, label: t?.selectDateTime || 'Select Date & Time', icon: '📅' },
-            { key: MODE.USER_TYPE, label: t?.bookingConfiguration || 'Configure Session', icon: '⚙️' },
             { key: MODE.GUEST_DETAILS, label: t?.guestDetails || 'Guest Details', icon: '📝' },
             { key: MODE.CONFIRMATION, label: t?.confirmation || 'Confirmation', icon: '✅' },
             { key: MODE.SUCCESS, label: t?.success || 'Success', icon: '🎉' }
@@ -220,10 +320,10 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                                         {isCompleted ? '✓' : step.icon}
                                     </div>
                                     <span className={`
-                                        text-xs mt-1 text-center max-w-[80px] leading-tight
-                                        ${isActive ? 'text-purple-400 font-semibold' :
-                                          isCompleted ? 'text-green-400' :
-                                          'text-gray-400'}
+                                        text-xs mt-1 text-center max-w-[80px] leading-tight font-medium
+                                        ${isActive ? 'text-purple-200 font-bold' :
+                                          isCompleted ? 'text-green-200 font-semibold' :
+                                          'text-gray-200'}
                                         hidden sm:block
                                     `}>
                                         {step.label}
@@ -329,7 +429,7 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
 
     const fetchSessionPricing = async () => {
         try {
-            const response = await axios.get(`${API_URL}/admin/sessions/pricing`);
+            const response = await axios.get(`${API_URL}/admin/sessions/public/pricing`);
             if (response.data.success) {
                 // Convert array to object for easy lookup
                 const pricingMap = {};
@@ -340,20 +440,33 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                     pricingMap[item.session_id][item.session_count] = item.price;
                 });
                 setSessionPricing(pricingMap);
+
+                if (process.env.NODE_ENV === 'development') {
+                    console.log('💰 Session pricing loaded:', pricingMap);
+                }
             }
         } catch (error) {
-            console.error('Error fetching session pricing:', error);
+            if (process.env.NODE_ENV === 'development') {
+                console.error('Error fetching session pricing:', error);
+            }
         }
     };
 
     const fetchGroupDiscounts = async () => {
         try {
-            const response = await axios.get(`${API_URL}/admin/sessions/group-discounts`);
+            const response = await axios.get(`${API_URL}/admin/sessions/public/group-discounts`);
             if (response.data.success) {
-                setGroupDiscounts(response.data.discounts.filter(d => d.is_active));
+                const activeDiscounts = response.data.discounts.filter(d => d.is_active);
+                setGroupDiscounts(activeDiscounts);
+
+                if (process.env.NODE_ENV === 'development') {
+                    console.log('💰 Fetched group discounts:', activeDiscounts);
+                }
             }
         } catch (error) {
-            console.error('Error fetching group discounts:', error);
+            if (process.env.NODE_ENV === 'development') {
+                console.error('Error fetching group discounts:', error);
+            }
         }
     };
 
@@ -372,23 +485,20 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
         const session = sessions.find(s => s.session_id === parseInt(sessionId));
         setCurrentSessionSelection(session);
 
-        // After selecting a session, go to calendar (date & time) as the next step
-        // This ensures users complete date/time selection before final booking details
-        setMode(MODE.CALENDAR);
+        // Set duration dynamically based on session duration
+        // But don't override duration for time passes
+        if (session && session.duration_minutes && !currentSessionSelection?.pass_type) {
+            const sessionDurationHours = session.duration_minutes / 60;
+            setDurationHours(sessionDurationHours);
+        }
 
-        // Scroll to top of the modal container
+        // After selecting a session, go to configure session step
+        setMode(MODE.CONFIGURE_SESSION);
+
+        // Scroll to top after mode change
         setTimeout(() => {
-            const modalContainer = document.getElementById('booking-modal-container');
-            console.log('🔄 Attempting to scroll, modal container:', modalContainer);
-            if (modalContainer) {
-                modalContainer.scrollTo({ top: 0, behavior: 'smooth' });
-                console.log('✅ Scrolled to top');
-            } else {
-                console.log('❌ Modal container not found');
-                // Fallback to window scroll
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        }, 100);
+            scrollToTop();
+        }, 150);
     };
 
     const handleTimeSlotSelect = (timeSlotData) => {
@@ -410,6 +520,7 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
 
     const handleUserTypeSelect = (type) => {
         setUserType(type);
+        setShowUserTypeModal(false);
         if (type === 'guest') {
             setMode(MODE.GUEST_DETAILS);
         } else {
@@ -454,8 +565,11 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
     // Handle back navigation
     const handleBackNavigation = () => {
         switch (mode) {
-            case MODE.CALENDAR:
+            case MODE.CONFIGURE_SESSION:
                 setMode(MODE.SESSION_SELECTION);
+                break;
+            case MODE.CALENDAR:
+                setMode(MODE.CONFIGURE_SESSION);
                 break;
             case MODE.USER_TYPE:
                 setMode(MODE.CALENDAR);
@@ -485,7 +599,10 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
             if (userType === 'guest') {
                 // Create guest booking
                 response = await axios.post(`${API_URL}/user/guest-booking`, {
-                    session_id: currentSessionSelection.session_id,
+                    session_id: currentSessionSelection.pass_type ? null : currentSessionSelection.session_id,
+                    pass_id: currentSessionSelection.pass_type ? currentSessionSelection.pass_id : null,
+                    booking_type: currentSessionSelection.pass_type ? 'pass' : bookingType,
+                    duration_hours: currentSessionSelection.pass_type ? (currentSessionSelection.duration_minutes / 60) : durationHours,
                     machine_type: currentSessionSelection.name,
                     start_time: selectedTimeSlot.startTime,
                     end_time: selectedTimeSlot.endTime,
@@ -501,7 +618,10 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
             } else {
                 // Create registered user booking
                 response = await axios.post(`${API_URL}/user/book-session`, {
-                    session_id: currentSessionSelection.session_id,
+                    session_id: currentSessionSelection.pass_type ? null : currentSessionSelection.session_id,
+                    pass_id: currentSessionSelection.pass_type ? currentSessionSelection.pass_id : null,
+                    booking_type: currentSessionSelection.pass_type ? 'pass' : bookingType,
+                    duration_hours: currentSessionSelection.pass_type ? (currentSessionSelection.duration_minutes / 60) : durationHours,
                     machine_type: currentSessionSelection.name,
                     start_time: selectedTimeSlot.startTime,
                     end_time: selectedTimeSlot.endTime,
@@ -604,54 +724,58 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                 </div>
             ) : (
                 <div className="space-y-6">
-                    {/* Cart Display */}
-                    {selectedSessions.length > 0 && (
-                        <div className="bg-gray-800 border border-gray-600 rounded-lg p-3 sm:p-4">
-                            <h3 className="text-base sm:text-lg font-bold text-white mb-3">
-                                {t?.yourCart || 'Your Cart'} ({selectedSessions.length} {selectedSessions.length === 1 ? (t?.session || 'session') : (t?.sessions || 'sessions')})
-                            </h3>
-                            <div className="space-y-2 mb-4">
-                                {selectedSessions.map(item => (
-                                    <div key={item.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-gray-700 p-3 rounded gap-2 sm:gap-3">
-                                        <div className="flex-1">
-                                            <span className="text-white font-medium text-sm sm:text-base block">
-                                                {getTranslatedExperienceName(item.session.name)}
-                                            </span>
-                                            <div className="text-xs sm:text-sm text-gray-300">
-                                                {item.bookingType === 'hourly'
-                                                    ? `${item.durationHours} ${item.durationHours === 1 ? (t?.hour || 'hour') : (t?.hours || 'hours')} × ${item.playerCount} ${t?.players || 'players'}`
-                                                    : `${item.sessionCount} ${item.sessionCount === 1 ? (t?.session || 'session') : (t?.sessions || 'sessions')} × ${item.playerCount} ${t?.players || 'players'}`
-                                                }
-                                            </div>
-                                            <div className="text-xs sm:text-sm text-gray-300">
-                                                {new Date(item.timeSlot.start_time).toLocaleString()}
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center justify-between sm:justify-end gap-3">
-                                            <span className="text-green-400 font-bold text-sm sm:text-base">${item.totalPrice}</span>
-                                            <button
-                                                onClick={() => removeSessionFromCart(item.id)}
-                                                className="text-red-400 hover:text-red-300 text-xs sm:text-sm px-2 py-1 rounded"
-                                            >
-                                                {t?.remove || 'Remove'}
-                                            </button>
+
+
+                    {/* Time Passes Section */}
+                    <div className="mb-8">
+                        <h3 className="text-lg font-bold text-white mb-4">
+                            {t?.timePasses || 'Time Passes'}
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {timePasses.map((pass) => (
+                                <div
+                                    key={pass.pass_id}
+                                    className="bg-gradient-to-br from-purple-900/50 to-blue-900/50 border border-purple-500/30 rounded-xl p-4 hover:border-purple-400 transition-all duration-200 cursor-pointer"
+                                    onClick={() => {
+                                        setCurrentSessionSelection({
+                                            session_id: null,
+                                            pass_id: pass.pass_id,
+                                            name: pass.name,
+                                            price: pass.price,
+                                            duration_minutes: pass.duration_hours * 60,
+                                            duration_hours: pass.duration_hours,
+                                            max_players: 1,
+                                            pass_type: true
+                                        });
+                                        // Set duration for time passes
+                                        setDurationHours(pass.duration_hours);
+                                        // For time passes, go to calendar to select time slots
+                                        setMode(MODE.CALENDAR);
+                                        // Scroll to top
+                                        setTimeout(() => {
+                                            const modalContainer = document.getElementById('booking-modal-container');
+                                            if (modalContainer) {
+                                                modalContainer.scrollTo({ top: 0, behavior: 'smooth' });
+                                            } else {
+                                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                            }
+                                        }, 100);
+                                    }}
+                                >
+                                    <div className="text-center">
+                                        <h4 className="text-lg font-bold text-white mb-2">{pass.name}</h4>
+                                        <div className="text-2xl font-bold text-green-400 mb-2">${pass.price}</div>
+                                        <p className="text-gray-300 text-sm mb-3">{pass.description}</p>
+                                        <div className="bg-green-900/30 rounded-lg p-2">
+                                            <p className="text-green-400 text-xs font-semibold">
+                                                ✨ {t?.unlimitedAccess || 'Unlimited access to all experiences'}
+                                            </p>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-t border-gray-600 pt-3 gap-3">
-                                <span className="text-base sm:text-lg font-bold text-white">
-                                    {t?.totalPrice || 'Total'}: ${getTotalCartPrice()}
-                                </span>
-                                <button
-                                    onClick={proceedToBooking}
-                                    className="w-full sm:w-auto bg-green-600 text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-green-700 transition-all duration-200 text-sm sm:text-base"
-                                >
-                                    {t?.proceedToBooking || 'Proceed to Booking'}
-                                </button>
-                            </div>
+                                </div>
+                            ))}
                         </div>
-                    )}
+                    </div>
 
                     {/* Session Selection */}
                     <div className="space-y-4">
@@ -668,28 +792,14 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                             <p className="text-gray-300 mb-3">{getTranslatedExperienceDescription(session.name) || session.description}</p>
                             <div className="flex justify-between items-center">
                                 <div className="text-left">
-                                    {session.name === 'Photo Booth' ? (
-                                        <span className="text-2xl font-bold text-green-400">$6 {t?.perSession || 'per session'}</span>
-                                    ) : (
-                                        <div>
-                                            <div className="text-lg font-bold text-green-400">
-                                                1 session: ${session.name === 'Free Roaming Arena' ? '12' :
-                                                            session.name === 'UFO Spaceship Cinema' ? '9' :
-                                                            session.name === 'VR 360' ? '9' :
-                                                            session.name === 'VR Battle' ? '9' :
-                                                            session.name === 'VR Warrior' ? '7' :
-                                                            session.name === 'VR Cat' ? '6' : '0'}
-                                            </div>
-                                            <div className="text-lg font-bold text-green-400">
-                                                2 sessions: ${session.name === 'Free Roaming Arena' ? '20' :
-                                                             session.name === 'UFO Spaceship Cinema' ? '15' :
-                                                             session.name === 'VR 360' ? '15' :
-                                                             session.name === 'VR Battle' ? '15' :
-                                                             session.name === 'VR Warrior' ? '12' :
-                                                             session.name === 'VR Cat' ? '10' : '0'}
-                                            </div>
+                                    <div>
+                                        <div className="text-lg font-bold text-green-400">
+                                            1 session: ${getBasePrice(session, 1)}
                                         </div>
-                                    )}
+                                        <div className="text-lg font-bold text-green-400">
+                                            2 sessions: ${getBasePrice(session, 2)}
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="text-right">
                                     <div className="text-gray-400">
@@ -705,6 +815,8 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                         </div>
                     ))}
                     </div>
+
+
                 </div>
             )}
         </div>
@@ -723,16 +835,28 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                             className="bg-gradient-to-br from-purple-900/50 to-blue-900/50 border border-purple-500/30 rounded-xl p-6 hover:border-purple-400 transition-all duration-200 cursor-pointer"
                             onClick={() => {
                                 setCurrentSessionSelection({
-                                    session_id: `pass_${pass.pass_id}`,
+                                    session_id: null,
+                                    pass_id: pass.pass_id,
                                     name: pass.name,
                                     price: pass.price,
                                     duration_minutes: pass.duration_hours * 60,
+                                    duration_hours: pass.duration_hours,
                                     max_players: 1,
                                     pass_type: true
                                 });
+                                // Set duration for time passes
+                                setDurationHours(pass.duration_hours);
+                                // For time passes, go to calendar to select time slots
                                 setMode(MODE.CALENDAR);
                                 // Scroll to top
-                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                setTimeout(() => {
+                                    const modalContainer = document.getElementById('booking-modal-container');
+                                    if (modalContainer) {
+                                        modalContainer.scrollTo({ top: 0, behavior: 'smooth' });
+                                    } else {
+                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    }
+                                }, 100);
                             }}
                         >
                             <div className="text-center">
@@ -761,6 +885,179 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                         <p className="text-gray-400">{t?.noPassesAvailable || 'No time passes available at the moment'}</p>
                     </div>
                 )}
+            </div>
+        );
+    };
+
+
+    const renderConfigureSession = () => {
+        if (!currentSessionSelection) {
+            return (
+                <div className="text-center py-8">
+                    <div className="mb-6">
+                        <div className="text-6xl mb-4">⚙️</div>
+                        <h3 className="text-white text-xl font-bold mb-2">
+                            {t?.configurationRequired || 'Configuration Required'}
+                        </h3>
+                        <p className="text-gray-300 mb-4">
+                            {t?.pleaseSelectSessionFirst || 'Please select a session first'}
+                        </p>
+                    </div>
+                    <button
+                        onClick={() => setMode(MODE.SESSION_SELECTION)}
+                        className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-pink-600 hover:to-purple-700 transition-all duration-200"
+                    >
+                        {t?.backToSessions || 'Back to Sessions'}
+                    </button>
+                </div>
+            );
+        }
+
+        return (
+            <div className="text-white">
+                <div className="flex items-center justify-between mb-6">
+                    <button
+                        onClick={() => setMode(MODE.SESSION_SELECTION)}
+                        className="text-purple-400 hover:text-purple-300"
+                    >
+                        {t?.backToSessions || '← Back to Sessions'}
+                    </button>
+                    <h2 className="text-2xl font-bold text-white">
+                        {getTranslatedExperienceName(currentSessionSelection?.name)}
+                    </h2>
+                </div>
+
+                {/* Session Configuration */}
+                <div className="bg-blackish border border-gray-700 rounded-lg p-6 mb-6">
+                    <div className="mb-6">
+                        <h3 className="text-xl font-bold text-white text-center">{t?.configureSessions || 'Configure Sessions'}</h3>
+                        <p className="text-gray-300 text-center mt-2">{t?.selectDurationAndPlayers || 'Select duration and number of players'}</p>
+                    </div>
+
+                    {/* Session Info */}
+                    <div className="bg-gray-800 rounded-lg p-4 mb-6">
+                        <div className="text-center">
+                            <h4 className="text-white font-semibold mb-2">{getTranslatedExperienceName(currentSessionSelection.name)}</h4>
+                            <p className="text-gray-300 text-sm mb-2">
+                                {t?.sessionDuration || 'Session Duration'}: {currentSessionSelection.duration_minutes} {t?.minutes || 'minutes'}
+                            </p>
+                            <p className="text-gray-300 text-sm">
+                                {t?.sessionPrice || 'Session Price'}: ${getBasePrice(currentSessionSelection, 1)}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Session Count Controls - Capped at 2 sessions */}
+                    <div className="mb-6">
+                        <label className="block text-gray-300 mb-3">{t?.numberOfSessions || 'Number of Sessions:'}</label>
+                        <div className="flex items-center gap-4 justify-center">
+                            <button
+                                onClick={() => setSessionCount(Math.max(1, sessionCount - 1))}
+                                className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                                disabled={sessionCount <= 1}
+                            >
+                                -
+                            </button>
+                            <div className="text-center">
+                                <span className="text-white text-lg font-bold block">
+                                    {sessionCount} {sessionCount === 1 ? (t?.session || 'session') : (t?.sessions || 'sessions')}
+                                </span>
+                                <span className="text-gray-400 text-sm">
+                                    ({sessionCount * currentSessionSelection.duration_minutes} {t?.minutes || 'minutes'} total)
+                                </span>
+                            </div>
+                            <button
+                                onClick={() => setSessionCount(Math.min(2, sessionCount + 1))}
+                                className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                                disabled={sessionCount >= 2}
+                            >
+                                +
+                            </button>
+                        </div>
+                        <div className="text-center mt-2">
+                            <span className="text-gray-400 text-sm">
+                                {t?.sessionRange || 'Choose 1 or 2 sessions'}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Player Count */}
+                    <div className="mb-6">
+                        <label className="block text-gray-300 mb-3">{t?.numberOfPlayers || 'Number of Players:'}</label>
+                        <div className="flex items-center gap-4 justify-center">
+                            <button
+                                onClick={() => setPlayerCount(Math.max(1, playerCount - 1))}
+                                className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                                disabled={playerCount <= 1}
+                            >
+                                -
+                            </button>
+                            <span className="text-white text-lg font-bold min-w-[3rem] text-center">
+                                {playerCount}
+                            </span>
+                            <button
+                                onClick={() => setPlayerCount(Math.min(currentSessionSelection?.max_players || 10, playerCount + 1))}
+                                className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                                disabled={playerCount >= (currentSessionSelection?.max_players || 10)}
+                            >
+                                +
+                            </button>
+                        </div>
+                        <div className="text-center mt-2">
+                            <span className="text-gray-400 text-sm">
+                                Max {currentSessionSelection?.max_players} {t?.players || 'players'}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Price Display with Discounts */}
+                    <div className="bg-gray-800 rounded-lg p-4 text-center mb-6">
+                        {(() => {
+                            const basePrice = getBasePrice(currentSessionSelection, sessionCount);
+                            const totalPrice = calculatePrice(currentSessionSelection, sessionCount, playerCount);
+                            const discount = getDiscountInfo(playerCount);
+                            const subtotal = basePrice * playerCount;
+                            const discountAmount = subtotal - totalPrice;
+
+                            return (
+                                <div>
+                                    <div className="mb-3">
+                                        <p className="text-gray-300 text-sm">
+                                            {t?.pricePerPerson || 'Price per person'}: ${basePrice.toFixed(2)}
+                                        </p>
+                                        <p className="text-gray-300 text-sm">
+                                            {t?.subtotal || 'Subtotal'}: ${subtotal.toFixed(2)}
+                                        </p>
+                                        {discount && (
+                                            <p className="text-green-400 text-sm">
+                                                {t?.groupDiscount || 'Group Discount'} ({discount.name}): -{discount.discount}% (-${discountAmount.toFixed(2)})
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="text-2xl font-bold text-green-400">
+                                        ${totalPrice.toFixed(2)}
+                                    </div>
+                                    <div className="text-sm text-gray-400">
+                                        {sessionCount} {sessionCount === 1 ? (t?.session || 'session') : (t?.sessions || 'sessions')} × {playerCount} {t?.players || 'players'}
+                                    </div>
+                                </div>
+                            );
+                        })()}
+                    </div>
+
+                    {/* Continue Button */}
+                    <div className="text-center">
+                        <button
+                            onClick={() => {
+                                setMode(MODE.CALENDAR);
+                                setTimeout(() => scrollToTop(), 100);
+                            }}
+                            className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-pink-600 hover:to-purple-700 transition-all duration-200"
+                        >
+                            {t?.continueToCalendar || 'Continue to Calendar'}
+                        </button>
+                    </div>
+                </div>
             </div>
         );
     };
@@ -890,198 +1187,7 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                     </h2>
                 </div>
 
-            {/* Session Configuration */}
-            <div className="bg-blackish border border-gray-700 rounded-lg p-6 mb-6">
-                <h3 className="text-xl font-bold mb-4 text-white">{t?.configureSession || 'Configure Session'}</h3>
 
-                {/* Booking Type Selection */}
-                <div className="mb-6">
-                    <label className="block text-gray-300 mb-3">{t?.bookingType || 'Booking Type:'}</label>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <button
-                            onClick={() => setBookingType('session')}
-                            className={`px-4 py-3 rounded-lg transition-all text-sm sm:text-base ${
-                                bookingType === 'session'
-                                    ? 'bg-purple-600 text-white'
-                                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                            }`}
-                        >
-                            {t?.sessionBased || 'Session-Based'}
-                        </button>
-                        <button
-                            onClick={() => setBookingType('hourly')}
-                            className={`px-4 py-3 rounded-lg transition-all text-sm sm:text-base ${
-                                bookingType === 'hourly'
-                                    ? 'bg-purple-600 text-white'
-                                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                            }`}
-                        >
-                            {t?.timeBased || 'Time-Based'}
-                        </button>
-                        <button
-                            onClick={() => setBookingType('pass')}
-                            className={`px-4 py-3 rounded-lg transition-all text-sm sm:text-base ${
-                                bookingType === 'pass'
-                                    ? 'bg-green-600 text-white'
-                                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                            }`}
-                        >
-                            {t?.timePasses || 'Time Passes'}
-                        </button>
-                    </div>
-                </div>
-
-                {/* Duration Selection for Time-Based Booking */}
-                {bookingType === 'hourly' && currentSessionSelection && (
-                    <div className="mb-6">
-                        <label className="block text-gray-300 mb-3">{t?.duration || 'Duration:'}</label>
-
-                        {/* Session Info */}
-                        <div className="bg-gray-800 rounded-lg p-4 mb-4">
-                            <div className="text-center">
-                                <h4 className="text-white font-semibold mb-2">{currentSessionSelection.name}</h4>
-                                <p className="text-gray-300 text-sm mb-2">
-                                    {t?.sessionDuration || 'Session Duration'}: {currentSessionSelection.duration_minutes} {t?.minutes || 'minutes'}
-                                </p>
-                                <p className="text-gray-300 text-sm">
-                                    {t?.sessionPrice || 'Session Price'}: ${currentSessionSelection.price}
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Duration Controls */}
-                        <div className="flex items-center gap-4 justify-center">
-                            <button
-                                onClick={() => {
-                                    const sessionDurationHours = (currentSessionSelection.duration_minutes || 15) / 60;
-                                    setDurationHours(Math.max(sessionDurationHours, durationHours - sessionDurationHours));
-                                }}
-                                className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
-                                disabled={durationHours <= (currentSessionSelection.duration_minutes || 15) / 60}
-                            >
-                                -
-                            </button>
-                            <div className="text-center">
-                                <span className="text-white text-lg font-bold block">
-                                    {durationHours} {durationHours === 1 ? (t?.hour || 'hour') : (t?.hours || 'hours')}
-                                </span>
-                                <span className="text-gray-400 text-sm">
-                                    ({Math.round(durationHours * 60)} {t?.minutes || 'minutes'})
-                                </span>
-                            </div>
-                            <button
-                                onClick={() => {
-                                    const sessionDurationHours = (currentSessionSelection.duration_minutes || 15) / 60;
-                                    setDurationHours(Math.min(8, durationHours + sessionDurationHours));
-                                }}
-                                className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
-                                disabled={durationHours >= 8}
-                            >
-                                +
-                            </button>
-                        </div>
-
-                        {/* Pricing Info */}
-                        <div className="text-center mt-4 p-3 bg-purple-900/30 rounded-lg">
-                            <div className="space-y-2">
-                                <p className="text-white font-semibold">
-                                    {t?.sessionPrice || 'Session Price'}: ${currentSessionSelection.price}
-                                </p>
-                                <p className="text-gray-300 text-sm">
-                                    {t?.per || 'per'} {currentSessionSelection.duration_minutes} {t?.minutes || 'minutes'}
-                                </p>
-                                <div className="border-t border-purple-700 pt-2 mt-2">
-                                    <p className="text-white font-semibold">
-                                        {t?.totalForDuration || 'Total for'} {durationHours} {durationHours === 1 ? (t?.hour || 'hour') : (t?.hours || 'hours')}: ${getBasePrice(currentSessionSelection, sessionCount, bookingType, durationHours).toFixed(2)}
-                                    </p>
-                                    <p className="text-gray-300 text-xs mt-1">
-                                        ({Math.round(durationHours * 60 / currentSessionSelection.duration_minutes)} × ${currentSessionSelection.price} {t?.sessions || 'sessions'})
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="text-center mt-2">
-                            <span className="text-gray-400 text-sm">
-                                {t?.durationRange || `Minimum: ${currentSessionSelection.duration_minutes} minutes, Maximum: 8 hours`}
-                            </span>
-                        </div>
-                    </div>
-                )}
-
-                {/* Session Count */}
-                {bookingType === 'session' && currentSessionSelection?.name !== 'Photo Booth' && (
-                    <div className="mb-6">
-                        <label className="block text-gray-300 mb-3">{t?.numberOfSessions || 'Number of Sessions:'}</label>
-                        <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 justify-center">
-                            <button
-                                onClick={() => setSessionCount(1)}
-                                className={`w-full sm:w-auto px-4 sm:px-6 py-3 rounded-lg transition-all text-sm sm:text-base ${
-                                    sessionCount === 1
-                                        ? 'bg-purple-600 text-white'
-                                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                                }`}
-                            >
-                                <span className="block sm:inline">1 {t?.session || 'session'}</span>
-                                <span className="block sm:inline sm:ml-1">- ${calculatePrice(currentSessionSelection, 1, playerCount, bookingType, durationHours)} {t?.perPerson || 'per person'}</span>
-                            </button>
-                            <button
-                                onClick={() => setSessionCount(2)}
-                                className={`w-full sm:w-auto px-4 sm:px-6 py-3 rounded-lg transition-all text-sm sm:text-base ${
-                                    sessionCount === 2
-                                        ? 'bg-purple-600 text-white'
-                                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                                }`}
-                            >
-                                <span className="block sm:inline">2 {t?.sessions || 'sessions'}</span>
-                                <span className="block sm:inline sm:ml-1">- ${calculatePrice(currentSessionSelection, 2, playerCount, bookingType, durationHours)} {t?.perPerson || 'per person'}</span>
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {/* Player Count */}
-                <div className="mb-6">
-                    <label className="block text-gray-300 mb-3">{t?.numberOfPlayers || 'Number of Players:'}</label>
-                    <div className="flex items-center gap-4 justify-center">
-                        <button
-                            onClick={() => setPlayerCount(Math.max(1, playerCount - 1))}
-                            className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
-                            disabled={playerCount <= 1}
-                        >
-                            -
-                        </button>
-                        <span className="text-white text-lg font-bold min-w-[3rem] text-center">
-                            {playerCount}
-                        </span>
-                        <button
-                            onClick={() => setPlayerCount(Math.min(currentSessionSelection?.max_players || 10, playerCount + 1))}
-                            className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
-                            disabled={playerCount >= (currentSessionSelection?.max_players || 10)}
-                        >
-                            +
-                        </button>
-                    </div>
-                    <div className="text-center mt-2">
-                        <span className="text-gray-400 text-sm">
-                            Max {currentSessionSelection?.max_players} {t?.players || 'players'}
-                        </span>
-                    </div>
-                </div>
-
-                {/* Price Display */}
-                <div className="text-center">
-                    <div className="text-2xl font-bold text-green-400 mb-2">
-                        ${calculatePrice(currentSessionSelection, sessionCount, playerCount, bookingType, durationHours)}
-                    </div>
-                    <div className="text-sm text-gray-400">
-                        {bookingType === 'hourly'
-                            ? `${durationHours} ${durationHours === 1 ? (t?.hour || 'hour') : (t?.hours || 'hours')} × ${playerCount} ${t?.players || 'players'}`
-                            : `${sessionCount} ${sessionCount === 1 ? (t?.session || 'session') : (t?.sessions || 'sessions')} × ${playerCount} ${t?.players || 'players'}`
-                        }
-                    </div>
-                </div>
-            </div>
 
             {/* Time Pass Summary */}
             {bookingType === 'pass' && currentSessionSelection?.pass_type && (
@@ -1115,71 +1221,35 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                 selectedSession={currentSessionSelection}
                 onTimeSlotSelect={handleTimeSlotSelect}
                 bookingType={bookingType}
-                allowMultipleSlots={bookingType === 'hourly' || bookingType === 'pass'}
+                allowMultipleSlots={
+                    currentSessionSelection?.pass_type ||
+                    (currentSessionSelection && sessionCount * currentSessionSelection.duration_minutes > 60)
+                }
+                maxSlots={
+                    currentSessionSelection?.pass_type
+                        ? (currentSessionSelection.duration_hours || Math.ceil((currentSessionSelection.duration_minutes || 60) / 60))
+                        : Math.ceil((sessionCount * (currentSessionSelection?.duration_minutes || 60)) / 60)
+                }
+                sessionCount={sessionCount}
             />
 
-            {/* Continue Button for Session-Based Bookings */}
-            {bookingType === 'session' && selectedTimeSlot && selectedTimeSlot.timeSlot && (
-                <div className="mt-6 text-center">
-                    <div className="mb-4 p-4 bg-gray-800 rounded-lg inline-block">
-                        <h4 className="text-white font-semibold mb-2">
-                            {t?.selectedTimeSlot || 'Selected Time Slot'}:
-                        </h4>
-                        <div className="text-purple-300 font-medium">
-                            {selectedTimeSlot.timeSlot.displayTime}
-                        </div>
-                    </div>
-                    <button
-                        onClick={() => {
-                            setMode(MODE.USER_TYPE);
-                            setTimeout(() => {
-                                const modalContainer = document.getElementById('booking-modal-container');
-                                if (modalContainer) {
-                                    modalContainer.scrollTo({ top: 0, behavior: 'smooth' });
-                                }
-                            }, 100);
-                        }}
-                        className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-pink-600 hover:to-purple-700 transition-all duration-200"
-                    >
-                        {t?.continueBooking || 'Continue'}
-                    </button>
+            {/* Debug info for development */}
+            {process.env.NODE_ENV === 'development' && currentSessionSelection && (
+                <div className="mt-4 p-4 bg-gray-800 rounded-lg text-sm text-gray-300">
+                    <h4 className="font-bold text-white mb-2">Debug Info:</h4>
+                    <p>Session: {currentSessionSelection.name}</p>
+                    <p>Duration per session: {currentSessionSelection.duration_minutes} minutes</p>
+                    <p>Session count: {sessionCount}</p>
+                    <p>Total duration: {sessionCount * (currentSessionSelection.duration_minutes || 0)} minutes</p>
+                    <p>Is pass: {currentSessionSelection.pass_type ? 'Yes' : 'No'}</p>
+                    <p>Allow multiple slots: {(currentSessionSelection?.pass_type || (currentSessionSelection && sessionCount * currentSessionSelection.duration_minutes > 60)) ? 'Yes' : 'No'}</p>
+                    <p>Max slots: {currentSessionSelection?.pass_type ? (currentSessionSelection.duration_hours || Math.ceil((currentSessionSelection.duration_minutes || 60) / 60)) : Math.ceil((sessionCount * (currentSessionSelection?.duration_minutes || 60)) / 60)}</p>
                 </div>
             )}
 
-            {/* Continue Button for Time-Based Bookings */}
-            {bookingType === 'hourly' && selectedTimeSlot && selectedTimeSlot.timeSlots && selectedTimeSlot.timeSlots.length > 0 && (
-                <div className="mt-6 text-center">
-                    <div className="mb-4 p-4 bg-gray-800 rounded-lg">
-                        <h4 className="text-white font-semibold mb-2">
-                            {t?.selectedTimeSlots || 'Selected Time Slots'}:
-                        </h4>
-                        <div className="flex flex-wrap gap-2 justify-center">
-                            {selectedTimeSlot.timeSlots.map((slot, index) => (
-                                <span key={index} className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm">
-                                    {slot.displayTime}
-                                </span>
-                            ))}
-                        </div>
-                        <p className="text-gray-300 mt-2">
-                            {t?.totalDuration || 'Total Duration'}: {selectedTimeSlot.duration} {t?.hours || 'hour(s)'}
-                        </p>
-                    </div>
-                    <button
-                        onClick={() => {
-                            setMode(MODE.USER_TYPE);
-                            setTimeout(() => {
-                                const modalContainer = document.getElementById('booking-modal-container');
-                                if (modalContainer) {
-                                    modalContainer.scrollTo({ top: 0, behavior: 'smooth' });
-                                }
-                            }, 100);
-                        }}
-                        className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-pink-600 hover:to-purple-700 transition-all duration-200"
-                    >
-                        {t?.continueBooking || 'Continue with Selected Slots'}
-                    </button>
-                </div>
-            )}
+
+
+
 
             {/* Debug Info */}
             {process.env.NODE_ENV === 'development' && (
@@ -1191,14 +1261,42 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                 </div>
             )}
 
-            {/* Add to Cart Button */}
+            {/* Selected Time Slots Display and Continue Button */}
             {selectedTimeSlot && (
                 <div className="mt-6 text-center">
+                    {/* Show selected time slots */}
+                    <div className="mb-4 p-4 bg-gray-800 rounded-lg">
+                        <h4 className="text-white font-semibold mb-2">
+                            {selectedTimeSlot.timeSlots ? (t?.selectedTimeSlots || 'Selected Time Slots') : (t?.selectedTimeSlot || 'Selected Time Slot')}:
+                        </h4>
+                        {selectedTimeSlot.timeSlots ? (
+                            <div>
+                                <div className="flex flex-wrap gap-2 justify-center mb-2">
+                                    {selectedTimeSlot.timeSlots.map((slot, index) => (
+                                        <span key={index} className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm">
+                                            {slot.displayTime}
+                                        </span>
+                                    ))}
+                                </div>
+                                <p className="text-gray-300 text-sm">
+                                    {t?.totalDuration || 'Total Duration'}: {selectedTimeSlot.duration} {t?.hours || 'hour(s)'}
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="text-purple-300 font-medium">
+                                {selectedTimeSlot.timeSlot?.displayTime}
+                            </div>
+                        )}
+                    </div>
+
                     <button
-                        onClick={addSessionToCart}
+                        onClick={() => {
+                            // Show user type selection modal/overlay
+                            setShowUserTypeModal(true);
+                        }}
                         className="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-all duration-200 font-bold"
                     >
-                        {t?.addToCart || 'Add to Cart'} - ${calculatePrice(currentSessionSelection, sessionCount, playerCount, bookingType, durationHours)}
+                        {t?.continueToBooking || 'Continue to Booking'} - ${calculatePrice(currentSessionSelection, sessionCount, playerCount, bookingType, durationHours)}
                     </button>
                 </div>
             )}
@@ -1209,11 +1307,40 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
     const renderUserTypeSelection = () => (
         <div className="text-white text-center">
             <h1 className="text-4xl font-bold mb-4">{t?.bookingConfiguration || 'Booking Configuration'}</h1>
-            <p className="text-lg mb-8">{t?.customizeVrExperience || 'Customize your VR experience'}</p>
+            <p className="text-lg mb-8">{currentSessionSelection?.pass_type ? (t?.completeYourBooking || 'Complete your booking') : (t?.customizeVrExperience || 'Customize your VR experience')}</p>
 
-            {/* Session and Player Count Controls */}
-            <div className="bg-blackish border border-gray-700 rounded-lg p-6 mb-8 max-w-2xl mx-auto">
-                <h3 className="text-xl font-bold mb-4 text-white">{t?.sessionDetails || 'Session Details'}</h3>
+            {/* Time Pass Summary */}
+            {currentSessionSelection?.pass_type && (
+                <div className="bg-gradient-to-r from-green-900/30 to-blue-900/30 border border-green-500/30 rounded-lg p-6 mb-8 max-w-2xl mx-auto">
+                    <div className="text-center">
+                        <h3 className="text-2xl font-bold text-white mb-2">
+                            {currentSessionSelection.name}
+                        </h3>
+                        <div className="text-3xl font-bold text-green-400 mb-3">
+                            ${currentSessionSelection.price}
+                        </div>
+                        <div className="text-gray-300 mb-4">
+                            {currentSessionSelection.duration_minutes / 60} {currentSessionSelection.duration_minutes === 60 ? (t?.hour || 'hour') : (t?.hours || 'hours')} {t?.unlimitedAccess || 'unlimited access'}
+                        </div>
+                        <div className="bg-green-900/30 rounded-lg p-3">
+                            <p className="text-green-400 text-sm font-semibold">
+                                ✨ {t?.whatsIncluded || "What's Included"}:
+                            </p>
+                            <ul className="text-green-300 text-sm space-y-1">
+                                <li>• {t?.allVrExperiences || 'All VR experiences'}</li>
+                                <li>• {t?.unlimitedSessions || 'Unlimited sessions'}</li>
+                                <li>• {t?.flexibleScheduling || 'Flexible scheduling'}</li>
+                                <li>• {t?.noAdditionalFees || 'No additional fees'}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Session and Player Count Controls - Only for regular sessions, not time passes */}
+            {!currentSessionSelection?.pass_type && (
+                <div className="bg-blackish border border-gray-700 rounded-lg p-6 mb-8 max-w-2xl mx-auto">
+                    <h3 className="text-xl font-bold mb-4 text-white">{t?.sessionDetails || 'Session Details'}</h3>
 
                 {/* Session Count */}
                 {currentSessionSelection?.name !== 'Photo Booth' && (
@@ -1324,6 +1451,7 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                     })()}
                 </div>
             </div>
+            )}
 
             {/* User Type Selection */}
             <h3 className="text-xl font-bold mb-4">{t?.howToBook || 'How would you like to book?'}</h3>
@@ -1464,32 +1592,12 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
 
                     {/* Pricing Breakdown */}
                     {(() => {
-                        // 🚨 CRITICAL FIX: Use pricing map for consistency
-                        const pricingMapLocal = {
-                            'Free Roaming Arena': { price1: 12, price2: 20 },
-                            'UFO Spaceship Cinema': { price1: 9, price2: 15 },
-                            'VR 360': { price1: 9, price2: 15 },
-                            'VR Battle': { price1: 9, price2: 15 },
-                            'VR Warrior': { price1: 7, price2: 12 },
-                            'VR Cat': { price1: 6, price2: 10 },
-                            'Photo Booth': { price1: 6, price2: 6 },
-                            // Legacy mappings
-                            'Free Roaming VR Arena 2.0': { price1: 12, price2: 20 },
-                            'VR UFO 5 Players': { price1: 9, price2: 15 },
-                            'VR 360° Motion Chair': { price1: 9, price2: 15 },
-                            'HTC VIVE VR Standing Platform': { price1: 9, price2: 15 },
-                            'VR Warrior 2players': { price1: 7, price2: 12 },
-                            'VR CAT': { price1: 6, price2: 10 }
-                        };
-
-                        const sessionPricing = pricingMapLocal[currentSessionSelection?.name];
-                        const basePrice = sessionPricing ?
-                            (sessionCount === 1 ? sessionPricing.price1 : sessionPricing.price2) :
-                            12; // Default fallback
+                        // Use dynamic pricing from database
+                        const basePrice = getBasePrice(currentSessionSelection, sessionCount, bookingType, durationHours);
 
                         const subtotal = basePrice * playerCount;
                         const discountInfo = getDiscountInfo(playerCount);
-                        const finalPrice = calculatePrice(currentSessionSelection, sessionCount, playerCount, bookingType, durationHours);
+                        const finalPrice = Number(calculatePrice(currentSessionSelection, sessionCount, playerCount, bookingType, durationHours)) || 0;
 
                         return (
                             <>
@@ -1624,6 +1732,7 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
             <div className="mb-4 text-center">
                 <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white">
                     {mode === MODE.SESSION_SELECTION && (t?.selectVrExperience || 'Select VR Experience')}
+                    {mode === MODE.CONFIGURE_SESSION && (t?.configureSession || 'Configure Session')}
                     {mode === MODE.CALENDAR && (t?.selectDateTime || 'Select Date & Time')}
                     {mode === MODE.USER_TYPE && (t?.bookingConfiguration || 'Booking Configuration')}
                     {mode === MODE.GUEST_DETAILS && (t?.guestDetails || 'Guest Details')}
@@ -1633,11 +1742,44 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
             </div>
 
             {mode === MODE.SESSION_SELECTION && renderSessionSelection()}
+            {mode === MODE.CONFIGURE_SESSION && renderConfigureSession()}
             {mode === MODE.CALENDAR && renderCalendar()}
-            {mode === MODE.USER_TYPE && renderUserTypeSelection()}
             {mode === MODE.GUEST_DETAILS && renderGuestDetails()}
             {mode === MODE.CONFIRMATION && renderConfirmation()}
             {mode === MODE.SUCCESS && renderSuccess()}
+
+            {/* User Type Selection Modal */}
+            {showUserTypeModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+                        <h3 className="text-xl font-bold text-white mb-4 text-center">
+                            {t?.chooseBookingType || 'Choose Booking Type'}
+                        </h3>
+                        <div className="space-y-4">
+                            <button
+                                onClick={() => handleUserTypeSelect('registered')}
+                                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+                            >
+                                <div className="text-lg font-semibold">🔐 {t?.registeredUser || 'Registered User'}</div>
+                                <div className="text-sm text-blue-200">{t?.fasterCheckout || 'Faster checkout with saved details'}</div>
+                            </button>
+                            <button
+                                onClick={() => handleUserTypeSelect('guest')}
+                                className="w-full bg-gradient-to-r from-green-600 to-teal-600 text-white p-4 rounded-lg hover:from-green-700 hover:to-teal-700 transition-all duration-200"
+                            >
+                                <div className="text-lg font-semibold">👤 {t?.guestBooking || 'Guest Booking'}</div>
+                                <div className="text-sm text-green-200">{t?.noAccountRequired || 'No account required'}</div>
+                            </button>
+                        </div>
+                        <button
+                            onClick={() => setShowUserTypeModal(false)}
+                            className="w-full mt-4 text-gray-400 hover:text-white transition-colors"
+                        >
+                            {t?.cancel || 'Cancel'}
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

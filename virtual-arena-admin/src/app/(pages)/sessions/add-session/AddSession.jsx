@@ -15,7 +15,8 @@ export default function CreateSession() {
         description: '',
         duration_minutes: '',
         max_players: '',
-        price: '',
+        price_1_session: '',
+        price_2_sessions: '',
         is_active: true,
     });
 
@@ -41,7 +42,8 @@ console.log(response)
                     description: '',
                     duration_minutes: '',
                     max_players: '',
-                    price: '',
+                    price_1_session: '',
+                    price_2_sessions: '',
                     is_active: true,
                 })
             } else {
@@ -91,12 +93,23 @@ console.log(response)
                             />
                         </FieldContainer>
 
-                        <FieldContainer label="Price" htmlFor="price">
+                        <FieldContainer label="Price for 1 Session" htmlFor="price_1_session">
                             <Input
                                 type="number"
                                 step="0.01"
-                                name="price"
-                                value={formData.price}
+                                name="price_1_session"
+                                value={formData.price_1_session}
+                                onChange={handleChange}
+                                required
+                            />
+                        </FieldContainer>
+
+                        <FieldContainer label="Price for 2 Sessions" htmlFor="price_2_sessions">
+                            <Input
+                                type="number"
+                                step="0.01"
+                                name="price_2_sessions"
+                                value={formData.price_2_sessions}
                                 onChange={handleChange}
                                 required
                             />

@@ -24,7 +24,13 @@ const CountdownTimer = () => {
             try {
                 // Fetch countdown date
                 console.log('📅 Fetching countdown date...');
-                const dateResponse = await fetch('/api/site-settings/grand-opening-date');
+                const dateResponse = await fetch(`/api/site-settings/grand-opening-date?t=${Date.now()}`, {
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
                 let countdownDate = null;
 
                 console.log('📅 Date response status:', dateResponse.status);
@@ -41,18 +47,29 @@ const CountdownTimer = () => {
 
                 // Fetch enabled status
                 console.log('🔘 Fetching enabled status...');
-                const enabledResponse = await fetch('/api/site-settings/countdown-enabled');
+                const enabledResponse = await fetch(`/api/site-settings/countdown-enabled?t=${Date.now()}`, {
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
                 let enabled = true; // Default to enabled
 
                 console.log('🔘 Enabled response status:', enabledResponse.status);
                 if (enabledResponse.ok) {
                     const enabledData = await enabledResponse.json();
                     console.log('🔘 Enabled data:', enabledData);
-                    if (enabledData.success) {
+                    console.log('🔘 enabledData.enabled type:', typeof enabledData.enabled, 'value:', enabledData.enabled);
+                    if (enabledData.success !== false) { // Only disable if explicitly false
                         enabled = enabledData.enabled === true || enabledData.enabled === 'true';
+                        console.log('🔘 Final enabled value:', enabled);
+                    } else {
+                        console.warn('⚠️ API returned success: false, keeping enabled as default true');
                     }
                 } else {
                     console.error('❌ Failed to fetch enabled status:', enabledResponse.status);
+                    console.log('🔘 Keeping enabled as default true due to fetch failure');
                 }
 
                 console.log('✅ Setting enabled status:', enabled);
@@ -124,7 +141,7 @@ const CountdownTimer = () => {
 
     // Don't render if disabled
     if (!isEnabled) {
-        console.log('❌ Countdown timer disabled, not rendering');
+        console.log('❌ Countdown timer disabled, not rendering. isEnabled:', isEnabled);
         return null;
     }
 
