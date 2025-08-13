@@ -1593,6 +1593,90 @@ export const translations = {
     payOnlineNow: '💳 Payer en Ligne Maintenant',
     securePaymentStripe: 'Paiement sécurisé avec Stripe',
     payAtVenue: '🏢 Payer sur Place',
+    payAtVenueDesc: 'Payez en espèces ou par carte à votre arrivée',
+
+    // Time Passes
+    timePasses: 'Forfaits Temps',
+    selectTimePass: 'Sélectionner un Forfait Temps',
+    unlimitedAccess: 'Accès illimité',
+    allExperiences: 'Toutes les expériences VR incluses',
+    noPassesAvailable: 'Aucun forfait temps disponible pour le moment',
+    whatsIncluded: 'Ce qui est inclus',
+    allVrExperiences: 'Toutes les expériences VR',
+    unlimitedSessions: 'Sessions illimitées',
+    flexibleScheduling: 'Planification flexible',
+    noAdditionalFees: 'Aucun frais supplémentaire',
+
+    // Configuration
+    configurationRequired: 'Configuration Requise',
+    pleaseSelectSessionFirst: 'Veuillez d\'abord sélectionner une session',
+    pleaseConfigureSession: 'Veuillez d\'abord configurer les détails de votre session',
+    checklist: 'Liste de Vérification',
+    chooseBookingType: 'Choisir le Type de Réservation',
+    setPlayerCount: 'Définir le Nombre de Joueurs',
+    selectSessionCount: 'Sélectionner le Nombre de Sessions',
+    setDuration: 'Définir la Durée',
+    backToConfiguration: 'Retour à la Configuration',
+
+    // Session Configuration
+    configureSessions: 'Configurer les Sessions',
+    selectDurationAndPlayers: 'Sélectionnez la durée et le nombre de joueurs',
+    sessionDuration: 'Durée de la Session',
+    sessionPrice: 'Prix de la Session',
+    sessionRange: 'Choisissez 1 ou 2 sessions',
+    minutes: 'minutes',
+    continueToCalendar: 'Continuer vers le Calendrier',
+
+    // Calendar and Time Selection
+    pleaseSelectSession: 'Veuillez d\'abord sélectionner une expérience VR',
+    selectedTimeSlots: 'Créneaux Horaires Sélectionnés',
+    selectedTimeSlot: 'Créneau Horaire Sélectionné',
+    totalDuration: 'Durée Totale',
+    continueToBooking: 'Continuer vers la Réservation',
+
+    // User Type Selection
+    completeYourBooking: 'Complétez votre réservation',
+    continueAs: 'Continuer en tant que',
+    useAccountFasterBooking: 'Utilisez votre compte pour une réservation plus rapide',
+    bookAsGuest: 'Réserver en tant qu\'Invité',
+    noAccountRequired: 'Aucun compte requis',
+    backToCalendar: '← Retour au Calendrier',
+
+    // Guest Details
+    guestDetails: 'Détails de l\'Invité',
+    provideContactInfo: 'Veuillez fournir vos informations de contact',
+    enterFullName: 'Entrez votre nom complet',
+    email: 'Adresse Email',
+    enterEmail: 'Entrez votre email',
+    enterPhoneNumber: 'Entrez votre numéro de téléphone',
+    continueToConfirmation: 'Continuer vers la Confirmation',
+    back: '← Retour',
+
+    // Confirmation and Payment
+    confirmBookingPayment: 'Confirmer la Réservation et le Paiement',
+    bookingDetails: 'Détails de la Réservation',
+    date: 'Date',
+    time: 'Heure',
+    paymentMethod: 'Méthode de Paiement',
+    person: 'personne',
+    people: 'personnes',
+    off: 'RÉDUCTION',
+    youSave: 'Vous économisez',
+    total: 'Total',
+    for: 'pour',
+    proceedToPayment: 'Procéder au Paiement',
+    confirmBooking: 'Confirmer la Réservation',
+    creatingBooking: 'Création de la Réservation...',
+
+    // Success
+    bookingConfirmed: 'Réservation Confirmée!',
+
+    // Modal Types
+    chooseBookingType: 'Choisir le Type de Réservation',
+    registeredUser: 'Utilisateur Enregistré',
+    fasterCheckout: 'Commande plus rapide avec les détails sauvegardés',
+    guestBooking: 'Réservation Invité',
+    cancel: 'Annuler',
 
     // VR Experience Names and Descriptions
     experienceNames: {

@@ -216,8 +216,8 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
             return session.price; // Time passes are per-pass, not per-player
         }
 
-        const basePrice = getBasePrice(session, sessionCount);
-        let totalPrice = basePrice * playerCount;
+        const basePrice = getBasePrice(session, sessionCount) || 0;
+        let totalPrice = basePrice * (playerCount || 1);
 
         // Apply dynamic group discounts
         const discount = getDiscountInfo(playerCount);
@@ -226,7 +226,7 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
             totalPrice -= discountAmount;
         }
 
-        return totalPrice;
+        return Number(totalPrice) || 0;
     };
 
     // Get applied discount info for display - use dynamic discounts
@@ -1035,7 +1035,7 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                                         )}
                                     </div>
                                     <div className="text-2xl font-bold text-green-400">
-                                        ${totalPrice.toFixed(2)}
+                                        ${(totalPrice || 0).toFixed(2)}
                                     </div>
                                     <div className="text-sm text-gray-400">
                                         {sessionCount} {sessionCount === 1 ? (t?.session || 'session') : (t?.sessions || 'sessions')} × {playerCount} {t?.players || 'players'}
@@ -1438,7 +1438,7 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
 
                                 <div className="border-t border-gray-600 pt-3">
                                     <p className="text-white text-xl font-bold">
-                                        {t?.total || 'Total'}: ${totalPrice.toFixed(2)}
+                                        {t?.total || 'Total'}: ${(totalPrice || 0).toFixed(2)}
                                     </p>
                                     {bookingType === 'hourly' && (
                                         <p className="text-gray-400 text-sm mt-1">
