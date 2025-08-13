@@ -22,9 +22,12 @@ const CountdownTimer = () => {
     const fetchCountdownSettings = useCallback(async () => {
             console.log('🔄 Fetching countdown settings...');
             try {
-                // Fetch countdown date
+                // Import API_URL dynamically to avoid SSR issues
+                const { API_URL } = await import('@/utils/ApiUrl');
+
+                // Fetch countdown date directly from backend
                 console.log('📅 Fetching countdown date...');
-                const dateResponse = await fetch(`/api/site-settings/grand-opening-date?t=${Date.now()}`, {
+                const dateResponse = await fetch(`${API_URL}/admin/site-settings/grand_opening_date?t=${Date.now()}`, {
                     headers: {
                         'Cache-Control': 'no-cache, no-store, must-revalidate',
                         'Pragma': 'no-cache',
@@ -37,17 +40,18 @@ const CountdownTimer = () => {
                 if (dateResponse.ok) {
                     const dateData = await dateResponse.json();
                     console.log('📅 Date data:', dateData);
-                    if (dateData.success && dateData.date) {
-                        countdownDate = new Date(dateData.date);
+                    if (dateData.success && (dateData.date || dateData.setting?.setting_value)) {
+                        const dateValue = dateData.date || dateData.setting.setting_value;
+                        countdownDate = new Date(dateValue);
                         console.log('📅 Parsed countdown date:', countdownDate);
                     }
                 } else {
                     console.error('❌ Failed to fetch countdown date:', dateResponse.status);
                 }
 
-                // Fetch enabled status
+                // Fetch enabled status directly from backend
                 console.log('🔘 Fetching enabled status...');
-                const enabledResponse = await fetch(`/api/site-settings/countdown-enabled?t=${Date.now()}`, {
+                const enabledResponse = await fetch(`${API_URL}/admin/site-settings/countdown_enabled?t=${Date.now()}`, {
                     headers: {
                         'Cache-Control': 'no-cache, no-store, must-revalidate',
                         'Pragma': 'no-cache',
@@ -60,9 +64,9 @@ const CountdownTimer = () => {
                 if (enabledResponse.ok) {
                     const enabledData = await enabledResponse.json();
                     console.log('🔘 Enabled data:', enabledData);
-                    console.log('🔘 enabledData.enabled type:', typeof enabledData.enabled, 'value:', enabledData.enabled);
                     if (enabledData.success !== false) { // Only disable if explicitly false
-                        enabled = enabledData.enabled === true || enabledData.enabled === 'true';
+                        const enabledValue = enabledData.setting?.setting_value || enabledData.enabled;
+                        enabled = enabledValue === true || enabledValue === 'true';
                         console.log('🔘 Final enabled value:', enabled);
                     } else {
                         console.warn('⚠️ API returned success: false, keeping enabled as default true');

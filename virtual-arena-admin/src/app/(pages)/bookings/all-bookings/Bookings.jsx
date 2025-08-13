@@ -95,10 +95,26 @@ const Bookings = () => {
 
   const handleFetchBookings = async () => {
     try {
-      const response = await axios.get(`${API_URL}/admin/get-Bookings/`, getAuthHeaders());
-      setBookings(response?.data?.bookings);
+      console.log('🔄 CRITICAL: Fetching bookings from admin panel...');
+      console.log('🔄 CRITICAL: API URL:', API_URL);
+      console.log('🔄 CRITICAL: Full URL:', `${API_URL}/admin/get-bookings/`);
+
+      const response = await axios.get(`${API_URL}/admin/get-bookings/`, getAuthHeaders());
+      console.log('📋 CRITICAL: Bookings response:', response);
+      console.log('📋 CRITICAL: Bookings data:', response?.data);
+      console.log('📋 CRITICAL: Bookings array:', response?.data?.bookings);
+
+      setBookings(response?.data?.bookings || []);
+
+      if (response?.data?.bookings?.length > 0) {
+        console.log('✅ CRITICAL: Successfully loaded bookings:', response.data.bookings.length);
+      } else {
+        console.log('⚠️ CRITICAL: No bookings found in response');
+      }
     } catch (error) {
-      console.log(error);
+      console.error('❌ CRITICAL: Error fetching bookings:', error);
+      console.error('❌ CRITICAL: Error response:', error.response?.data);
+      console.error('❌ CRITICAL: Error status:', error.response?.status);
     }
   };
 
