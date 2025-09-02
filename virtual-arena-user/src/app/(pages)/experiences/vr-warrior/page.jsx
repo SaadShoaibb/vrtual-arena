@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { IoMdPeople, IoMdTime } from 'react-icons/io';
 import { MdOutlineEventSeat } from 'react-icons/md';
 import { useSearchParams } from 'next/navigation';
@@ -16,6 +16,20 @@ const VRWarriorPage = () => {
   const t = translations[locale] || translations.en;
   const dispatch = useDispatch();
 
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const showcaseImages = [
+    '/assets/experiences/vrwarrior/vrwarrior.jpeg',
+    '/assets/experiences/vrwarrior/vrwarrior3.jpeg',
+    '/assets/experiences/vrwarrior/vrwarrior4.jpeg'
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % showcaseImages.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [showcaseImages.length]);
+
   const handleBookNow = () => {
     dispatch(openBookModal({
       experienceType: 'VR Warrior',
@@ -31,7 +45,7 @@ const VRWarriorPage = () => {
       <div className="relative h-[60vh] overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-80"></div>
         <img 
-          src="/assets/deal1.png" 
+          src="/assets/experiences/vrwarrior/vrwarrior2.jpeg" 
           alt="VR WARRIOR Experience" 
           className="w-full h-full object-cover"
         />
@@ -82,6 +96,22 @@ const VRWarriorPage = () => {
 
           {/* Right Column - Booking Info */}
           <div className="lg:col-span-1">
+            {/* Image Showcase */}
+            <div className="bg-gray-900 rounded-xl p-6 mb-6">
+              <div className="relative aspect-auto overflow-hidden rounded-lg">
+                {showcaseImages.map((image, index) => (
+                  <img 
+                    key={index}
+                    src={image} 
+                    alt={`VR Warrior Experience ${index + 1}`} 
+                    className={`w-full h-auto object-contain transition-opacity duration-1000 ${
+                      index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+                    } ${index !== currentImageIndex ? 'absolute inset-0' : ''}`}
+                  />
+                ))}
+              </div>
+            </div>
+            
             <div className="bg-gray-900 rounded-xl p-8 sticky top-24">
               <h3 className="text-2xl font-bold mb-6 text-white">Experience Details</h3>
               
@@ -150,9 +180,11 @@ const VRWarriorPage = () => {
             {/* VR CAT Card */}
             <div className="bg-black rounded-xl overflow-hidden group">
               <div className="aspect-video relative overflow-hidden bg-gray-800">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <h3 className="text-xl font-bold text-white">VR CAT</h3>
-                </div>
+                <img 
+                  src="/assets/experiences/vrcat/vrcat.jpeg" 
+                  alt="VR CAT" 
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-2 text-white">VR CAT (Kids)</h3>
@@ -188,9 +220,11 @@ const VRWarriorPage = () => {
             {/* UFO Spaceship Card */}
             <div className="bg-black rounded-xl overflow-hidden group">
               <div className="aspect-video relative overflow-hidden bg-gray-800">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <h3 className="text-xl font-bold text-white">UFO Spaceship</h3>
-                </div>
+                <img 
+                  src="/assets/experiences/ufo/ufo.jpeg" 
+                  alt="UFO Spaceship" 
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-2 text-white">UFO Spaceship</h3>
