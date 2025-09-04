@@ -28,7 +28,7 @@ export const useExperienceMedia = (experienceName, fallbackImages = []) => {
               .filter(item => item.media_type === 'image')
               .sort((a, b) => a.media_order - b.media_order)
               .map(item => {
-                const url = item.media_url.startsWith('/uploads/') ? `http://localhost:8080${item.media_url}` : item.media_url;
+                const url = item.media_url.startsWith('/uploads/') ? `${baseUrl}${item.media_url}` : item.media_url;
                 console.log(`Image URL: ${url}`);
                 return url;
               });
@@ -36,7 +36,7 @@ export const useExperienceMedia = (experienceName, fallbackImages = []) => {
             const videos = data.media
               .filter(item => item.media_type === 'video')
               .sort((a, b) => a.media_order - b.media_order)
-              .map(item => item.media_url.startsWith('/uploads/') ? `http://localhost:8080${item.media_url}` : item.media_url);
+              .map(item => item.media_url.startsWith('/uploads/') ? `${baseUrl}${item.media_url}` : item.media_url);
             
             console.log(`Found ${images.length} images, ${videos.length} videos`);
             

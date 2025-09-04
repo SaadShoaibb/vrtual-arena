@@ -204,13 +204,13 @@ const ExperienceMediaManager = () => {
                                         <div className="aspect-video bg-gray-100 relative">
                                             {media.media_type === 'image' ? (
                                                 <img
-                                                    src={media.media_url.startsWith('/uploads/') ? `http://localhost:8080${media.media_url}` : media.media_url}
+                                                    src={media.media_url.startsWith('/uploads/') ? `${API_URL.replace('/api/v1', '')}${media.media_url}` : media.media_url}
                                                     alt={`${selectedExperience} media ${index + 1}`}
                                                     className="w-full h-full object-cover"
                                                 />
                                             ) : (
                                                 <video
-                                                    src={media.media_url.startsWith('/uploads/') ? `http://localhost:8080${media.media_url}` : media.media_url}
+                                                    src={media.media_url.startsWith('/uploads/') ? `${API_URL.replace('/api/v1', '')}${media.media_url}` : media.media_url}
                                                     className="w-full h-full object-cover"
                                                     controls
                                                 />
