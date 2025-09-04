@@ -2,7 +2,7 @@
 
 // Use relative URLs that will be proxied by Nginx
 export const API_URL = '/api/v1'; // this is for the production
-// export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+// export const API_URL = 'http://localhost:8080/api/v1';
 
 // Helper function to get payment API URL
 export const getPaymentApiUrl = () => {

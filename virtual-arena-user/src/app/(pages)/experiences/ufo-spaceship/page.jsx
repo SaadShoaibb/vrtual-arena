@@ -9,6 +9,7 @@ import Footer from '@/app/components/Footer';
 import BookModal from '@/app/components/BookModal';
 import { openBookModal } from '@/Store/ReduxSlice/bookModalSlice';
 import { translations } from '@/app/translations';
+import { useExperienceMedia } from '@/app/hooks/useExperienceMedia';
 
 const UfoSpaceshipPage = () => {
   const searchParams = useSearchParams();
@@ -17,13 +18,14 @@ const UfoSpaceshipPage = () => {
   const dispatch = useDispatch();
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const showcaseImages = [
+  
+  // Fetch media from database with fallback images
+  const { showcaseImages, showcaseVideos, loading } = useExperienceMedia('ufo-spaceship', [
     '/assets/experiences/ufo/ufo1.jpeg',
     '/assets/experiences/ufo/ufo2.jpeg',
     '/assets/experiences/ufo/ufo4.jpeg',
     '/assets/experiences/ufo/ufo.jpeg',
-
-  ];
+  ]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -51,7 +53,7 @@ const UfoSpaceshipPage = () => {
             alt="UFO Spaceship VR Experience"
             className="w-full h-full object-cover"
           />
-          <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 z-20">
+          <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
             <div className="max-w-[1600px] mx-auto">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white text-wrap-balance">{t.ufoSpaceshipTitle}</h1>
               <p className="text-xl md:text-2xl text-gray-200 max-w-3xl text-wrap-balance">
@@ -160,9 +162,11 @@ const UfoSpaceshipPage = () => {
                   {t.bookNow}
                 </button>
 
-                <button className="w-full border border-white text-white hover:bg-white hover:text-black transition-colors font-bold py-3 px-6 rounded-full">
-                  {t.viewAvailablePackages}
-                </button>
+                <a href="/pricing" className="block w-full">
+                  <button className="w-full border border-white text-white hover:bg-white hover:text-black transition-colors font-bold py-3 px-6 rounded-full">
+                    {t.viewAvailablePackages}
+                  </button>
+                </a>
               </div>
             </div>
           </div>

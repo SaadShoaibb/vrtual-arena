@@ -215,6 +215,15 @@ const DashboardLayout = ({ children, pageTitle }) => {
                         </li>
 
                         <li className="p-4">
+                            <Link href="/experience-media" className={`flex items-center ${pathname === '/experience-media' ? "text-gradiant font-bold" : ""}`}>
+                                <div className='flex items-center gap-2 leading-none'>
+                                    <MdOutlineDashboard className='text-[#926BB9]' size={20} />
+                                    {isSidebarOpen && "Experience Media"}
+                                </div>
+                            </Link>
+                        </li>
+
+                        <li className="p-4">
                             <Link href="/users" className={`flex items-center ${pathname === '/users' ? "text-gradiant font-bold" : ""}`}>
                                 <div className='flex items-center gap-2 leading-none'>
                                     <FaUsers className='text-[#926BB9]' size={20} />

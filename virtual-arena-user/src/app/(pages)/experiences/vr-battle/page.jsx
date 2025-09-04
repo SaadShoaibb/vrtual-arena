@@ -9,6 +9,7 @@ import Footer from '@/app/components/Footer';
 import BookModal from '@/app/components/BookModal';
 import { openBookModal } from '@/Store/ReduxSlice/bookModalSlice';
 import { translations } from '@/app/translations';
+import { useExperienceMedia } from '@/app/hooks/useExperienceMedia';
 
 const VRBattlePage = () => {
   const searchParams = useSearchParams();
@@ -17,13 +18,14 @@ const VRBattlePage = () => {
   const dispatch = useDispatch();
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const showcaseImages = [
+  
+  // Fetch media from database with fallback images
+  const { showcaseImages, showcaseVideos, loading } = useExperienceMedia('vr-battle', [
     '/assets/experiences/vrbattle/vrbattle2.jpeg',
     '/assets/experiences/vrbattle/vrbattle3.jpeg',
     '/assets/experiences/vrbattle/vrbattle4.jpeg',
     '/assets/experiences/vrbattle/vrbattle5.jpeg'
-
-  ];
+  ]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -164,9 +166,11 @@ const VRBattlePage = () => {
                   {t.bookNow}
                 </button>
 
-                <button className="w-full border border-white text-white hover:bg-white hover:text-black transition-colors font-bold py-3 px-6 rounded-full">
-                  {t.viewAvailablePackages}
-                </button>
+                <a href="/pricing" className="block w-full">
+                  <button className="w-full border border-white text-white hover:bg-white hover:text-black transition-colors font-bold py-3 px-6 rounded-full">
+                    {t.viewAvailablePackages}
+                  </button>
+                </a>
               </div>
             </div>
           </div>
