@@ -6,59 +6,104 @@ import toast from 'react-hot-toast'
 
 const ExperienceMediaManager = () => {
     const [experiences, setExperiences] = useState([])
-    const [selectedExperience, setSelectedExperience] = useState('')
+    const [selectedExperienceId, setSelectedExperienceId] = useState('')
     const [experienceMedia, setExperienceMedia] = useState([])
     const [loading, setLoading] = useState(false)
     const [uploadingMedia, setUploadingMedia] = useState(false)
-
-    const experienceOptions = [
-        { value: 'free-roaming-arena', label: 'Free Roaming Arena' },
-        { value: 'vr-battle', label: 'VR Battle' },
-        { value: 'ufo-spaceship', label: 'UFO Spaceship' },
-        { value: 'vr-360', label: 'VR 360' },
-        { value: 'vr-cat', label: 'VR Cat' },
-        { value: 'vr-warrior', label: 'VR Warrior' },
-        { value: 'photo-booth', label: 'Photo Booth' }
-    ]
+    const [headerImageUrl, setHeaderImageUrl] = useState('')
 
     useEffect(() => {
         fetchAllExperiences()
     }, [])
 
     useEffect(() => {
-        if (selectedExperience) {
-            fetchExperienceMedia(selectedExperience)
+        if (selectedExperienceId && experiences.length > 0) {
+            const exp = experiences.find(e => e.id === Number(selectedExperienceId))
+            setHeaderImageUrl(exp?.header_image_url || '')
+            fetchExperienceMedia(selectedExperienceId)
         }
-    }, [selectedExperience])
+    }, [selectedExperienceId, experiences])
+
+    // Refresh experiences when other pages update them
+    useEffect(() => {
+        const onExternalUpdate = () => fetchAllExperiences()
+        const onFocus = () => fetchAllExperiences()
+        if (typeof window !== 'undefined') {
+            window.addEventListener('experiences:updated', onExternalUpdate)
+            window.addEventListener('focus', onFocus)
+        }
+        return () => {
+            if (typeof window !== 'undefined') {
+                window.removeEventListener('experiences:updated', onExternalUpdate)
+                window.removeEventListener('focus', onFocus)
+            }
+        }
+    }, [])
 
     const fetchAllExperiences = async () => {
         try {
             setLoading(true)
-            const response = await axios.get(`${API_URL}/admin/experience-media`, getAuthHeaders())
+            console.log('Fetching experiences from:', `${API_URL}/admin/experiences`)
+            const response = await axios.get(`${API_URL}/admin/experiences`, getAuthHeaders())
+            console.log('Experiences response:', response.data)
             if (response.data.success) {
                 setExperiences(response.data.experiences || [])
+                console.log('Set experiences:', response.data.experiences)
             }
         } catch (error) {
             console.error('Error fetching experiences:', error)
-            // Don't show error toast on initial load
+            console.error('Error details:', error.response?.data)
             setExperiences([])
         } finally {
             setLoading(false)
         }
     }
 
-    const fetchExperienceMedia = async (experienceName) => {
+    const fetchExperienceMedia = async (experienceId) => {
         try {
             setLoading(true)
-            const response = await axios.get(`${API_URL}/admin/experience-media/${experienceName}`, getAuthHeaders())
-            if (response.data.success) {
-                setExperienceMedia(response.data.media)
+            const experience = experiences.find(exp => exp.id === Number(experienceId))
+            if (experience) {
+                // Use the implemented route that fetches by experience slug
+                const response = await axios.get(`${API_URL}/admin/experience-media/${experience.slug}`)
+                if (response?.data?.success) setExperienceMedia(response.data.media || [])
             }
         } catch (error) {
             console.error('Error fetching experience media:', error)
             toast.error('Failed to load media')
+            setExperienceMedia([])
         } finally {
             setLoading(false)
+        }
+    }
+
+    const saveHeaderImage = async () => {
+        try {
+            if (!selectedExperienceId) return
+            await axios.put(`${API_URL}/admin/experiences/${selectedExperienceId}`, {
+                header_image_url: headerImageUrl,
+            }, getAuthHeaders())
+            toast.success('Header image updated')
+            // refresh list to reflect change
+            await fetchAllExperiences()
+        } catch (err) {
+            console.error('Error saving header image:', err)
+            toast.error('Failed to save header image')
+        }
+    }
+
+    const setHeaderFromMedia = async (mediaUrl) => {
+        try {
+            if (!selectedExperienceId) return
+            await axios.put(`${API_URL}/admin/experiences/${selectedExperienceId}`, {
+                header_image_url: mediaUrl,
+            }, getAuthHeaders())
+            setHeaderImageUrl(mediaUrl)
+            toast.success('Set as header image')
+            await fetchAllExperiences()
+        } catch (err) {
+            console.error('Error setting header image:', err)
+            toast.error('Failed to set header image')
         }
     }
 
@@ -66,14 +111,22 @@ const ExperienceMediaManager = () => {
         const file = event.target.files[0]
         if (!file) return
 
-        if (!selectedExperience) {
+        if (!selectedExperienceId) {
             toast.error('Please select an experience first')
+            return
+        }
+
+        const experience = experiences.find(exp => exp.id === Number(selectedExperienceId))
+        if (!experience) {
+            toast.error('Experience not found')
             return
         }
 
         const formData = new FormData()
         formData.append('media', file)
-        formData.append('experience_name', selectedExperience)
+        formData.append('experience_id', experience.id)
+        // Keep using slug as experience_name for compatibility with existing media routes
+        formData.append('experience_name', experience.slug)
         formData.append('media_type', file.type.startsWith('video/') ? 'video' : 'image')
         formData.append('media_order', experienceMedia.length + 1)
 
@@ -89,7 +142,7 @@ const ExperienceMediaManager = () => {
 
             if (response.data.success) {
                 toast.success('Media uploaded successfully')
-                fetchExperienceMedia(selectedExperience)
+                fetchExperienceMedia(selectedExperienceId)
             }
         } catch (error) {
             console.error('Error uploading media:', error)
@@ -106,7 +159,7 @@ const ExperienceMediaManager = () => {
             const response = await axios.delete(`${API_URL}/admin/experience-media/${mediaId}`, getAuthHeaders())
             if (response.data.success) {
                 toast.success('Media deleted successfully')
-                fetchExperienceMedia(selectedExperience)
+                fetchExperienceMedia(selectedExperienceId)
             }
         } catch (error) {
             console.error('Error deleting media:', error)
@@ -123,7 +176,7 @@ const ExperienceMediaManager = () => {
 
             if (response.data.success) {
                 toast.success('Media order updated')
-                fetchExperienceMedia(selectedExperience)
+                fetchExperienceMedia(selectedExperienceId)
             }
         } catch (error) {
             console.error('Error updating media order:', error)
@@ -141,20 +194,23 @@ const ExperienceMediaManager = () => {
             <div className="bg-white rounded-lg shadow p-6 mb-6">
                 <h2 className="text-lg font-semibold mb-4">Select Experience</h2>
                 <select
-                    value={selectedExperience}
-                    onChange={(e) => setSelectedExperience(e.target.value)}
+                    value={selectedExperienceId}
+                    onChange={(e) => setSelectedExperienceId(e.target.value)}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                     <option value="">Choose an experience...</option>
-                    {experienceOptions.map(option => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
+                    {experiences.length === 0 && !loading && (
+                        <option disabled>No experiences found</option>
+                    )}
+                    {experiences.map(experience => (
+                        <option key={experience.id} value={experience.id}>
+                            {experience.title}
                         </option>
                     ))}
                 </select>
             </div>
 
-            {selectedExperience && (
+            {selectedExperienceId && (
                 <>
                     {/* Upload Section */}
                     <div className="bg-white rounded-lg shadow p-6 mb-6">
@@ -205,7 +261,7 @@ const ExperienceMediaManager = () => {
                                             {media.media_type === 'image' ? (
                                                 <img
                                                     src={media.media_url.startsWith('/uploads/') ? `${API_URL.replace('/api/v1', '')}${media.media_url}` : media.media_url}
-                                                    alt={`${selectedExperience} media ${index + 1}`}
+                                                    alt={`experience media ${index + 1}`}
                                                     className="w-full h-full object-cover"
                                                 />
                                             ) : (

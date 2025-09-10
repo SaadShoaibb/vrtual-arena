@@ -116,13 +116,13 @@ const VRWarriorPage = () => {
             </div>
             
             <div className="bg-gray-900 rounded-xl p-8 sticky top-24">
-              <h3 className="text-2xl font-bold mb-6 text-white">Experience Details</h3>
+              <h3 className="text-2xl font-bold mb-6 text-white">{t.experienceDetails}</h3>
               
               <div className="space-y-6 mb-8">
                 <div className="flex items-center">
                   <MdOutlineEventSeat className="text-[#DB1FEB] text-2xl mr-4" />
                   <div>
-                    <p className="font-semibold text-white">Capacity</p>
+                    <p className="font-semibold text-white">{t.capacity}</p>
                     <p className="text-gray-300">2 players</p>
                   </div>
                 </div>
@@ -130,7 +130,7 @@ const VRWarriorPage = () => {
                 <div className="flex items-center">
                   <IoMdTime className="text-[#DB1FEB] text-2xl mr-4" />
                   <div>
-                    <p className="font-semibold text-white">Duration</p>
+                    <p className="font-semibold text-white">{t.duration}</p>
                     <p className="text-gray-300">15-20 minutes per session</p>
                   </div>
                 </div>
@@ -138,13 +138,13 @@ const VRWarriorPage = () => {
                 <div className="flex items-center">
                   <IoMdPeople className="text-[#DB1FEB] text-2xl mr-4" />
                   <div>
-                    <p className="font-semibold text-white">Age Requirement</p>
+                    <p className="font-semibold text-white">{t.ageRequirement}</p>
                     <p className="text-gray-300">6-12 years</p>
                   </div>
                 </div>
               </div>
               
-              <h4 className="text-xl font-bold mb-4 text-white">Pricing</h4>
+              <h4 className="text-xl font-bold mb-4 text-white">{t.pricing}</h4>
               <div className="bg-gray-800 rounded-lg p-4 mb-6">
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-300">Per Child</span>
@@ -180,7 +180,7 @@ const VRWarriorPage = () => {
       {/* Related Experiences Section */}
       <div className="bg-gray-900">
         <div className="max-w-[1600px] mx-auto px-4 md:px-10 lg:px-16 xl:px-20 2xl:px-6 py-16">
-          <h2 className="text-3xl font-bold mb-8 text-white">You Might Also Like</h2>
+          <h2 className="text-3xl font-bold mb-8 text-white">{t.youMightAlsoLike}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* VR CAT Card */}
             <div className="bg-black rounded-xl overflow-hidden group">
@@ -192,13 +192,13 @@ const VRWarriorPage = () => {
                 />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold mb-2 text-white">VR CAT (Kids)</h3>
-                <p className="text-gray-300 mb-4">Another kid-friendly VR experience with creative and educational content.</p>
+                <h3 className="text-xl font-bold mb-2 text-white">{t.vrCatTitle}</h3>
+                <p className="text-gray-300 mb-4">{t.vrCatCardDescription}</p>
                 <a 
                   href="/experiences/vr-cat"
                   className="inline-block text-[#DB1FEB] font-semibold hover:underline"
                 >
-                  Learn More →
+                  {t.learnMore} →
                 </a>
               </div>
             </div>
@@ -207,17 +207,17 @@ const VRWarriorPage = () => {
             <div className="bg-black rounded-xl overflow-hidden group">
               <div className="aspect-video relative overflow-hidden bg-gray-800">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <h3 className="text-xl font-bold text-white">Photo Booth</h3>
+                  <h3 className="text-xl font-bold text-white">{t.photoBoothTitle}</h3>
                 </div>
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold mb-2 text-white">Photo Booth</h3>
-                <p className="text-gray-300 mb-4">Capture amazing photos in virtual worlds with our high-tech photo booth.</p>
+                <h3 className="text-xl font-bold mb-2 text-white">{t.photoBoothTitle}</h3>
+                <p className="text-gray-300 mb-4">{t.photoBoothCardDescription}</p>
                 <a 
                   href="/experiences/photo-booth"
                   className="inline-block text-[#DB1FEB] font-semibold hover:underline"
                 >
-                  Learn More →
+                  {t.learnMore} →
                 </a>
               </div>
             </div>
@@ -232,13 +232,13 @@ const VRWarriorPage = () => {
                 />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold mb-2 text-white">UFO Spaceship</h3>
-                <p className="text-gray-300 mb-4">A family-friendly experience for up to 5 people in our UFO simulator.</p>
+                <h3 className="text-xl font-bold mb-2 text-white">{t.ufoSpaceshipTitle}</h3>
+                <p className="text-gray-300 mb-4">{t.ufoSpaceshipCardDescription}</p>
                 <a 
                   href="/experiences/ufo-spaceship"
                   className="inline-block text-[#DB1FEB] font-semibold hover:underline"
                 >
-                  Learn More →
+                  {t.learnMore} →
                 </a>
               </div>
             </div>

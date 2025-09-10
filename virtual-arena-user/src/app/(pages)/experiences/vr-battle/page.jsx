@@ -115,13 +115,13 @@ const VRBattlePage = () => {
               </div>
 
               <div className="bg-gray-900 rounded-xl p-8 sticky top-24">
-                <h3 className="text-2xl font-bold mb-6 text-white">Experience Details</h3>
+                <h3 className="text-2xl font-bold mb-6 text-white">{t.experienceDetails}</h3>
 
                 <div className="space-y-6 mb-8">
                   <div className="flex items-center">
                     <MdOutlineEventSeat className="text-[#DB1FEB] text-2xl mr-4" />
                     <div>
-                      <p className="font-semibold text-white">Capacity</p>
+                      <p className="font-semibold text-white">{t.capacity}</p>
                       <p className="text-gray-300">2 players</p>
                     </div>
                   </div>
@@ -129,7 +129,7 @@ const VRBattlePage = () => {
                   <div className="flex items-center">
                     <IoMdTime className="text-[#DB1FEB] text-2xl mr-4" />
                     <div>
-                      <p className="font-semibold text-white">Duration</p>
+                      <p className="font-semibold text-white">{t.duration}</p>
                       <p className="text-gray-300">30-45 minutes per session</p>
                     </div>
                   </div>
@@ -137,24 +137,24 @@ const VRBattlePage = () => {
                   <div className="flex items-center">
                     <IoMdPeople className="text-[#DB1FEB] text-2xl mr-4" />
                     <div>
-                      <p className="font-semibold text-white">Age Requirement</p>
+                      <p className="font-semibold text-white">{t.ageRequirement}</p>
                       <p className="text-gray-300">12 years and older</p>
                     </div>
                   </div>
                 </div>
 
-                <h4 className="text-xl font-bold mb-4 text-white">Pricing</h4>
+                <h4 className="text-xl font-bold mb-4 text-white">{t.pricing}</h4>
                 <div className="bg-gray-800 rounded-lg p-4 mb-6">
                   <div className="flex justify-between mb-2">
-                    <span className="text-gray-300">Per Player</span>
+                    <span className="text-gray-300">{t.singleSession}</span>
                     <span className="font-bold text-white">$9.00</span>
                   </div>
                   <div className="flex justify-between mb-2">
-                    <span className="text-gray-300">Pair (2 players)</span>
+                    <span className="text-gray-300">{t.twoSessions}</span>
                     <span className="font-bold text-white">$15.00</span>
                   </div>
                   <p className="text-sm text-gray-400 mt-2">
-                    <span className="text-[#DB1FEB] font-bold">All-Inclusive Pricing</span> - What you see is what you pay.
+                    <span className="text-[#DB1FEB] font-bold">{t.allInclusivePricing}</span> - {t.whatYouSeeIsWhatYouPay}.
                     No hidden fees or taxes added at checkout.
                   </p>
                 </div>
@@ -179,7 +179,7 @@ const VRBattlePage = () => {
         {/* Related Experiences Section */}
         <div className="bg-gray-900">
           <div className="max-w-[1600px] mx-auto px-4 md:px-10 lg:px-16 xl:px-20 2xl:px-6 py-16">
-            <h2 className="text-3xl font-bold mb-8 text-white">You Might Also Like</h2>
+            <h2 className="text-3xl font-bold mb-8 text-white">{t.youMightAlsoLike}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {/* VR WARRIOR Card */}
               <div className="bg-black rounded-xl overflow-hidden group">
@@ -197,7 +197,7 @@ const VRBattlePage = () => {
                     href="/experiences/vr-warrior"
                     className="inline-block text-[#DB1FEB] font-semibold hover:underline"
                   >
-                    Learn More →
+                    {t.learnMore} →
                   </a>
                 </div>
               </div>
@@ -218,7 +218,7 @@ const VRBattlePage = () => {
                     href="/experiences/vr-360"
                     className="inline-block text-[#DB1FEB] font-semibold hover:underline"
                   >
-                    Learn More →
+                    {t.learnMore} →
                   </a>
                 </div>
               </div>
@@ -239,7 +239,7 @@ const VRBattlePage = () => {
                     href="/experiences/free-roaming-arena"
                     className="inline-block text-[#DB1FEB] font-semibold hover:underline"
                   >
-                    Learn More →
+                    {t.learnMore} →
                   </a>
                 </div>
               </div>

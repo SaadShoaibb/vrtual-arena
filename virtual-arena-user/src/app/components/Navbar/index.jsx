@@ -24,27 +24,63 @@ import NotificationDropdown from './Notification';
 import { IoIosArrowDown } from "react-icons/io";
 import LanguageSwitcher from '../common/LanguageSwitcher';
 import { translations } from '@/app/translations';
+import axios from 'axios';
+import { API_URL } from '@/utils/ApiUrl';
 
 const Navbar = ({ locale = 'en' }) => {
     // Get translations
     const t = translations[locale] || translations.en;
     
-    // Define navigation structure
+    // Public experiences (fetched dynamically)
+    const [publicExperiences, setPublicExperiences] = useState([]);
+
+    // Fetch experiences for dropdown (active only)
+    const fetchPublicExperiences = async () => {
+        try {
+            const res = await axios.get(`${API_URL}/user/experiences?active_only=true`);
+            if (res.data?.success) {
+                setPublicExperiences(res.data.experiences || []);
+            } else {
+                setPublicExperiences([]);
+            }
+        } catch (e) {
+            setPublicExperiences([]);
+        }
+    };
+
+    useEffect(() => {
+        fetchPublicExperiences();
+        const onFocus = () => fetchPublicExperiences();
+        if (typeof window !== 'undefined') window.addEventListener('focus', onFocus);
+        return () => {
+            if (typeof window !== 'undefined') window.removeEventListener('focus', onFocus);
+        };
+    }, []);
+
+    const fallbackExperienceItems = [
+        { title: t.ufoSpaceship, path: `/experiences/ufo-spaceship?locale=${locale}`, description: t.ufoSpaceshipDesc },
+        { title: t.vr360, path: `/experiences/vr-360?locale=${locale}`, description: t.vr360Desc },
+        { title: t.vrBattle, path: `/experiences/vr-battle?locale=${locale}`, description: t.vrBattleDesc },
+        { title: t.vrWarrior, path: `/experiences/vr-warrior?locale=${locale}`, description: t.vrWarriorDesc },
+        { title: t.vrCat, path: `/experiences/vr-cat?locale=${locale}`, description: t.vrCatDesc },
+        { title: t.freeRoaming, path: `/experiences/free-roaming-arena?locale=${locale}`, description: t.freeRoamingDesc },
+        { title: t.photoBooth, path: `/gallery?locale=${locale}`, description: t.photoBoothDesc },
+    ];
+
+    const dynamicExperienceItems = (publicExperiences || []).map(exp => ({
+        title: exp.title,
+        path: `/experiences/${exp.slug}?locale=${locale}`,
+        description: exp.description?.slice(0, 90) || ''
+    }));
+
+    // Define navigation structure (experiences dropdown is dynamic)
     const primaryNavItems = [
         { title: t.home, path: `/?locale=${locale}` },
         {
             title: t.experiences,
             path: `/experiences?locale=${locale}`,
             hasDropdown: true,
-            dropdownItems: [
-                { title: t.ufoSpaceship, path: `/experiences/ufo-spaceship?locale=${locale}`, description: t.ufoSpaceshipDesc },
-                { title: t.vr360, path: `/experiences/vr-360?locale=${locale}`, description: t.vr360Desc },
-                { title: t.vrBattle, path: `/experiences/vr-battle?locale=${locale}`, description: t.vrBattleDesc },
-                { title: t.vrWarrior, path: `/experiences/vr-warrior?locale=${locale}`, description: t.vrWarriorDesc },
-                { title: t.vrCat, path: `/experiences/vr-cat?locale=${locale}`, description: t.vrCatDesc },
-                { title: t.freeRoaming, path: `/experiences/free-roaming-arena?locale=${locale}`, description: t.freeRoamingDesc },
-                { title: t.photoBooth, path: `/gallery?locale=${locale}`, description: t.photoBoothDesc },
-            ]
+            dropdownItems: (dynamicExperienceItems.length > 0 ? dynamicExperienceItems : fallbackExperienceItems)
         },
         { title: t.pricing, path: `/pricing?locale=${locale}` },
         { title: t.eventsParties, path: `/events?locale=${locale}` },
@@ -499,8 +535,7 @@ const Navbar = ({ locale = 'en' }) => {
                                                                     <div className={`${isActivePath(subItem.path) ? 'text-[#DB1FEB]' : 'text-white'} hover:text-[#DB1FEB]`}>
                                                                         {subItem.title}
                                                                     </div>
-                                                                    <div className="text-xs text-gray-400">{subItem.description}</div>
-                                                                </button>
+                                                                                                                                    </button>
                                                             ))}
                                                         </motion.div>
                                                     )}
@@ -634,8 +669,7 @@ const Navbar = ({ locale = 'en' }) => {
                                                             <div className={`${isActivePath(subItem.path) ? 'text-[#DB1FEB]' : 'text-white'} hover:text-[#DB1FEB]`}>
                                                                 {subItem.title}
                                                             </div>
-                                                            <div className="text-xs text-gray-400">{subItem.description}</div>
-                                                        </button>
+                                                                                                                    </button>
                                                     ))}
                                                 </div>
                                             </motion.div>

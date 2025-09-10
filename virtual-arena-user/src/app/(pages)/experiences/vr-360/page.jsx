@@ -83,7 +83,7 @@ const VR360Page = () => {
               </div>
 
               <div>
-                <h3 className="text-2xl font-bold mb-4 text-white">The Experience</h3>
+                <h3 className="text-2xl font-bold mb-4 text-white">{t.theExperience}</h3>
                 <p className="text-lg text-gray-200 mb-4">
                   When you arrive for your VR 360 session, our staff will help you get comfortable in one of our
                   specially engineered rotating chairs. These chairs allow for a full range of motion, making it possible
@@ -117,13 +117,13 @@ const VR360Page = () => {
               </div>
 
               <div className="bg-gray-900 rounded-xl p-8 sticky top-24">
-                <h3 className="text-2xl font-bold mb-6 text-white">Experience Details</h3>
+                <h3 className="text-2xl font-bold mb-6 text-white">{t.experienceDetails}</h3>
 
                 <div className="space-y-6 mb-8">
                   <div className="flex items-center">
                     <MdOutlineEventSeat className="text-[#DB1FEB] text-2xl mr-4" />
                     <div>
-                      <p className="font-semibold text-white">Capacity</p>
+                      <p className="font-semibold text-white">{t.capacity}</p>
                       <p className="text-gray-300">2 seats</p>
                     </div>
                   </div>
@@ -131,7 +131,7 @@ const VR360Page = () => {
                   <div className="flex items-center">
                     <IoMdTime className="text-[#DB1FEB] text-2xl mr-4" />
                     <div>
-                      <p className="font-semibold text-white">Duration</p>
+                      <p className="font-semibold text-white">{t.duration}</p>
                       <p className="text-gray-300">15-30 minutes per session</p>
                     </div>
                   </div>
@@ -139,24 +139,24 @@ const VR360Page = () => {
                   <div className="flex items-center">
                     <IoMdPeople className="text-[#DB1FEB] text-2xl mr-4" />
                     <div>
-                      <p className="font-semibold text-white">Age Requirement</p>
+                      <p className="font-semibold text-white">{t.ageRequirement}</p>
                       <p className="text-gray-300">10 years and older</p>
                     </div>
                   </div>
                 </div>
 
-                <h4 className="text-xl font-bold mb-4 text-white">Pricing</h4>
+                <h4 className="text-xl font-bold mb-4 text-white">{t.pricing}</h4>
                 <div className="bg-gray-800 rounded-lg p-4 mb-6">
                   <div className="flex justify-between mb-2">
-                    <span className="text-gray-300">Individual Ticket</span>
+                    <span className="text-gray-300">{t.singleSession}</span>
                     <span className="font-bold text-white">$9.00</span>
                   </div>
                   <div className="flex justify-between mb-2">
-                    <span className="text-gray-300">Pair (2 people)</span>
+                    <span className="text-gray-300">{t.twoSessions}</span>
                     <span className="font-bold text-white">$15.00</span>
                   </div>
                   <p className="text-sm text-gray-400 mt-2">
-                    <span className="text-[#DB1FEB] font-bold">All-Inclusive Pricing</span> - What you see is what you pay.
+                    <span className="text-[#DB1FEB] font-bold">{t.allInclusivePricing}</span> - {t.whatYouSeeIsWhatYouPay}.
                     No hidden fees or taxes added at checkout.
                   </p>
                 </div>
@@ -194,7 +194,7 @@ const VR360Page = () => {
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold mb-2 text-white">UFO Spaceship</h3>
-                  <p className="text-gray-300 mb-4">Pilot a UFO through immersive virtual worlds with our 5-seat simulator.</p>
+                  <p className="text-gray-300 mb-4">{t.ufoSpaceshipDescription}</p>
                   <a
                     href={`/experiences/ufo-spaceship?locale=${locale}`}
                     className="inline-block text-[#DB1FEB] font-semibold hover:underline"

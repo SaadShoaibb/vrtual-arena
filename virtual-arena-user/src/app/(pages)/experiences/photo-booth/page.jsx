@@ -175,13 +175,13 @@ const PhotoBoothPage = () => {
           {/* Right Column - Booking Info */}
           <div className="lg:col-span-1">
             <div className="bg-gray-900 rounded-xl p-8 sticky top-24">
-              <h3 className="text-2xl font-bold mb-6 text-white">Experience Details</h3>
+              <h3 className="text-2xl font-bold mb-6 text-white">{t.experienceDetails}</h3>
               
               <div className="space-y-6 mb-8">
                 <div className="flex items-center">
                   <MdOutlineEventSeat className="text-[#DB1FEB] text-2xl mr-4" />
                   <div>
-                    <p className="font-semibold text-white">Capacity</p>
+                    <p className="font-semibold text-white">{t.capacity}</p>
                     <p className="text-gray-300">Up to 6 people</p>
                   </div>
                 </div>
@@ -189,7 +189,7 @@ const PhotoBoothPage = () => {
                 <div className="flex items-center">
                   <IoMdTime className="text-[#DB1FEB] text-2xl mr-4" />
                   <div>
-                    <p className="font-semibold text-white">Duration</p>
+                    <p className="font-semibold text-white">{t.duration}</p>
                     <p className="text-gray-300">15-30 minutes per session</p>
                   </div>
                 </div>
@@ -197,13 +197,13 @@ const PhotoBoothPage = () => {
                 <div className="flex items-center">
                   <IoMdPeople className="text-[#DB1FEB] text-2xl mr-4" />
                   <div>
-                    <p className="font-semibold text-white">Age Requirement</p>
+                    <p className="font-semibold text-white">{t.ageRequirement}</p>
                     <p className="text-gray-300">All ages welcome</p>
                   </div>
                 </div>
               </div>
               
-              <h4 className="text-xl font-bold mb-4 text-white">Pricing</h4>
+              <h4 className="text-xl font-bold mb-4 text-white">{t.pricing}</h4>
               <div className="bg-gray-800 rounded-lg p-4 mb-6">
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-300">Basic Session (5 photos)</span>
@@ -240,23 +240,23 @@ const PhotoBoothPage = () => {
       {/* Related Experiences Section */}
       <div className="bg-gray-900">
         <div className="max-w-[1600px] mx-auto px-4 md:px-10 lg:px-16 xl:px-20 2xl:px-6 py-16">
-          <h2 className="text-3xl font-bold mb-8 text-white">You Might Also Like</h2>
+          <h2 className="text-3xl font-bold mb-8 text-white">{t.youMightAlsoLike}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* VR CAT Card */}
             <div className="bg-black rounded-xl overflow-hidden group">
               <div className="aspect-video relative overflow-hidden bg-gray-800">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <h3 className="text-xl font-bold text-white">VR CAT</h3>
+                  <h3 className="text-xl font-bold text-white">{t.vrCatTitle}</h3>
                 </div>
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold mb-2 text-white">VR CAT (Kids)</h3>
-                <p className="text-gray-300 mb-4">Educational VR experience designed for younger visitors.</p>
+                <h3 className="text-xl font-bold mb-2 text-white">{t.vrCatTitle}</h3>
+                <p className="text-gray-300 mb-4">{t.vrCatCardDescription}</p>
                 <a 
                   href="/experiences/vr-cat"
                   className="inline-block text-[#DB1FEB] font-semibold hover:underline"
                 >
-                  Learn More →
+                  {t.learnMore} →
                 </a>
               </div>
             </div>
@@ -265,17 +265,17 @@ const PhotoBoothPage = () => {
             <div className="bg-black rounded-xl overflow-hidden group">
               <div className="aspect-video relative overflow-hidden bg-gray-800">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <h3 className="text-xl font-bold text-white">UFO Spaceship</h3>
+                  <h3 className="text-xl font-bold text-white">{t.ufoSpaceshipTitle}</h3>
                 </div>
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold mb-2 text-white">UFO Spaceship</h3>
-                <p className="text-gray-300 mb-4">Pilot a UFO through immersive virtual worlds with our 5-seat simulator.</p>
+                <h3 className="text-xl font-bold mb-2 text-white">{t.ufoSpaceshipTitle}</h3>
+                <p className="text-gray-300 mb-4">{t.ufoSpaceshipCardDescription}</p>
                 <a 
                   href="/experiences/ufo-spaceship"
                   className="inline-block text-[#DB1FEB] font-semibold hover:underline"
                 >
-                  Learn More →
+                  {t.learnMore} →
                 </a>
               </div>
             </div>
@@ -284,17 +284,17 @@ const PhotoBoothPage = () => {
             <div className="bg-black rounded-xl overflow-hidden group">
               <div className="aspect-video relative overflow-hidden bg-gray-800">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <h3 className="text-xl font-bold text-white">Free-roaming Arena</h3>
+                  <h3 className="text-xl font-bold text-white">{t.freeRoamingArenaTitle}</h3>
                 </div>
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold mb-2 text-white">Free-roaming Arena</h3>
-                <p className="text-gray-300 mb-4">Explore our 34x49 feet arena with up to 10 players simultaneously.</p>
+                <h3 className="text-xl font-bold mb-2 text-white">{t.freeRoamingArenaTitle}</h3>
+                <p className="text-gray-300 mb-4">{t.freeRoamingArenaCardDescription}</p>
                 <a 
                   href="/experiences/free-roaming-arena"
                   className="inline-block text-[#DB1FEB] font-semibold hover:underline"
                 >
-                  Learn More →
+                  {t.learnMore} →
                 </a>
               </div>
             </div>

@@ -18,21 +18,51 @@ const PricingCalculator = ({ locale = 'en' }) => {
   const router = useRouter();
   const t = translations[locale] || translations.en;
 
+  const [sessions, setSessions] = useState([]);
   const [sessionPricing, setSessionPricing] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // Fetch session pricing from database
+  // Fetch sessions and pricing from database
   useEffect(() => {
-    fetchSessionPricing();
+    fetchSessionsAndPricing();
   }, []);
 
-  const fetchSessionPricing = async () => {
+  const fetchSessionsAndPricing = async () => {
     try {
-      const response = await axios.get(`${API_URL}/admin/sessions/public/pricing`);
-      if (response.data.success) {
-        // Convert array to object for easy lookup by session name
+      // Fetch session pricing first (this endpoint works)
+      const pricingResponse = await axios.get(`${API_URL}/admin/sessions/public/pricing`);
+      
+      // Try to fetch sessions from admin endpoint (fallback approach)
+      let sessionsResponse;
+      try {
+        sessionsResponse = await axios.get(`${API_URL}/admin/sessions/public/sessions`);
+      } catch (sessionError) {
+        console.log('Public sessions endpoint not available, using fallback');
+        // Fallback: create sessions from hardcoded list for now
+        sessionsResponse = {
+          data: {
+            success: true,
+            sessions: [
+              { session_id: 1, name: 'Free Roaming Arena', description: 'VR Arena Experience', is_active: true },
+              { session_id: 2, name: 'UFO Spaceship Cinema', description: 'UFO Experience', is_active: true },
+              { session_id: 3, name: 'VR 360', description: 'VR 360 Experience', is_active: true },
+              { session_id: 4, name: 'VR Battle', description: 'VR Battle Experience', is_active: true },
+              { session_id: 5, name: 'VR Warrior', description: 'VR Warrior Experience', is_active: true },
+              { session_id: 6, name: 'VR Cat', description: 'VR Cat Experience', is_active: true },
+              { session_id: 7, name: 'Photo Booth', description: 'Photo Booth Experience', is_active: true }
+            ]
+          }
+        };
+      }
+      
+      if (sessionsResponse.data.success) {
+        setSessions(sessionsResponse.data.sessions);
+      }
+      
+      if (pricingResponse.data.success) {
+        // Convert array to object for easy lookup by session ID
         const pricingMap = {};
-        response.data.pricing.forEach(item => {
+        pricingResponse.data.pricing.forEach(item => {
           if (!pricingMap[item.session_id]) {
             pricingMap[item.session_id] = {};
           }
@@ -41,54 +71,28 @@ const PricingCalculator = ({ locale = 'en' }) => {
         setSessionPricing(pricingMap);
       }
     } catch (error) {
-      console.error('Error fetching session pricing:', error);
+      console.error('Error fetching sessions and pricing:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Helper function to get price by session name
-  const getPriceBySessionName = (sessionName, sessionCount) => {
-    // Map session names to their likely session IDs (you may need to adjust these)
-    const sessionNameMap = {
-      'Free Roaming Arena': 1,
-      'UFO Spaceship Cinema': 2,
-      'VR 360': 3,
-      'VR Battle': 4,
-      'VR Warrior': 5,
-      'VR Cat': 6,
-      'Photo Booth': 7
-    };
-
-    const sessionId = sessionNameMap[sessionName];
-    if (sessionId && sessionPricing[sessionId] && sessionPricing[sessionId][sessionCount]) {
+  // Helper function to get price by session ID
+  const getPriceBySessionId = (sessionId, sessionCount) => {
+    if (sessionPricing[sessionId] && sessionPricing[sessionId][sessionCount]) {
       return sessionPricing[sessionId][sessionCount];
     }
-
-    // Fallback pricing if database pricing is not available
-    const fallbackPricing = {
-      'Free Roaming Arena': { 1: 12, 2: 20 },
-      'UFO Spaceship Cinema': { 1: 9, 2: 15 },
-      'VR 360': { 1: 9, 2: 15 },
-      'VR Battle': { 1: 9, 2: 15 },
-      'VR Warrior': { 1: 7, 2: 12 },
-      'VR Cat': { 1: 6, 2: 10 },
-      'Photo Booth': { 1: 6, 2: 6 }
-    };
-
-    return fallbackPricing[sessionName]?.[sessionCount] || 0;
+    return 0;
   };
 
-  // Dynamic pricing data
-  const experiences = [
-    { id: 'free-roaming', name: t.freeRoamingArena, price1: getPriceBySessionName('Free Roaming Arena', 1), price2: getPriceBySessionName('Free Roaming Arena', 2) },
-    { id: 'ufo-spaceship', name: t.ufoSpaceshipCinema, price1: getPriceBySessionName('UFO Spaceship Cinema', 1), price2: getPriceBySessionName('UFO Spaceship Cinema', 2) },
-    { id: 'vr-360', name: t.vr360, price1: getPriceBySessionName('VR 360', 1), price2: getPriceBySessionName('VR 360', 2) },
-    { id: 'vr-battle', name: t.vrBattle, price1: getPriceBySessionName('VR Battle', 1), price2: getPriceBySessionName('VR Battle', 2) },
-    { id: 'vr-warrior', name: t.vrWarrior, price1: getPriceBySessionName('VR Warrior', 1), price2: getPriceBySessionName('VR Warrior', 2) },
-    { id: 'vr-cat', name: t.vrCat, price1: getPriceBySessionName('VR Cat', 1), price2: getPriceBySessionName('VR Cat', 2) },
-    { id: 'photo-booth', name: t.photoBooth, price1: getPriceBySessionName('Photo Booth', 1), price2: getPriceBySessionName('Photo Booth', 2), isPhoto: true }
-  ];
+  // Dynamic experiences from database sessions
+  const experiences = sessions.map(session => ({
+    id: session.session_id,
+    name: session.name,
+    price1: getPriceBySessionId(session.session_id, 1),
+    price2: getPriceBySessionId(session.session_id, 2),
+    isPhoto: session.name.toLowerCase().includes('photo')
+  }));
   
   const hourlyPasses = [
     { id: '1hour', name: t.oneHourPass, price: 35, description: t.unlimitedAccess },
@@ -268,29 +272,40 @@ const PricingCalculator = ({ locale = 'en' }) => {
       {selectedTab === 'experiences' && (
         <div className="mb-8">
           <h3 className="text-white text-xl font-bold mb-4">{t.selectExperiences}</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {experiences.map((experience) => (
-              <div 
-                key={experience.id}
-                onClick={() => handleExperienceSelect(experience.id)}
-                className={`p-4 rounded-lg cursor-pointer transition-all ${
-                  selectedExperiences.some(e => e.experienceId === experience.id)
-                    ? 'bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7]'
-                    : 'bg-gray-800 hover:bg-gray-700'
-                }`}
-              >
-                <div className="flex justify-between items-center">
-                  <h4 className="text-white font-medium">{experience.name}</h4>
-                  <div className="flex flex-col">
-                    <span className="text-sm text-gray-300">1 {t.singleSession}: ${experience.price1}</span>
-                    {!experience.isPhoto && (
-                      <span className="text-sm text-gray-300">2 {t.twoSessions}: ${experience.price2}</span>
-                    )}
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <div key={n} className="bg-gray-800 p-4 rounded-lg animate-pulse">
+                  <div className="h-4 bg-gray-700 rounded mb-2"></div>
+                  <div className="h-3 bg-gray-700 rounded w-3/4"></div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {experiences.map((experience) => (
+                <div 
+                  key={experience.id}
+                  onClick={() => handleExperienceSelect(experience.id)}
+                  className={`p-4 rounded-lg cursor-pointer transition-all ${
+                    selectedExperiences.some(e => e.experienceId === experience.id)
+                      ? 'bg-gradient-to-tr from-[#926BB9] via-[#5A79FB] to-[#2FBCF7]'
+                      : 'bg-gray-800 hover:bg-gray-700'
+                  }`}
+                >
+                  <div className="flex justify-between items-center">
+                    <h4 className="text-white font-medium">{experience.name}</h4>
+                    <div className="flex flex-col">
+                      <span className="text-sm text-gray-300">1 {t.singleSession}: ${experience.price1}</span>
+                      {!experience.isPhoto && experience.price2 > 0 && (
+                        <span className="text-sm text-gray-300">2 {t.twoSessions}: ${experience.price2}</span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
           
           {/* Selected Experiences */}
           {selectedExperiences.length > 0 && (

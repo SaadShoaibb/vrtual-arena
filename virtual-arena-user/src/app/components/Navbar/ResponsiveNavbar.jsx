@@ -21,6 +21,8 @@ import NotificationDropdown from './Notification';
 import { IoIosArrowDown } from "react-icons/io";
 import LanguageToggle from '../common/LanguageToggle';
 import { translations } from '@/app/translations';
+import axios from 'axios';
+import { API_URL } from '@/utils/ApiUrl';
 
 const ResponsiveNavbar = ({ locale = 'en' }) => {
     // Get translations
@@ -39,8 +41,9 @@ const ResponsiveNavbar = ({ locale = 'en' }) => {
         { title: t.merchandise, path: `/merchandise?locale=${locale}` }
     ];
 
-    // VR experiences for dropdown menu
-    const experiences = [
+    // Experiences for dropdown (dynamic from API with fallback)
+    const [publicExperiences, setPublicExperiences] = useState([]);
+    const fallbackExperiences = [
         { title: t.ufoSpaceship, path: `/experiences/ufo-spaceship?locale=${locale}` },
         { title: t.vr360, path: `/experiences/vr-360?locale=${locale}` },
         { title: t.vrBattle, path: `/experiences/vr-battle?locale=${locale}` },
@@ -49,6 +52,28 @@ const ResponsiveNavbar = ({ locale = 'en' }) => {
         { title: t.freeRoaming, path: `/experiences/free-roaming-arena?locale=${locale}` },
         { title: t.photoBooth, path: `/gallery?locale=${locale}` },
     ];
+
+    const dynamicExperiences = (publicExperiences || []).map(exp => ({
+        title: exp.title,
+        path: `/experiences/${exp.slug}?locale=${locale}`
+    }));
+
+    const fetchPublicExperiences = async () => {
+        try {
+            const res = await axios.get(`${API_URL}/user/experiences?active_only=true`);
+            if (res.data?.success) setPublicExperiences(res.data.experiences || []);
+            else setPublicExperiences([]);
+        } catch (e) {
+            setPublicExperiences([]);
+        }
+    };
+
+    useEffect(() => {
+        fetchPublicExperiences();
+        const onFocus = () => fetchPublicExperiences();
+        if (typeof window !== 'undefined') window.addEventListener('focus', onFocus);
+        return () => { if (typeof window !== 'undefined') window.removeEventListener('focus', onFocus); };
+    }, []);
 
     const pathname = usePathname()
     const dispatch = useDispatch()
@@ -194,7 +219,7 @@ const ResponsiveNavbar = ({ locale = 'en' }) => {
                                             exit="exit"
                                             transition={{ duration: 0.2 }}
                                         >
-                                            {experiences.map((item, i) => (
+                                            {(dynamicExperiences.length ? dynamicExperiences : fallbackExperiences).map((item, i) => (
                                                 <button
                                                     key={i}
                                                     onClick={() => handleLink(item.path)}
@@ -301,7 +326,7 @@ const ResponsiveNavbar = ({ locale = 'en' }) => {
                                                 <div>
                                                     <h3 className="text-[#DB1FEB] font-bold mb-4 text-lg">{t.experience}</h3>
                                                     <div className="flex flex-col space-y-3">
-                                                        {experiences.map((exp, i) => (
+                                                        {(dynamicExperiences.length ? dynamicExperiences : fallbackExperiences).map((exp, i) => (
                                                             <button
                                                                 key={i}
                                                                 onClick={() => handleLink(exp.path)}
@@ -440,7 +465,7 @@ const ResponsiveNavbar = ({ locale = 'en' }) => {
                         
                         {showExperiences && (
                             <div className='mt-2 ml-4 flex flex-col gap-3'>
-                                {experiences.map((exp, idx) => (
+                                {(dynamicExperiences.length ? dynamicExperiences : fallbackExperiences).map((exp, idx) => (
                                     <button
                                         key={idx}
                                         onClick={() => handleLink(exp.path)}

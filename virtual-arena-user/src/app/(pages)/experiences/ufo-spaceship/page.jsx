@@ -111,13 +111,13 @@ const UfoSpaceshipPage = () => {
               </div>
 
               <div className="bg-gray-900 rounded-xl p-8 sticky top-24">
-                <h3 className="text-2xl font-bold mb-6 text-white">Experience Details</h3>
+                <h3 className="text-2xl font-bold mb-6 text-white">{t.experienceDetails}</h3>
 
                 <div className="space-y-6 mb-8">
                   <div className="flex items-center">
                     <MdOutlineEventSeat className="text-[#DB1FEB] text-2xl mr-4" />
                     <div>
-                      <p className="font-semibold text-white">Capacity</p>
+                      <p className="font-semibold text-white">{t.capacity}</p>
                       <p className="text-gray-300">5 seats</p>
                     </div>
                   </div>
@@ -125,7 +125,7 @@ const UfoSpaceshipPage = () => {
                   <div className="flex items-center">
                     <IoMdTime className="text-[#DB1FEB] text-2xl mr-4" />
                     <div>
-                      <p className="font-semibold text-white">Duration</p>
+                      <p className="font-semibold text-white">{t.duration}</p>
                       <p className="text-gray-300">15-20 minutes per session</p>
                     </div>
                   </div>
@@ -133,24 +133,24 @@ const UfoSpaceshipPage = () => {
                   <div className="flex items-center">
                     <IoMdPeople className="text-[#DB1FEB] text-2xl mr-4" />
                     <div>
-                      <p className="font-semibold text-white">Age Requirement</p>
+                      <p className="font-semibold text-white">{t.ageRequirement}</p>
                       <p className="text-gray-300">8 years and older</p>
                     </div>
                   </div>
                 </div>
 
-                <h4 className="text-xl font-bold mb-4 text-white">Pricing</h4>
+                <h4 className="text-xl font-bold mb-4 text-white">{t.pricing}</h4>
                 <div className="bg-gray-800 rounded-lg p-4 mb-6">
                   <div className="flex justify-between mb-2">
-                    <span className="text-gray-300">Individual Ticket</span>
+                    <span className="text-gray-300">{t.singleSession}</span>
                     <span className="font-bold text-white">$9.00</span>
                   </div>
                   <div className="flex justify-between mb-2">
-                    <span className="text-gray-300">Two Sessions</span>
+                    <span className="text-gray-300">{t.twoSessions}</span>
                     <span className="font-bold text-white">$15.00</span>
                   </div>
                   <p className="text-sm text-gray-400 mt-2">
-                    <span className="text-[#DB1FEB] font-bold">All-Inclusive Pricing</span> - What you see is what you pay.
+                    <span className="text-[#DB1FEB] font-bold">{t.allInclusivePricing}</span> - {t.whatYouSeeIsWhatYouPay}.
                     No hidden fees or taxes added at checkout.
                   </p>
                 </div>
@@ -175,7 +175,7 @@ const UfoSpaceshipPage = () => {
         {/* Related Experiences Section */}
         <div className="bg-gray-900">
           <div className="max-w-[1600px] mx-auto px-4 md:px-10 lg:px-16 xl:px-20 2xl:px-6 py-16">
-            <h2 className="text-3xl font-bold mb-8 text-white">You Might Also Like</h2>
+            <h2 className="text-3xl font-bold mb-8 text-white">{t.youMightAlsoLike}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {/* VR 360 Card */}
               <div className="bg-black rounded-xl overflow-hidden group">
@@ -188,12 +188,12 @@ const UfoSpaceshipPage = () => {
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold mb-2 text-white">VR 360</h3>
-                  <p className="text-gray-300 mb-4">Experience full 360° immersion with our rotating VR chairs.</p>
+                  <p className="text-gray-300 mb-4">{t.vr360Description}</p>
                   <a
                     href="/experiences/vr-360"
                     className="inline-block text-[#DB1FEB] font-semibold hover:underline"
                   >
-                    Learn More →
+                    {t.learnMore} →
                   </a>
                 </div>
               </div>
@@ -209,12 +209,12 @@ const UfoSpaceshipPage = () => {
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold mb-2 text-white">VR Battle</h3>
-                  <p className="text-gray-300 mb-4">Challenge your friends in our two-player VR battle arena.</p>
+                  <p className="text-gray-300 mb-4">{t.vrBattleDescription}</p>
                   <a
                     href="/experiences/vr-battle"
                     className="inline-block text-[#DB1FEB] font-semibold hover:underline"
                   >
-                    Learn More →
+                    {t.learnMore} →
                   </a>
                 </div>
               </div>
@@ -230,12 +230,12 @@ const UfoSpaceshipPage = () => {
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold mb-2 text-white">Free-roaming Arena</h3>
-                  <p className="text-gray-300 mb-4">Explore our 34x49 feet arena with up to 10 players simultaneously.</p>
+                  <p className="text-gray-300 mb-4">{t.freeRoamingDescription}</p>
                   <a
                     href="/experiences/free-roaming-arena"
                     className="inline-block text-[#DB1FEB] font-semibold hover:underline"
                   >
-                    Learn More →
+                    {t.learnMore} →
                   </a>
                 </div>
               </div>

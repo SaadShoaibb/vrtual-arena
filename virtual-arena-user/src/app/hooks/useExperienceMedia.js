@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_URL } from '@/utils/ApiUrl';
 
 export const useExperienceMedia = (experienceName, fallbackImages = []) => {
   const [showcaseImages, setShowcaseImages] = useState(fallbackImages);
@@ -9,9 +10,7 @@ export const useExperienceMedia = (experienceName, fallbackImages = []) => {
     const fetchMedia = async () => {
       try {
         setLoading(true);
-        // Use relative URLs that will be proxied by Nginx
-        const API_URL = '/api/v1'; // this is for the production
-        // const API_URL = 'http://localhost:8080/api/v1';
+        // Use shared API_URL from utils (dev: http://localhost:8080/api/v1, prod: /api/v1)
         
         console.log(`Fetching media for: ${experienceName}`);
         const response = await fetch(`${API_URL}/user/experience-media/${experienceName}?t=${Date.now()}`);
