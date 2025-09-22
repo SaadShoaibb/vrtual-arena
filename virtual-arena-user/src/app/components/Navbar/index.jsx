@@ -313,7 +313,7 @@ const Navbar = ({ locale = 'en' }) => {
     return (
         <>
             {/* Main navigation container */}
-            <div className={`w-full ${scrolled ? 'bg-gradient-to-tr from-[#023B6299] to-[#49094F66]' : 'bg-[#0C1339]'} ${scrolled ? 'fixed' : 'sticky'} top-0 shadow-md z-20 transition-all duration-300 border-t-0`}>
+            <div className='w-full bg-gradient-to-tr sticky top-0 shadow-md from-[#023B6299] to-[#49094F66] z-30'>
                 <div className="container mx-auto px-4">
                     {/* Top utility bar - Secondary Navigation */}
                     <div className="hidden md:flex justify-between items-center py-2 ">

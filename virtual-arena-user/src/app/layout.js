@@ -36,18 +36,24 @@ export default function RootLayout({ children }) {
           }}
         />
 
-        {/* Prevent flash of unstyled content */}
+        {/* Minimal anti-flicker - only prevent white flash */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            /* Only set basic page background to prevent white flash */
+            html, body {
+              background-color: #000000;
+              margin: 0;
+              padding: 0;
+            }
+          `
+        }} />
+        {/* Simple anti-flicker script */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              // Prevent flickering by setting background immediately
-              document.documentElement.style.backgroundColor = 'black';
-              document.documentElement.style.color = 'white';
-              
-              // Add loading class to body until React hydrates
-              document.addEventListener('DOMContentLoaded', function() {
-                document.body.classList.add('loading');
-              });
+              // Only set page background to prevent white flash
+              document.documentElement.style.backgroundColor = '#000000';
+              document.body.style.backgroundColor = '#000000';
             `
           }}
         />

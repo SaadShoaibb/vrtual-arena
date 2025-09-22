@@ -66,8 +66,12 @@ body.loaded #__next {
   }
 }
 
-/* Prevent horizontal scrolling */
+/* Simple anti-flicker - only prevent white flash */
 html, body {
+  background-color: black;
+  color: white;
+  margin: 0;
+  padding: 0;
   overflow-x: hidden;
   max-width: 100%;
   position: relative;

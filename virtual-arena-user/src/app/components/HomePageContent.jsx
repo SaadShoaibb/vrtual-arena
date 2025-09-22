@@ -28,7 +28,21 @@ export default function HomePageContent() {
   const searchParams = useSearchParams();
   const dispatch = useDispatch();
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [locale, setLocale] = useState(() => validateLocale(searchParams.get('locale')));
+  
+  // Handle initial loading to prevent flicker
+  useEffect(() => {
+    // Ensure background is set immediately
+    document.body.style.backgroundColor = '#000000';
+    document.documentElement.style.backgroundColor = '#000000';
+    
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 100); // Minimal delay to ensure styles are applied
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   useEffect(() => {
     const currentLocale = validateLocale(searchParams.get('locale'));
@@ -56,9 +70,9 @@ export default function HomePageContent() {
     setIsRedirecting(false);
   }, [router, searchParams, dispatch, locale, isRedirecting]);
   
-  // Show loading during redirect
-  if (isRedirecting) {
-    return <LoadingPage />;
+  // Show loading during redirect or initial load
+  if (isRedirecting || isLoading) {
+    return <LoadingPage locale={locale} />;
   }
 
   return (
