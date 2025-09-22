@@ -36,6 +36,22 @@ export default function RootLayout({ children }) {
           }}
         />
 
+        {/* Prevent flash of unstyled content */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Prevent flickering by setting background immediately
+              document.documentElement.style.backgroundColor = 'black';
+              document.documentElement.style.color = 'white';
+              
+              // Add loading class to body until React hydrates
+              document.addEventListener('DOMContentLoaded', function() {
+                document.body.classList.add('loading');
+              });
+            `
+          }}
+        />
+
         {/* Language alternates */}
         {locales.map((locale) => (
           <link
@@ -85,7 +101,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body
-        className={inter.className}
+        className={`${inter.className} hydration-safe`}
         style={{ margin: 0, padding: 0, backgroundColor: 'black', border: 'none' }}
       >
         <ClientLayout>{children}</ClientLayout>

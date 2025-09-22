@@ -4,6 +4,68 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prevent flickering during hydration */
+html {
+  background-color: black;
+  color: white;
+}
+
+/* Loading state to prevent flash */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Fade in animation for smooth loading */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Prevent content jumping during hydration */
+.hydration-safe {
+  min-height: 100vh;
+  background-color: black;
+}
+
+/* Hide content until React hydrates to prevent flicker */
+body.loading #__next {
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+body.loaded #__next {
+  opacity: 1;
+}
+
+/* Smooth transition for components */
+.component-fade-in {
+  opacity: 0;
+  animation: componentFadeIn 0.5s ease-in-out forwards;
+}
+
+@keyframes componentFadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
 /* Prevent horizontal scrolling */
 html, body {
   overflow-x: hidden;
