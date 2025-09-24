@@ -71,7 +71,6 @@ const HeroSection = ({ locale = 'en' }) => {
 
   return (
     <div className="relative h-[70vh] md:h-[75vh] lg:h-[85vh] overflow-hidden">
-      {/* Background video/image slider */}
       <div className="absolute inset-0 z-0">
         {slides.map((slide, index) => (
           <div
@@ -111,11 +110,26 @@ const HeroSection = ({ locale = 'en' }) => {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="mb-8 flex justify-center"
             >
-              <img
-                src="/assets/logo.png"
-                alt="VRtual Arena"
-                className="h-16 sm:h-20 md:h-24 lg:h-28 w-auto"
-              />
+       <div className="relative flex items-center justify-center">
+  {/* Circular orbit sparkles */}
+  <div className="sparkle-path"></div>
+
+  {/* Floating sparkles */}
+  <div className="floating-sparkle"></div>
+  <div className="floating-sparkle"></div>
+  <div className="floating-sparkle"></div>
+  <div className="floating-sparkle"></div>
+
+  {/* Animated logo */}
+  <motion.img
+    src="/assets/logo.png"
+    alt="VRtual Arena"
+    className="h-16 sm:h-20 md:h-24 lg:h-28 w-auto relative z-10"
+    animate={{ y: [0, -10, 0], rotate: [0, 2, -2, 0] }}
+    transition={{ duration: 4, repeat: Infinity, repeatType: "reverse" }}
+  />
+</div>
+
             </motion.div>
             <motion.div
               key={`buttons-${currentIndex}`}
@@ -169,14 +183,87 @@ const HeroSection = ({ locale = 'en' }) => {
       {/* Booking Modal */}
 
 
-      {/* Add text shadow style */}
-      <style jsx global>{`
-        .text-shadow {
-          text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-      `}</style>
+      {/* Add text shadow style and custom animations */}
+   <style jsx global>{`
+  .text-shadow {
+    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Circular orbit sparkles */
+  .sparkle-path {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: 
+      radial-gradient(circle at 20% 30%, rgba(255, 215, 0, 0.9) 2px, transparent 2px),
+      radial-gradient(circle at 70% 40%, rgba(0, 191, 255, 0.8) 2px, transparent 2px),
+      radial-gradient(circle at 40% 70%, rgba(255, 223, 100, 0.8) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 80% 20%, rgba(135, 206, 250, 0.7) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 50% 10%, rgba(255, 255, 200, 0.9) 1px, transparent 1px),
+      radial-gradient(circle at 10% 50%, rgba(255, 223, 150, 0.6) 1px, transparent 1px),
+      radial-gradient(circle at 90% 60%, rgba(173, 216, 230, 0.7) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 30% 80%, rgba(255, 215, 0, 0.7) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 60% 90%, rgba(0, 191, 255, 0.6) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 75% 75%, rgba(255, 230, 180, 0.7) 1px, transparent 1px),
+      radial-gradient(circle at 25% 60%, rgba(100, 200, 255, 0.7) 1px, transparent 1px),
+      radial-gradient(circle at 85% 35%, rgba(255, 200, 100, 0.8) 1px, transparent 1px);
+    animation: spin 10s linear infinite;
+    z-index: 5;
+    filter: blur(0.5px);
+    pointer-events: none;
+  }
+
+  /* Floating upward sparkles */
+  .floating-sparkle {
+    position: absolute;
+    bottom: 0;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: rgba(255, 215, 0, 0.9);
+    animation: floatUp 6s linear infinite;
+    opacity: 0.8;
+    filter: blur(0.5px);
+  }
+
+  .floating-sparkle:nth-child(2) {
+    left: 30%;
+    background: rgba(0, 191, 255, 0.9);
+    animation-duration: 7s;
+    animation-delay: 2s;
+  }
+  .floating-sparkle:nth-child(3) {
+    left: 60%;
+    background: rgba(255, 223, 100, 0.9);
+    animation-duration: 5s;
+    animation-delay: 1s;
+  }
+  .floating-sparkle:nth-child(4) {
+    left: 80%;
+    background: rgba(173, 216, 230, 0.9);
+    animation-duration: 8s;
+    animation-delay: 3s;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes floatUp {
+    0% { transform: translateY(0) scale(1); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-120px) scale(0.5); opacity: 0; }
+  }
+`}</style>
+
+
     </div>
   )
 }
 
 export default HeroSection
+
+
