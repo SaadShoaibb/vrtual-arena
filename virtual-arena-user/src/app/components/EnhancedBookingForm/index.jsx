@@ -11,6 +11,8 @@ import Input from '../common/Input';
 import Select from '../common/Select';
 import { FaUser, FaUserPlus, FaCalendarCheck, FaCreditCard } from 'react-icons/fa';
 import { loadStripe } from '@stripe/stripe-js';
+import { openModal, closeModal } from '@/Store/ReduxSlice/ModalSlice';
+import { closeBookModal, openBookModal } from '@/Store/ReduxSlice/bookModalSlice';
 
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
@@ -27,6 +29,7 @@ const MODE = {
 };
 
 const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
+    const dispatch = useDispatch();
     const [mode, setMode] = useState(MODE.SESSION_SELECTION);
     const [sessions, setSessions] = useState([]);
     const [selectedSessions, setSelectedSessions] = useState([]); // Array of selected sessions with time slots
@@ -53,6 +56,45 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
         guest_email: '',
         guest_phone: ''
     });
+
+    // Check for pending booking after login
+    useEffect(() => {
+        if (isLoggedIn) {
+            const pendingBooking = localStorage.getItem('pendingBooking');
+            if (pendingBooking) {
+                try {
+                    const bookingState = JSON.parse(pendingBooking);
+                    // Check if the booking is not too old (less than 30 minutes)
+                    if (Date.now() - bookingState.timestamp < 30 * 60 * 1000) {
+                        // Close login modal and reopen booking modal
+                        dispatch(closeModal());
+                        setTimeout(() => {
+                            // Restore the booking state (but not the time slot)
+                            setCurrentSessionSelection(bookingState.currentSessionSelection);
+                            setSessionCount(bookingState.sessionCount || 1);
+                            setPlayerCount(bookingState.playerCount || 1);
+                            setDurationHours(bookingState.durationHours || 0.5);
+                            setBookingType(bookingState.bookingType || 'session');
+                            setUserType('registered');
+                            // Clear the old time slot and go back to calendar to reselect
+                            setSelectedTimeSlot(null);
+                            setMode(MODE.CALENDAR);
+                            
+                            // Reopen booking modal
+                            dispatch(openBookModal());
+                            
+                            toast.success(t?.welcomeBackPleaseReselectTime || 'Welcome back! Please reselect your preferred time slot.');
+                        }, 200);
+                    }
+                    // Clear the pending booking
+                    localStorage.removeItem('pendingBooking');
+                } catch (error) {
+                    console.error('Error restoring booking state:', error);
+                    localStorage.removeItem('pendingBooking');
+                }
+            }
+        }
+    }, [isLoggedIn]);
 
     // Fetch available sessions
     useEffect(() => {
@@ -519,13 +561,39 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
     };
 
     const handleUserTypeSelect = (type) => {
-        setUserType(type);
         setShowUserTypeModal(false);
+        
         if (type === 'guest') {
+            setUserType(type);
             setMode(MODE.GUEST_DETAILS);
         } else {
+            // Check if user is logged in
+            if (!isLoggedIn) {
+                // Save the current booking state to localStorage before closing
+                const bookingState = {
+                    currentSessionSelection,
+                    selectedTimeSlot,
+                    sessionCount,
+                    playerCount,
+                    durationHours,
+                    bookingType,
+                    mode: 'USER_TYPE_PENDING',
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('pendingBooking', JSON.stringify(bookingState));
+                
+                // Close the booking form modal and open login modal
+                toast.error(t?.pleaseLoginToContinue || 'Please login to continue');
+                dispatch(closeBookModal());
+                setTimeout(() => {
+                    dispatch(openModal('LOGIN'));
+                }, 100);
+                return;
+            }
+            setUserType(type);
             setMode(MODE.CONFIRMATION);
         }
+        
         setTimeout(() => {
             const modalContainer = document.getElementById('booking-modal-container');
             console.log('🔄 Attempting to scroll, modal container:', modalContainer);
@@ -664,6 +732,7 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
                 {
                     user_id: userType === 'guest' ? 0 : userData?.user_id,
                     amount: calculatePrice(currentSessionSelection, sessionCount, playerCount, bookingType, durationHours),
+                    currency: 'cad',
                     entity_type: 'booking',
                     entity_id: booking.booking_id,
                 },
@@ -1263,7 +1332,7 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
 
             {/* Selected Time Slots Display and Continue Button */}
             {selectedTimeSlot && (
-                <div className="mt-6 text-center">
+                <div className="mt-6 pb-8 text-center">
                     {/* Show selected time slots */}
                     <div className="mb-4 p-4 bg-gray-800 rounded-lg">
                         <h4 className="text-white font-semibold mb-2">
@@ -1724,7 +1793,7 @@ const EnhancedBookingForm = ({ onClose, locale = 'en', translations: t }) => {
     );
 
     return (
-        <div className="w-full max-w-none mx-auto p-2 sm:p-4 overflow-x-hidden">
+        <div className="w-full max-w-none mx-auto p-2 sm:p-4 pb-8 overflow-x-hidden">
             {/* Step Indicator - Always visible except on success */}
             {mode !== MODE.SUCCESS && <StepIndicator />}
 

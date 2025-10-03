@@ -40,7 +40,7 @@ const PaymentForm = ({ entity, userId, amount, onSuccess, onClose, type }) => {
     
     // Validate amount
     if (typeof amountNumber !== 'number' || isNaN(amountNumber) || amountNumber < 0.50) {
-      setError('Amount must be a number and at least 0.50 USD');
+      setError('Amount must be a number and at least 0.50 CAD');
       setProcessing(false);
       return;
     }
@@ -61,6 +61,7 @@ const PaymentForm = ({ entity, userId, amount, onSuccess, onClose, type }) => {
         {
           user_id: userId,
           amount: amountNumber,
+          currency: 'cad',
           entity_type: type,
           entity_id: entity || 0,
         },

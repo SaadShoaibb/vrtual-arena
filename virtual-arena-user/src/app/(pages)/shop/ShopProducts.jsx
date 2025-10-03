@@ -188,7 +188,7 @@ const ShopProducts = ({ category, locale = 'en' }) => {
                                         className={`flex items-center justify-center gap-2 ${product.stock > 0 ? 'bg-white' : 'bg-gray-300'} w-[78%] py-4`}
                                     >
                                         <img src="/icons/cart.png" alt="cart" />
-                                        <h1 className={`text-lg font-semibold ${product.stock <= 0 ? 'text-gray-500' : ''}`}>
+                                        <h1 className={`text-lg font-semibold ${product.stock <= 0 ? 'text-gray-500' : 'text-black'}`}>
                                             {product.stock > 0 ? t.addToCart : t.outOfStock}
                                         </h1>
                                     </button>
