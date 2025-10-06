@@ -3,11 +3,28 @@ import Checkbox from '@/components/common/Checkbox';
 import FieldContainer from '@/components/common/FieldContainer';
 import Input from '@/components/common/Input';
 import Select from '@/components/common/Select';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { API_URL, getAuthHeaders } from '@/utils/ApiUrl';
 
 const EditBookingForm = ({ data, onSave }) => {
     const [formData, setFormData] = useState(data);
-console.log(data)
+    const [sessions, setSessions] = useState([]);
+
+    console.log(data)
+
+    // Fetch sessions from API
+    useEffect(() => {
+        const fetchSessions = async () => {
+            try {
+                const response = await axios.get(`${API_URL}/admin/get-sessions/`, getAuthHeaders());
+                setSessions(response?.data?.sessions || []);
+            } catch (error) {
+                console.log('Error fetching sessions:', error);
+            }
+        };
+        fetchSessions();
+    }, []);
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
@@ -38,15 +55,13 @@ console.log(data)
     return `${year}-${month}-${day}T${hours}:${minutes}`;
 };
 
-  
+    // Generate session options dynamically from fetched sessions
     const sessionOptions = [
         { value: '', label: 'Select a session' },
-        { value: 'Free Roaming VR Arena 2.0', label: 'Free Roaming VR Arena 2.0' },
-        { value: 'VR UFO 5 Players', label: 'VR UFO 5 Players' },
-        { value: 'VR 360° Motion Chair', label: 'VR 360° Motion Chair' },
-        { value: 'HTC VIVE VR Standing Platform', label: 'HTC VIVE VR Standing Platform' },
-        { value: 'VR Warrior 2players', label: 'VR Warrior 2players' },
-        { value: 'VR CAT', label: 'VR CAT' },
+        ...sessions.map(session => ({
+            value: session.name,
+            label: session.name
+        }))
     ];
     const paymentOptions = [
         { value: '', label: 'Select a Payment status' },

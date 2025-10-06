@@ -159,7 +159,7 @@ console.log(bookings)
                     start_time: formData.start_time,
                     end_time: formData.end_time,
                     price: formData.price,
-                    payment_status: "paid"
+                    payment_status: "pending"
                 };
                 setSelectedSession(bookingData)
                 setMode('DETAIL')

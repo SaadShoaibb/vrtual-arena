@@ -20,10 +20,13 @@ const Bookings = () => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const columns = [
+    { header: 'Booking ID', accessor: 'booking_id' },
     { header: 'Machine Type', accessor: 'machine_type' },
     { header: 'Start Time', accessor: 'startTime' },
     { header: 'End Time', accessor: 'endTime' },
@@ -105,9 +108,14 @@ const Bookings = () => {
       console.log('📋 CRITICAL: Bookings array:', response?.data?.bookings);
 
       setBookings(response?.data?.bookings || []);
+      setLastUpdated(new Date());
 
       if (response?.data?.bookings?.length > 0) {
         console.log('✅ CRITICAL: Successfully loaded bookings:', response.data.bookings.length);
+        // Log payment statuses for debugging
+        response.data.bookings.forEach(booking => {
+          console.log(`📊 Booking #${booking.booking_id}: ${booking.payment_status}`);
+        });
       } else {
         console.log('⚠️ CRITICAL: No bookings found in response');
       }
@@ -116,6 +124,12 @@ const Bookings = () => {
       console.error('❌ CRITICAL: Error response:', error.response?.data);
       console.error('❌ CRITICAL: Error status:', error.response?.status);
     }
+  };
+
+  const handleManualRefresh = async () => {
+    setIsRefreshing(true);
+    await handleFetchBookings();
+    setTimeout(() => setIsRefreshing(false), 500);
   };
 
   useEffect(() => {
@@ -257,7 +271,38 @@ const Bookings = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6 text-gradiant">Bookings</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gradiant">Bookings</h1>
+        <div className="flex items-center gap-4">
+          {lastUpdated && (
+            <span className="text-sm text-gray-400">
+              Last updated: {lastUpdated.toLocaleTimeString()}
+            </span>
+          )}
+          <button
+            onClick={handleManualRefresh}
+            disabled={isRefreshing}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            {isRefreshing ? (
+              <>
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Refreshing...
+              </>
+            ) : (
+              <>
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Refresh
+              </>
+            )}
+          </button>
+        </div>
+      </div>
       <DynamicTable
         headers={columns}
         data={data}

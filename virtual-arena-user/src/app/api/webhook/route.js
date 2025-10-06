@@ -53,7 +53,6 @@ export async function POST(request) {
   } catch (error) {
     console.error(`Error processing webhook: ${error.message}`);
     return NextResponse.json(
-      { error: 'Webhook processing failed' },
       { status: 500 }
     );
   }
@@ -66,6 +65,13 @@ export async function POST(request) {
 async function handleCheckoutSessionCompleted(session) {
   try {
     console.log('Processing checkout.session.completed:', session.id);
+    console.log('Payment status:', session.payment_status);
+    
+    // CRITICAL: Only process if payment was actually completed
+    if (session.payment_status !== 'paid') {
+      console.log(`⚠️ Checkout session ${session.id} completed but payment status is '${session.payment_status}', not 'paid'. Skipping payment confirmation.`);
+      return;
+    }
     
     // Extract metadata from the session
     const { user_id, entity_id, entity_type } = session.metadata || {};
@@ -74,6 +80,8 @@ async function handleCheckoutSessionCompleted(session) {
       console.error('Missing required metadata in checkout session:', session.id);
       return;
     }
+
+    console.log(`✅ Payment confirmed for ${entity_type} #${entity_id}, updating to paid...`);
 
     // Call the backend API to confirm the payment
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payment/confirm-payment`, {
@@ -91,7 +99,7 @@ async function handleCheckoutSessionCompleted(session) {
     }
 
     const data = await response.json();
-    console.log('Payment confirmed:', data);
+    console.log('Payment confirmed successfully:', data);
   } catch (error) {
     console.error('Error handling checkout.session.completed:', error);
     throw error;
