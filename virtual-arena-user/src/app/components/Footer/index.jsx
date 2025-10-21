@@ -53,7 +53,7 @@ const Footer = ({ locale = 'en' }) => {
                             <div className="mt-7 flex flex-col gap-5">
                                 <Link href={`/?locale=${locale}`} className='font-light text-white hover:underline'>{t.home}</Link>
                                 <Link href={`/about?locale=${locale}`} className='font-light text-white hover:underline'>{t.aboutUs}</Link>
-                                <Link href={`/experiences?locale=${locale}`} className='font-light text-white hover:underline'>{t.experiences}</Link>
+                                <Link href={`/experiences/photo-booth?locale=${locale}`} className='font-light text-white hover:underline'>{t.experiences}</Link>
                                 <Link href={`/pricing?locale=${locale}`} className='font-light text-white hover:underline'>{t.pricing}</Link>
                                 <Link href={`/contact?locale=${locale}`} className='font-light text-white hover:underline'>{t.contactUs}</Link>
                             </div>

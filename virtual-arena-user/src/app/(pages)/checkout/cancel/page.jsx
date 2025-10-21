@@ -1,15 +1,46 @@
 'use client';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
 import { translations } from '@/app/translations';
 import { useSearchParams } from 'next/navigation';
 import Footer from "@/app/components/Footer";
+import axios from 'axios';
+import { API_URL, getAuthHeaders } from '@/utils/ApiUrl';
 
 const CheckoutCancelPage = ({ searchParams }) => {
     const localeParam = searchParams.locale || 'en';
     const t = translations[localeParam] || translations.en;
     const router = useRouter();
+    const [cancelling, setCancelling] = useState(false);
+
+    useEffect(() => {
+        const cancelBooking = async () => {
+            const entityType = searchParams.entity_type;
+            const entityId = searchParams.entity_id;
+
+            console.log('🚫 Cancel page loaded with params:', { entityType, entityId, cancelling });
+
+            if (entityType === 'booking' && entityId && !cancelling) {
+                setCancelling(true);
+                console.log(`🚫 Attempting to cancel booking ${entityId}`);
+                try {
+                    const response = await axios.put(
+                        `${API_URL}/user/cancel-booking/${entityId}`,
+                        {},
+                        getAuthHeaders()
+                    );
+                    console.log(`✅ Booking ${entityId} cancelled successfully:`, response.data);
+                } catch (error) {
+                    console.error('❌ Error cancelling booking:', error);
+                }
+            } else {
+                console.log('⚠️ Cancel conditions not met:', { entityType, entityId, cancelling });
+            }
+        };
+
+        cancelBooking();
+    }, [searchParams, cancelling]);
 
     return (
         <div className="bg-blackish text-white">
@@ -32,12 +63,14 @@ const CheckoutCancelPage = ({ searchParams }) => {
                             {t.canRetryPayment || 'You can try again anytime from your bookings page.'}
                         </p>
                         <div className='mt-6 space-y-3'>
-                            <button
-                                onClick={() => router.push(`/bookings?locale=${localeParam}`)}
-                                className="w-full bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition"
-                            >
-                                {t.viewYourBookings || 'View Your Bookings'}
-                            </button>
+                            {searchParams.entity_type === 'booking' && (
+                                <button
+                                    onClick={() => router.push(`/bookings?locale=${localeParam}`)}
+                                    className="w-full bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition"
+                                >
+                                    {t.viewYourBookings || 'View Your Bookings'}
+                                </button>
+                            )}
                             <button
                                 onClick={() => router.push(`/?locale=${localeParam}`)} 
                                 className="w-full bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-600 transition"

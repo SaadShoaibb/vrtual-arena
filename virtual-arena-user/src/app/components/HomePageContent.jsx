@@ -85,7 +85,7 @@ export default function HomePageContent() {
         <About locale={locale} />
         <Offers locale={locale} />
         <Experience locale={locale} />
-        <Plans locale={locale} />
+        {/* <Plans locale={locale} /> */}
         <Package locale={locale} />
         <Calender locale={locale} />
         <Gallery locale={locale} />

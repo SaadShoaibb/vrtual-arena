@@ -67,7 +67,15 @@ const EditBookingForm = ({ data, onSave }) => {
         { value: '', label: 'Select a Payment status' },
         { value: 'pending', label: 'Pending' },
         { value: 'paid', label: 'Paid' },
-        { value: 'cancelled', label: 'Cancel' },
+        { value: 'cancelled', label: 'Cancelled' },
+    ];
+    
+    const sessionStatusOptions = [
+        { value: '', label: 'Select Session Status' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'started', label: 'Started' },
+        { value: 'completed', label: 'Completed' },
+        { value: 'cancelled', label: 'Cancelled' },
     ];
     return (
         <form onSubmit={handleSubmit}>
@@ -112,9 +120,15 @@ const EditBookingForm = ({ data, onSave }) => {
                             />
                         </FieldContainer>
 
-                        
-
-                        
+                        <FieldContainer label="Session Status" htmlFor="session_status">
+                        <Select
+                                name="session_status"
+                                value={formData.session_status || 'pending'}
+                                onChange={handleChange}
+                                options={sessionStatusOptions}
+                                required
+                            />
+                        </FieldContainer>
             </div>
             </div>
             {/* Add other fields here */}

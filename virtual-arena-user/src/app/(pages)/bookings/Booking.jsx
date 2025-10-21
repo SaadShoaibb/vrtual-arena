@@ -169,11 +169,13 @@ const Booking = () => {
         payment_status: booking.payment_status,
         session_status: booking.session_status,
         user_name: booking.user_name,
-        actions: booking.session_status === 'completed' ? (
+        actions: booking.payment_status === 'cancelled' ? (
+            <span className="text-gray-500">Cancelled</span>
+        ) : booking.session_status === 'completed' ? (
             <button
                 onClick={(e) => {
-                    e.stopPropagation(); // Stop event propagation
-                    openFeedbackModal(booking); // Open feedback modal
+                    e.stopPropagation();
+                    openFeedbackModal(booking);
                 }}
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
             >
@@ -182,7 +184,7 @@ const Booking = () => {
         ) : (
             <button
                 onClick={(e) => {
-                    e.stopPropagation(); // Stop event propagation
+                    e.stopPropagation();
                     handleCancelBooking(booking);
                 }}
                 className="text-red-600 hover:text-red-800"
