@@ -2,69 +2,41 @@
 import React, { useState } from 'react'
 import { FaAngleDown } from 'react-icons/fa'
 import BookNowButton from '../common/BookNowButton';
-
-// Translations for FAQ data
-const translations = {
-    en: {
-        whyChooseUs: "Why Choose Us",
-        whyPerfect: "Why VRA is the Perfect Choice for You?",
-        startFrom: "Start from",
-        moneyback: "30 Days Moneyback Guarantee!",
-        faq: [
-            {
-                id: 1,
-                question: "What is Virtual Arena (VRA)?",
-                answer: "Virtual Arena is a premium destination for immersive VR gaming experiences. From solo adventures to multiplayer tournaments, VRA brings cutting-edge technology and unforgettable fun under one roof.",
-            },
-            {
-                id: 2,
-                question: "Do I need prior VR experience to play?",
-                answer: "Not at all! Whether you're a beginner or a seasoned gamer, VRA is designed for all skill levels. Our team will guide you through everything you need to get started.",
-            },
-            {
-                id: 3,
-                question: "What kind of games are available at VRA?",
-                answer: "We offer a wide variety of VR games—from action and adventure to puzzle-solving and sports simulations. There's something exciting for everyone.",
-            },
-            {
-                id: 4,
-                question: "Is VRA suitable for group events or parties?",
-                answer: "Absolutely! VRA is perfect for birthday parties, corporate events, team-building sessions, and group hangouts. Ask us about our group booking packages!",
-            },
-        ]
-    },
-    fr: {
-        whyChooseUs: "Pourquoi nous choisir",
-        whyPerfect: "Pourquoi VRA est le choix parfait pour vous ?",
-        startFrom: "À partir de",
-        moneyback: "Garantie de remboursement de 30 jours !",
-        faq: [
-            {
-                id: 1,
-                question: "Qu'est-ce que Virtual Arena (VRA) ?",
-                answer: "Virtual Arena est une destination premium pour des expériences de jeu VR immersives. Des aventures solo aux tournois multijoueurs, VRA réunit une technologie de pointe et un plaisir inoubliable sous un même toit.",
-            },
-            {
-                id: 2,
-                question: "Ai-je besoin d'une expérience VR préalable pour jouer ?",
-                answer: "Pas du tout ! Que vous soyez débutant ou joueur expérimenté, VRA est conçu pour tous les niveaux de compétence. Notre équipe vous guidera à travers tout ce dont vous avez besoin pour commencer.",
-            },
-            {
-                id: 3,
-                question: "Quels types de jeux sont disponibles chez VRA ?",
-                answer: "Nous proposons une grande variété de jeux VR, de l'action et l'aventure à la résolution d'énigmes et aux simulations sportives. Il y a quelque chose d'excitant pour tout le monde.",
-            },
-            {
-                id: 4,
-                question: "VRA convient-il aux événements de groupe ou aux fêtes ?",
-                answer: "Absolument ! VRA est parfait pour les fêtes d'anniversaire, les événements d'entreprise, les sessions de team-building et les sorties en groupe. Renseignez-vous sur nos forfaits de réservation de groupe !",
-            },
-        ]
-    }
-};
+import { translations } from '@/app/translations';
 
 const WhyChoose = ({ locale = 'en' }) => {
     const t = translations[locale] || translations.en;
+    
+    const faqData = [
+        {
+            id: 1,
+            question: locale === 'en' ? "What is Virtual Arena (VRA)?" : "Qu'est-ce que Virtual Arena (VRA) ?",
+            answer: locale === 'en' 
+                ? "Virtual Arena is a premium destination for immersive VR gaming experiences. From solo adventures to multiplayer tournaments, VRA brings cutting-edge technology and unforgettable fun under one roof."
+                : "Virtual Arena est une destination premium pour des expériences de jeu VR immersives. Des aventures solo aux tournois multijoueurs, VRA réunit une technologie de pointe et un plaisir inoubliable sous un même toit.",
+        },
+        {
+            id: 2,
+            question: locale === 'en' ? "Do I need prior VR experience to play?" : "Ai-je besoin d'une expérience VR préalable pour jouer ?",
+            answer: locale === 'en'
+                ? "Not at all! Whether you're a beginner or a seasoned gamer, VRA is designed for all skill levels. Our team will guide you through everything you need to get started."
+                : "Pas du tout ! Que vous soyez débutant ou joueur expérimenté, VRA est conçu pour tous les niveaux de compétence. Notre équipe vous guidera à travers tout ce dont vous avez besoin pour commencer.",
+        },
+        {
+            id: 3,
+            question: locale === 'en' ? "What kind of games are available at VRA?" : "Quels types de jeux sont disponibles chez VRA ?",
+            answer: locale === 'en'
+                ? "We offer a wide variety of VR games—from action and adventure to puzzle-solving and sports simulations. There's something exciting for everyone."
+                : "Nous proposons une grande variété de jeux VR, de l'action et l'aventure à la résolution d'énigmes et aux simulations sportives. Il y a quelque chose d'excitant pour tout le monde.",
+        },
+        {
+            id: 4,
+            question: locale === 'en' ? "Is VRA suitable for group events or parties?" : "VRA convient-il aux événements de groupe ou aux fêtes ?",
+            answer: locale === 'en'
+                ? "Absolutely! VRA is perfect for birthday parties, corporate events, team-building sessions, and group hangouts. Ask us about our group booking packages!"
+                : "Absolument ! VRA est parfait pour les fêtes d'anniversaire, les événements d'entreprise, les sessions de team-building et les sorties en groupe. Renseignez-vous sur nos forfaits de réservation de groupe !",
+        },
+    ];
     const [openId, setOpenId] = useState(1);
 
     const toggleAccordion = (id) => {
@@ -76,11 +48,10 @@ const WhyChoose = ({ locale = 'en' }) => {
             <div className='w-full mx-auto max-w-[1600px] border-b pt-[113px] pb-[100px] flex justify-between items-center px-4 md:px-10 lg:px-16 xl:px-20 2xl:px-6'>
                 <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 xl:gap-4'>
                     <div className='flex flex-col'>
-                        <h1 className='text-gradiant text-[26px] font-semibold'>{t.whyChooseUs}</h1>
-                        <h1 className='text-white text-[40px] md:text-[50px] font-bold pb-5 leading-none text-wrap-balance'>{t.whyPerfect}</h1>
+                        <h1 className='text-white text-[40px] md:text-[50px] font-bold pb-5 leading-none text-wrap-balance'>{t.haveQuestionsWeHaveAnswers}</h1>
                         <div className='flex flex-col w-full gap-4'>
 
-                            {t.faq.map((item) => (
+                            {faqData.map((item) => (
                                 <div key={item.id} className="w-full">
                                     <div
                                         className="flex justify-between items-center w-full pb-3 border-b cursor-pointer mt-[20px]"
@@ -108,10 +79,10 @@ const WhyChoose = ({ locale = 'en' }) => {
                             <div className='flex flex-col'>
                                 <div className='flex items-center gap-2'>
                                     <h1 className='text-base sm:text-xl text-white font-semibold text-wrap-balance'>
-                                        {t.startFrom} <span className='text-gradiant'>$49</span>
+                                        {locale === 'en' ? 'Start from' : 'À partir de'} <span className='text-gradiant'>$49</span>
                                     </h1>
                                 </div>
-                                <p className='text-[12px] text-white font-light text-wrap-balance'>{t.moneyback}</p>
+                                <p className='text-[12px] text-white font-light text-wrap-balance'>{locale === 'en' ? '30 Days Moneyback Guarantee!' : 'Garantie de remboursement de 30 jours !'}</p>
                             </div>
                         </div>
                     </div>

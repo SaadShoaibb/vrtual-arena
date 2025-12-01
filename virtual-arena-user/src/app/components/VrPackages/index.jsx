@@ -20,10 +20,10 @@ const VRPackage = ({ locale = 'en' }) => {
           <div className="absolute inset-0 z-0 bg-black bg-gradient-to-tr from-[#003C66] to-[##580060] bg-opacity-50"></div>
           <div className='w-full mx-auto max-w-[1600px] py-[100px] flex items-center px-4 md:px-10 lg:px-16 xl:px-20 2xl:px-6'>
             <div className='w-full max-w-[858px] mx-auto flex flex-col justify-center items-center z-10'>
-              <h3 className='text-white text-[24px] sm:text-[30px] text-wrap-balance text-center'>{t.letsGetStarted || 'Lets Get Started'}</h3>
-              <h1 className='text-white text-[40px] sm:text-[60px] md:text-[70px] mt-3 font-bold leading-none text-center text-wrap-balance'>{t.readyToEnjoy || 'Ready to Enjoy?'}</h1>
+              <h3 className='text-white text-[24px] sm:text-[30px] text-wrap-balance text-center'>{t.bookYourAdventure || 'Book Your Adventure Today'}</h3>
+              <h1 className='text-white text-[40px] sm:text-[60px] md:text-[70px] mt-3 font-bold leading-none text-center text-wrap-balance'>{t.readyToDiveIn || 'Ready to Dive In?'}</h1>
               <p className='text-[16px] sm:text-[18px] text-white mt-3 text-center text-wrap-balance'>
-                {t.vrPackageDescription || 'Dive into the action with our immersive VR gaming packages. Whether you\'re here for intense competition, team battles, or just pure fun—Virtual Arena offers experiences designed for every skill level and every thrill seeker.'}
+                {t.vrPackageNewDescription || 'Whether you\'re a hardcore gamer, a group of friends looking for fun, or a family ready for an unforgettable adventure we have the perfect VR experience for you. Choose your game, book your time, and step into a new reality.'}
               </p>
               <button
                 onClick={handleBookNow}

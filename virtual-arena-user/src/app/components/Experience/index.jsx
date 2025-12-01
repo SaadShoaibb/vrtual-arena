@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation'
 // Translations
 const translations = {
     en: {
-        experiences: "Experiences",
-        gamingExperiences: "Our Gaming Experiences by Category",
+        experiences: "Choose Your Adventure",
+        gamingExperiences: "A VR Experience for Every Player",
         description: "Dive into a wide variety of immersive VR games—from intense action and exploration to fun family-friendly adventures. Our curated categories ensure there's something exciting for everyone at Vrtual Arena.",
         exploreExperiences: "Explore Experiences",
         happyClients: "HAPPY CLIENTS",
@@ -15,8 +15,8 @@ const translations = {
         countriesServed: "COUNTRIES SERVED"
     },
     fr: {
-        experiences: "Expériences",
-        gamingExperiences: "Nos expériences de jeu par catégorie",
+        experiences: "Choisissez Votre Aventure",
+        gamingExperiences: "Une Expérience VR pour Chaque Joueur",
         description: "Plongez dans une grande variété de jeux VR immersifs, de l'action intense et l'exploration aux aventures familiales amusantes. Nos catégories soigneusement sélectionnées garantissent qu'il y a quelque chose d'excitant pour tout le monde à Virtual Arena.",
         exploreExperiences: "Explorer les expériences",
         happyClients: "CLIENTS SATISFAITS",

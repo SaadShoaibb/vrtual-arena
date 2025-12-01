@@ -147,7 +147,7 @@ export const translations = {
     ourMission: 'Our Mission',
     missionDescription: 'To provide accessible, innovative, and engaging virtual reality experiences that inspire creativity and connection.',
     ourStory: 'Our Story',
-    storyDescription1: 'Founded in 2021 by tech entrepreneur Abdallah Abouda, VRtual Arena was born from a passion for technology and a vision to make cutting-edge virtual reality experiences accessible to everyone in Edmonton.',
+    storyDescription1: 'In 2023, VRtual Arena was born from a single belief held by our founder, Abdallah ABOUDA: that everyone in Edmonton deserves a place to experience world-class VR. As a gaming enthusiast himself, he set out to build exactly that a safe, fun, and affordable arena for exploration and adventure.',
     storyDescription2: 'What started as a small VR arcade has grown into Edmonton\'s premier virtual reality entertainment center, offering a wide range of immersive experiences for all ages and interests.',
     storyDescription3: 'As a locally owned business operating under ABOUDA Enterprise Inc., we\'re proud to be part of the Edmonton community and committed to bringing innovative entertainment experiences to our city.',
     missionStatement1: 'At VRtual Arena, our mission is to transport people beyond the boundaries of reality through immersive virtual experiences that inspire, entertain, and bring people together.',
@@ -388,7 +388,11 @@ export const translations = {
 
     // VR Package Section
     readyToEnjoy: 'Ready to Enjoy?',
+    readyToDiveIn: 'Ready to Dive In?',
+    bookYourAdventure: 'Book Your Adventure Today',
     vrPackageDescription: 'Dive into the action with our immersive VR gaming packages. Whether you\'re here for intense competition, team battles, or just pure fun—Virtual Arena offers experiences designed for every skill level and every thrill seeker.',
+    vrPackageNewDescription: 'Whether you\'re a hardcore gamer, a group of friends looking for fun, or a family ready for an unforgettable adventure we have the perfect VR experience for you. Choose your game, book your time, and step into a new reality.',
+    haveQuestionsWeHaveAnswers: 'Have Questions? We Have Answers.',
 
     // Why Choose
     whyChooseTitle: 'Why Choose Us',
@@ -1087,7 +1091,7 @@ export const translations = {
     ourMission: 'Notre Mission',
     missionDescription: 'Fournir des expériences de réalité virtuelle accessibles, innovantes et engageantes qui inspirent la créativité et la connexion.',
     ourStory: 'Notre Histoire',
-    storyDescription1: 'Fondée en 2021 par l\'entrepreneur technologique Abdallah Abouda, VRtual Arena est née d\'une passion pour la technologie et d\'une vision visant à rendre les expériences de réalité virtuelle de pointe accessibles à tous à Edmonton.',
+    storyDescription1: 'En 2023, VRtual Arena est né d\'une seule conviction de notre fondateur, Abdallah ABOUDA : que tout le monde à Edmonton mérite un endroit pour vivre une expérience VR de classe mondiale. En tant que passionné de jeux lui-même, il s\'est lancé pour construire exactement cela une arène sûre, amusante et abordable pour l\'exploration et l\'aventure.',
     storyDescription2: 'Ce qui a commencé comme une petite arcade VR est devenu le premier centre de divertissement de réalité virtuelle d\'Edmonton, offrant une large gamme d\'expériences immersives pour tous les âges et intérêts.',
     storyDescription3: 'En tant qu\'entreprise locale opérant sous ABOUDA Enterprise Inc., nous sommes fiers de faire partie de la communauté d\'Edmonton et nous nous engageons à apporter des expériences de divertissement innovantes à notre ville.',
     missionStatement1: 'Chez VRtual Arena, notre mission est de transporter les gens au-delà des limites de la réalité grâce à des expériences virtuelles immersives qui inspirent, divertissent et rassemblent les gens.',
@@ -1329,7 +1333,11 @@ export const translations = {
 
     // VR Package Section
     readyToEnjoy: 'Prêt à Profiter?',
+    readyToDiveIn: 'Prêt à Plonger?',
+    bookYourAdventure: 'Réservez Votre Aventure Aujourd\'hui',
     vrPackageDescription: 'Plongez dans l\'action avec nos packages de jeu VR immersifs. Que vous soyez ici pour une compétition intense, des batailles d\'équipe ou simplement pour le plaisir pur—Virtual Arena offre des expériences conçues pour tous les niveaux de compétence et tous les amateurs de sensations fortes.',
+    vrPackageNewDescription: 'Que vous soyez un joueur passionné, un groupe d\'amis à la recherche de plaisir, ou une famille prête pour une aventure inoubliable, nous avons l\'expérience VR parfaite pour vous. Choisissez votre jeu, réservez votre temps et entrez dans une nouvelle réalité.',
+    haveQuestionsWeHaveAnswers: 'Vous Avez des Questions? Nous Avons des Réponses.',
 
     // Why Choose
     whyChooseTitle: 'Pourquoi Nous Choisir',
