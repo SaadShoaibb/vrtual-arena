@@ -7,8 +7,8 @@ export const seoMetadata = {
   location: 'Edmonton, AB',
   phone: '+1 780-901-0804',
   email: 'contact@vrtualarena.ca',
-  address: '8109 102 St NW, Edmonton, AB T6E 4A4',
-  
+  address: '10150 81 Ave NW, Edmonton, AB T6E 1X1',
+
   // Default metadata
   default: {
     en: {
@@ -37,7 +37,7 @@ export const seoMetadata = {
         keywords: 'jeux VR Edmonton, arène réalité virtuelle, expériences VR, batailles VR, VR libre, divertissement Edmonton'
       }
     },
-    
+
     pricing: {
       en: {
         title: 'VR Gaming Prices & Packages - VRtual Arena Edmonton',
@@ -50,7 +50,7 @@ export const seoMetadata = {
         keywords: 'prix jeux VR Edmonton, forfaits VR, réductions groupe, fête anniversaire VR, événements corporatifs VR, VR abordable'
       }
     },
-    
+
     experiences: {
       en: {
         title: 'VR Games & Experiences - VRtual Arena Edmonton',
@@ -63,20 +63,20 @@ export const seoMetadata = {
         keywords: 'jeux VR Edmonton, expériences VR, arène libre, batailles VR, simulateur UFO, VR 360, jeux immersifs'
       }
     },
-    
+
     contact: {
       en: {
         title: 'Contact VRtual Arena - VR Gaming Center Edmonton',
-        description: 'Contact VRtual Arena Edmonton for bookings and inquiries. Located at 8109 102 St NW. Call +1 780-901-0804 or email contact@vrtualarena.ca',
+        description: 'Contact VRtual Arena Edmonton for bookings and inquiries. Located at 10150 81 Ave NW. Call +1 780-901-0804 or email contact@vrtualarena.ca',
         keywords: 'contact VRtual Arena, VR gaming center Edmonton, book VR session, VR arena location, Edmonton VR contact'
       },
       fr: {
         title: 'Contactez VRtual Arena - Centre de Jeu VR Edmonton',
-        description: 'Contactez VRtual Arena Edmonton pour réservations et demandes. Situé au 8109 102 St NW. Appelez +1 780-901-0804 ou email contact@vrtualarena.ca',
+        description: 'Contactez VRtual Arena Edmonton pour réservations et demandes. Situé au 10150 81 Ave NW. Appelez +1 780-901-0804 ou email contact@vrtualarena.ca',
         keywords: 'contact VRtual Arena, centre jeu VR Edmonton, réserver session VR, emplacement arène VR, contact VR Edmonton'
       }
     },
-    
+
     tournaments: {
       en: {
         title: 'VR Tournaments & Competitions - VRtual Arena Edmonton',
@@ -89,7 +89,7 @@ export const seoMetadata = {
         keywords: 'tournois VR Edmonton, compétitions VR, esports VR, tournois jeux VR, VR compétitif, prix VR'
       }
     },
-    
+
     events: {
       en: {
         title: 'VR Events & Parties - VRtual Arena Edmonton',
@@ -102,7 +102,7 @@ export const seoMetadata = {
         keywords: 'événements VR Edmonton, fêtes VR, fête anniversaire VR, événements corporatifs VR, team building VR, location venue VR'
       }
     },
-    
+
     shop: {
       en: {
         title: 'VR Gaming Shop - Gift Cards & Merchandise | VRtual Arena',
@@ -158,12 +158,12 @@ export const seoMetadata = {
     contact: {
       en: {
         title: 'Contact VRtual Arena Edmonton - Book Your VR Experience',
-        description: 'Contact VRtual Arena Edmonton for bookings, inquiries, and information. Located at 8109 102 St NW. Call +1 780-901-0804 or email us today!',
+        description: 'Contact VRtual Arena Edmonton for bookings, inquiries, and information. Located at 10150 81 Ave NW. Call +1 780-901-0804 or email us today!',
         keywords: 'contact VRtual Arena, VR booking Edmonton, VRtual Arena location, VR gaming contact, Edmonton VR center phone'
       },
       fr: {
         title: 'Contactez VRtual Arena Edmonton - Réservez Votre Expérience VR',
-        description: 'Contactez VRtual Arena Edmonton pour réservations, demandes et informations. Situé au 8109 102 St NW. Appelez +1 780-901-0804 ou écrivez-nous aujourd\'hui!',
+        description: 'Contactez VRtual Arena Edmonton pour réservations, demandes et informations. Situé au 10150 81 Ave NW. Appelez +1 780-901-0804 ou écrivez-nous aujourd\'hui!',
         keywords: 'contact VRtual Arena, réservation VR Edmonton, emplacement VRtual Arena, contact jeu VR, centre VR Edmonton téléphone'
       }
     },
@@ -200,7 +200,7 @@ export const seoMetadata = {
 export const generatePageMetadata = (page, locale = 'en') => {
   const pageData = seoMetadata.pages[page] || seoMetadata.default;
   const localeData = pageData[locale] || pageData.en;
-  
+
   return {
     title: localeData.title,
     description: localeData.description,
@@ -240,14 +240,14 @@ export const generatePageMetadata = (page, locale = 'en') => {
 // Generate structured data for local business
 export const generateLocalBusinessSchema = (locale = 'en') => {
   const isEnglish = locale === 'en';
-  
+
   return {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     '@id': `${seoMetadata.siteUrl}/#business`,
     name: seoMetadata.businessName,
     alternateName: seoMetadata.siteName,
-    description: isEnglish 
+    description: isEnglish
       ? 'Premier VR gaming center in Edmonton offering immersive virtual reality experiences, tournaments, and events.'
       : 'Centre de jeu VR premier à Edmonton offrant des expériences de réalité virtuelle immersives, tournois et événements.',
     url: seoMetadata.siteUrl,
@@ -255,10 +255,10 @@ export const generateLocalBusinessSchema = (locale = 'en') => {
     email: seoMetadata.email,
     address: {
       '@type': 'PostalAddress',
-      streetAddress: '8109 102 St NW',
+      streetAddress: '10150 81 Ave NW',
       addressLocality: 'Edmonton',
       addressRegion: 'AB',
-      postalCode: 'T6E 4A4',
+      postalCode: 'T6E 1X1',
       addressCountry: 'CA'
     },
     geo: {
@@ -284,7 +284,7 @@ export const generateLocalBusinessSchema = (locale = 'en') => {
           itemOffered: {
             '@type': 'Service',
             name: isEnglish ? 'VR Gaming Sessions' : 'Sessions de Jeu VR',
-            description: isEnglish 
+            description: isEnglish
               ? 'Immersive virtual reality gaming experiences'
               : 'Expériences de jeu en réalité virtuelle immersives'
           }

@@ -11,7 +11,7 @@ const translations = {
         emailAddress: "Email Address",
         email: "contact@vrtualarena.ca",
         location: "Location",
-        address: "8109 102 St NW, Edmonton, AB T6E 4A4",
+        address: "10150 81 Ave NW, Edmonton, AB T6E 1X1",
         corporation: "Corporation: ABOUDA Enterprise Inc.",
         hearFromYou: "We'd Love To Hear From You",
         fillForm: "Fill out the form below, and we'll get back to you at the earliest possible.",
@@ -30,7 +30,7 @@ const translations = {
         emailAddress: "Adresse e-mail",
         email: "contact@vrtualarena.ca",
         location: "Emplacement",
-        address: "8109 102 St NW, Edmonton, AB T6E 4A4",
+        address: "10150 81 Ave NW, Edmonton, AB T6E 1X1",
         corporation: "Corporation: ABOUDA Enterprise Inc.",
         hearFromYou: "Nous aimerions avoir de vos nouvelles",
         fillForm: "Remplissez le formulaire ci-dessous et nous vous répondrons dans les plus brefs délais.",
@@ -142,7 +142,7 @@ const Contact = ({ locale = 'en' }) => {
             });
         }
     };
-    
+
     return (
         <div id='contact' className={`w-full  h-full  bg-blackish `}>
             <div className='w-full mx-auto max-w-[1600px] border-y py-[100px] flex-col flex   px-4 md:px-10 lg:px-16 xl:px-20 2xl:px-6'>
@@ -156,7 +156,14 @@ const Contact = ({ locale = 'en' }) => {
                         <h1 className=' text-[30px] text-white  mt-6'>{t.emailAddress}</h1>
                         <h1 className='text-white text-lg  font-light leading-none'>{t.email}</h1>
                         <h1 className=' text-[30px] text-white  mt-6'>{t.location}</h1>
-                        <h1 className='text-white text-lg  font-light leading-none'>{t.address}</h1>
+                        <a
+                            href="https://maps.app.goo.gl/YKcZX919AxBSq7on9"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className='text-white text-lg font-light leading-none block hover:text-[#DB1FEB] transition-colors cursor-pointer'
+                        >
+                            {t.address}
+                        </a>
                         <h1 className='text-white text-sm  font-light leading-none mt-2'>{t.corporation}</h1>
                     </div>
 

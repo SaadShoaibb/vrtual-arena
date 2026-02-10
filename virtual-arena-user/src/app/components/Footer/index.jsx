@@ -82,12 +82,17 @@ const Footer = ({ locale = 'en' }) => {
                                 <span><img src="/icons/mail.png" alt="" className='min-w-full min-h-full' /></span>
                                 {t.emailContact}
                             </h3>
-                            <h3 className='font-light text-white mb-5 flex items-center gap-2 max-w-[347px]'>
+                            <a
+                                href="https://maps.app.goo.gl/YKcZX919AxBSq7on9"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className='font-light text-white mb-5 flex items-center gap-2 max-w-[347px] hover:text-[#DB1FEB] transition-colors'
+                            >
                                 <span><img src="/icons/location.png" alt="" className='min-h-full h-4 min-w-3' /></span>
                                 {t.physicalAddress}
-                            </h3>
+                            </a>
                             <a
-                                href="https://share.google/rZ7xFBlbv9VNpk9IO"
+                                href="https://maps.app.goo.gl/YKcZX919AxBSq7on9"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center text-[#DB1FEB] hover:text-[#FF1FEB] transition-colors text-sm font-medium mb-5"
@@ -95,20 +100,20 @@ const Footer = ({ locale = 'en' }) => {
                                 <span><img src="/icons/location.png" alt="" className='min-h-full h-4 min-w-3 mr-2' /></span>
                                 {t.getDirections}
                             </a>
-                            
+
                             {/* Newsletter Signup */}
                             <h3 className='text-[22px] font-bold mt-8 mb-4'>{t.newsletter}</h3>
                             <form onSubmit={handleSubmit} className='mt-3'>
                                 <div className='flex flex-col gap-2'>
-                                    <input 
-                                        type="email" 
+                                    <input
+                                        type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         placeholder={t.emailPlaceholder}
                                         className='bg-gray-800 border border-gray-700 text-white px-4 py-2 rounded-md w-full'
                                         required
                                     />
-                                    <button 
+                                    <button
                                         type="submit"
                                         className='bg-gradient-to-r from-[#DB1FEB] to-[#24CBFF] hover:opacity-90 text-white px-4 py-2 rounded-md'
                                     >

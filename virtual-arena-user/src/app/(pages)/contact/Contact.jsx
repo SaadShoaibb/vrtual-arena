@@ -127,7 +127,7 @@ const Contact = ({ locale = 'en' }) => {
                     <div className='w-full'>
                         <h1 className='text-gradiant text-[26px] font-semibold'>{t.contactTitle}</h1>
                         <h1 className='text-white text-[40px] md:text-[50px] font-bold leading-none'>{t.contactSubtitle}</h1>
-                       
+
                         <p className='text-white text-lg font-light max-w-[720px] mt-3'>
                             {t.contactDescription}
                         </p>
@@ -143,11 +143,16 @@ const Contact = ({ locale = 'en' }) => {
                                     {/* Edmonton Location */}
                                     <div className="mb-3">
                                         <h4 className="text-white font-semibold text-lg">{t.ourLocation} (Main)</h4>
-                                        <p className="text-white text-lg font-light">
-                                            {t.locationAddress}
-                                        </p>
                                         <a
-                                            href="https://share.google/rZ7xFBlbv9VNpk9IO"
+                                            href="https://maps.app.goo.gl/YKcZX919AxBSq7on9"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-white text-lg font-light hover:text-[#DB1FEB] transition-colors block"
+                                        >
+                                            {t.locationAddress}
+                                        </a>
+                                        <a
+                                            href="https://maps.app.goo.gl/YKcZX919AxBSq7on9"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="inline-flex items-center mt-2 text-[#DB1FEB] hover:text-[#FF1FEB] transition-colors text-sm font-medium"
@@ -256,10 +261,10 @@ const Contact = ({ locale = 'en' }) => {
                         {/* Google Map Integration */}
                         <div className="mb-8 rounded-xl overflow-hidden h-[300px] relative">
                             <iframe
-                                src="https://maps.google.com/maps?q=8109+102+St+NW,+Edmonton,+AB+T6E+4A4&output=embed"
+                                src="https://maps.google.com/maps?q=10150+81+Ave+NW,+Edmonton,+AB+T6E+1X1&output=embed"
                                 width="100%"
                                 height="100%"
-                                style={{border:0}}
+                                style={{ border: 0 }}
                                 allowFullScreen=""
                                 loading="lazy"
                                 referrerPolicy="no-referrer-when-downgrade"
@@ -268,7 +273,7 @@ const Contact = ({ locale = 'en' }) => {
                             {/* Directions Button Overlay */}
                             <div className="absolute top-4 right-4">
                                 <a
-                                    href="https://share.google/rZ7xFBlbv9VNpk9IO"
+                                    href="https://maps.app.goo.gl/YKcZX919AxBSq7on9"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="bg-white/90 backdrop-blur-sm hover:bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg transition-all duration-200 flex items-center gap-2 text-sm font-medium hover:shadow-xl"

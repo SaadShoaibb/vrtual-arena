@@ -30,7 +30,7 @@ import { API_URL } from '@/utils/ApiUrl';
 const Navbar = ({ locale = 'en' }) => {
     // Get translations
     const t = translations[locale] || translations.en;
-    
+
     // Public experiences (fetched dynamically)
     const [publicExperiences, setPublicExperiences] = useState([]);
 
@@ -181,7 +181,7 @@ const Navbar = ({ locale = 'en' }) => {
             // Unlock scroll
             document.body.style.overflow = 'unset';
         }
-        
+
         // Cleanup function
         return () => {
             document.body.style.overflow = 'unset';
@@ -210,18 +210,18 @@ const Navbar = ({ locale = 'en' }) => {
             if (!dropdownRefs.current.some(ref => ref && ref.contains(event.target))) {
                 setActiveDropdown(null);
             }
-            
+
             // Close user menu when clicking outside
             if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
                 setIsMenuOpen(false);
             }
-            
+
             // Close search input when clicking outside
             if (!event.target.closest('.search-container')) {
                 setShowSearchInput(false);
             }
         };
-        
+
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
@@ -319,29 +319,34 @@ const Navbar = ({ locale = 'en' }) => {
                     <div className="hidden md:flex justify-between items-center py-2 ">
                         {/* Location and Hours */}
                         <div className="flex items-center space-x-4 text-sm">
-                            <div className="flex items-center">
+                            <a
+                                href="https://maps.app.goo.gl/YKcZX919AxBSq7on9"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center hover:text-[#DB1FEB] transition-colors"
+                            >
                                 <FaMapMarkerAlt className="mr-1 text-[#DB1FEB]" />
-                                <span className="text-white">8109 102 St NW, Edmonton, AB T6E 4A4</span>
-                            </div>
+                                <span className="text-white">10150 81 Ave NW, Edmonton, AB T6E 1X1</span>
+                            </a>
                             <div className="flex items-center">
                                 <FaClock className="mr-1 text-[#DB1FEB]" />
                                 <span className="text-white">{t.mondayToFriday}: {t.mondayToFridayHours}</span>
                             </div>
                         </div>
-                        
+
                         {/* Right side secondary navigation */}
                         <div className="flex items-center space-x-5">
                             {/* Language Toggle */}
-                            <LanguageSwitcher 
-                                currentLocale={locale} 
+                            <LanguageSwitcher
+                                currentLocale={locale}
                                 showLabel={false}
-                                buttonStyle="text" 
+                                buttonStyle="text"
                                 size="md"
                             />
-                            
+
                             {/* Search */}
                             <div className="search-container relative">
-                                <button 
+                                <button
                                     onClick={toggleSearchInput}
                                     className="text-white hover:text-[#DB1FEB]"
                                     aria-label="Search"
@@ -382,7 +387,7 @@ const Navbar = ({ locale = 'en' }) => {
                                     )}
                                 </AnimatePresence>
                             </div>
-                            
+
                             {/* Cart Icon for authenticated users only */}
                             {isAuthenticated && (
                                 <div className="relative">
@@ -399,7 +404,7 @@ const Navbar = ({ locale = 'en' }) => {
                                     </button>
                                 </div>
                             )}
-                            
+
                             {/* Login/Signup or User Account */}
                             {!isAuthenticated ? (
                                 <div className="flex items-center space-x-3">
@@ -426,7 +431,7 @@ const Navbar = ({ locale = 'en' }) => {
                                 </div>
                             ) : (
                                 <div className="relative" ref={userMenuRef}>
-                                    <button 
+                                    <button
                                         onClick={toggleUserMenu}
                                         className="flex items-center text-sm text-white hover:text-[#DB1FEB] transition-colors"
                                     >
@@ -436,9 +441,9 @@ const Navbar = ({ locale = 'en' }) => {
                                     </button>
                                     <AnimatePresence>
                                         {isMenuOpen && (
-                                                                                            <motion.div
-                                                    className="absolute right-0 mt-2 w-48 bg-black bg-opacity-90 shadow-lg rounded-lg z-40"
-                                                    variants={dropdownVariants}
+                                            <motion.div
+                                                className="absolute right-0 mt-2 w-48 bg-black bg-opacity-90 shadow-lg rounded-lg z-40"
+                                                variants={dropdownVariants}
                                                 initial="hidden"
                                                 animate="visible"
                                                 exit="exit"
@@ -478,7 +483,7 @@ const Navbar = ({ locale = 'en' }) => {
                                     </AnimatePresence>
                                 </div>
                             )}
-                            
+
                             {/* Book Now button - always visible */}
                             <div>
                                 <BookNowButton locale={locale} margin="" />
@@ -502,8 +507,8 @@ const Navbar = ({ locale = 'en' }) => {
                             {/* Primary Navigation */}
                             <nav className="flex items-center justify-center space-x-6 xl:space-x-8">
                                 {primaryNavItems.map((item, index) => (
-                                    <div 
-                                        key={index} 
+                                    <div
+                                        key={index}
                                         className="relative"
                                         ref={el => dropdownRefs.current[index] = el}
                                     >
@@ -535,7 +540,7 @@ const Navbar = ({ locale = 'en' }) => {
                                                                     <div className={`${isActivePath(subItem.path) ? 'text-[#DB1FEB]' : 'text-white'} hover:text-[#DB1FEB]`}>
                                                                         {subItem.title}
                                                                     </div>
-                                                                                                                                    </button>
+                                                                </button>
                                                             ))}
                                                         </motion.div>
                                                     )}
@@ -570,28 +575,28 @@ const Navbar = ({ locale = 'en' }) => {
                                     )}
                                 </button>
                             </div>
-                            
+
                             {/* User account icon for mobile */}
                             {isAuthenticated ? (
-                                <button 
+                                <button
                                     onClick={() => setShowSidebar(true)}
                                     className="text-white"
                                 >
                                     <FaRegCircleUser size={20} />
                                 </button>
                             ) : (
-                                <button 
+                                <button
                                     onClick={() => handleShowModal('LOGIN')}
                                     className="text-white"
                                 >
                                     <FaRegCircleUser size={20} />
                                 </button>
                             )}
-                            
+
                             {/* Use smaller button size on mobile */}
                             <BookNowButton locale={locale} margin="" size={locale === 'fr' ? 'compact' : 'small'} />
-                            
-                            <button 
+
+                            <button
                                 onClick={toggleSidebar}
                                 className="text-white p-1"
                                 aria-label="Menu"
@@ -613,17 +618,17 @@ const Navbar = ({ locale = 'en' }) => {
                         <IoCloseCircleSharp size={24} />
                     </button>
                 </div>
-                
+
                 {/* Language switcher */}
                 <div className="flex justify-center mb-6">
-                    <LanguageSwitcher 
-                        currentLocale={locale} 
+                    <LanguageSwitcher
+                        currentLocale={locale}
                         showLabel={true}
-                        buttonStyle="pill" 
+                        buttonStyle="pill"
                         size="sm"
                     />
                 </div>
-                
+
                 {/* Search input */}
                 <div className="mb-6">
                     <div className="relative">
@@ -636,7 +641,7 @@ const Navbar = ({ locale = 'en' }) => {
                         <FaSearch className="absolute right-4 top-3 text-gray-400" />
                     </div>
                 </div>
-                
+
                 {/* Mobile navigation items */}
                 <nav className="flex flex-col space-y-4">
                     {primaryNavItems.map((item, index) => (
@@ -650,7 +655,7 @@ const Navbar = ({ locale = 'en' }) => {
                                         <span>{item.title}</span>
                                         <IoIosArrowDown className={`transition-transform ${showMobileSubmenu === index ? 'rotate-180' : ''}`} />
                                     </button>
-                                    
+
                                     <AnimatePresence>
                                         {showMobileSubmenu === index && (
                                             <motion.div
@@ -669,7 +674,7 @@ const Navbar = ({ locale = 'en' }) => {
                                                             <div className={`${isActivePath(subItem.path) ? 'text-[#DB1FEB]' : 'text-white'} hover:text-[#DB1FEB]`}>
                                                                 {subItem.title}
                                                             </div>
-                                                                                                                    </button>
+                                                        </button>
                                                     ))}
                                                 </div>
                                             </motion.div>
@@ -687,7 +692,7 @@ const Navbar = ({ locale = 'en' }) => {
                         </div>
                     ))}
                 </nav>
-                
+
                 {/* Mobile user account section */}
                 <div className="mt-8 pt-6 border-t border-gray-800">
                     {isAuthenticated ? (
@@ -740,11 +745,11 @@ const Navbar = ({ locale = 'en' }) => {
                             >
                                 {t.login}
                             </button>
-                            <button 
+                            <button
                                 onClick={() => {
                                     handleShowModal('REGISTER');
                                     setShowSidebar(false);
-                                }} 
+                                }}
                                 className="bg-[#DB1FEB] text-white py-2 px-4 rounded-full hover:bg-opacity-80 transition-colors"
                             >
                                 {t.signup}
@@ -752,13 +757,18 @@ const Navbar = ({ locale = 'en' }) => {
                         </div>
                     )}
                 </div>
-                
+
                 {/* Business info */}
                 <div className="mt-8 pt-6 border-t border-gray-800 text-sm text-gray-400">
-                    <div className="flex items-center mb-2">
+                    <a
+                        href="https://maps.app.goo.gl/YKcZX919AxBSq7on9"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center mb-2 hover:text-[#DB1FEB] transition-colors"
+                    >
                         <FaMapMarkerAlt className="mr-2 text-[#DB1FEB]" />
-                        <span>8109 102 St NW, Edmonton, AB T6E 4A4</span>
-                    </div>
+                        <span>10150 81 Ave NW, Edmonton, AB T6E 1X1</span>
+                    </a>
                     <div className="flex items-center">
                         <FaClock className="mr-2 text-[#DB1FEB]" />
                         <span>{t.mondayToFriday}: {t.mondayToFridayHours}</span>
@@ -768,8 +778,8 @@ const Navbar = ({ locale = 'en' }) => {
 
             {/* Backdrop for mobile sidebar */}
             {showSidebar && (
-                <div 
-                    className="fixed inset-0 bg-black bg-opacity-50 z-20" 
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 z-20"
                     onClick={toggleSidebar}
                 />
             )}
